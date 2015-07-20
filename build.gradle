@@ -1,0 +1,40 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.1.6.RELEASE")
+    }
+}
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'idea'
+apply plugin: 'spring-boot'
+jar {
+    baseName = 'pilinc'
+    version = '0.1.0-SNAPSHOT'
+}
+// tag::version[]
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+// end::version[]
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version:'1.2.5.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version:'1.2.5.RELEASE'
+    compile group: 'com.h2database', name: 'h2', version:'1.4.187'
+    compile group: 'org.labkey', name: 'labkey-client-api', version:'0.1'
+    compile(group: 'org.apache.httpcomponents', name: 'httpclient', version:'4.4.1') {
+exclude(module: 'commons-logging')
+    }
+    compile group: 'com.googlecode.json-simple', name: 'json-simple', version:'1.1'
+    compile group: 'mysql', name: 'mysql-connector-java', version:'5.1.35'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.1'
+}

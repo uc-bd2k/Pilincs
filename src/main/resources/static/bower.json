@@ -1,0 +1,31 @@
+{
+  "name": "Pilincs",
+  "version": "0.0.0",
+  "authors": [
+    "Szymon Chojnacki"
+  ],
+  "description": "Frontend for Pilincs",
+  "main": "PilincsController",
+  "moduleType": [
+    "amd"
+  ],
+  "keywords": [
+    "Proteomics"
+  ],
+  "license": "MIT",
+  "homepage": "eh3.uc.edu/pilincs/",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap-table": "~1.8.1",
+    "angular": "1.4.2",
+    "bootstrap": "~3.3.5",
+    "ng-tags-input": "~3.0.0",
+    "jquery-1.11.3.min": "https://code.jquery.com/jquery-1.11.3.min.js"
+  }
+}

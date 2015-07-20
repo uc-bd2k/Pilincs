@@ -1,0 +1,33 @@
+spring:
+  jpa.hibernate.ddl-auto: create-drop
+server:
+  contextPath: /pilincs
+panorama:
+  connectionUrl: https://panoramaweb.org/labkey
+  folders: LINCS/P100,LINCS/GCP
+  runIdUrl: https://panoramaweb.org/labkey/targetedms/LINCS/%s/showPrecursorList.view?id=%d
+  gctUrl: https://panoramaweb.org/labkey/targetedms/LINCS/%s/RunGCTReport.view?runId=%d&reportName=GCT%%20File%%20GCP&processed=true
+  detailedLink1: https://panoramaweb.org/labkey/query/LINCS/%s/selectRows.view?schemaName=targetedms&query.queryName=PeptideAnnotation&query.Name~eq=pr_id&query.Value~eq=%s&query.PeptideId/PeptideGroupId/RunId/Id~eq=%d
+  detailedLink2: https://panoramaweb.org/labkey/targetedms/LINCS/%s/showPeptide.view?id=%d&annotationsFilter=id%%20%%3A%%20%s
+
+---
+spring:
+  profiles: default
+  datasource:
+    url: jdbc:h2:mem:AZ;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+
+---
+spring:
+  profiles: mysql
+  datasource:
+    url: jdbc:mysql://localhost/pilincs
+    driverClassName: com.mysql.jdbc.Driver
+    username: root
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect

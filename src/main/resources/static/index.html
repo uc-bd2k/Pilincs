@@ -1,0 +1,159 @@
+<!doctype html>
+
+<html ng-app="plunker">
+
+<meta charset="utf-8">
+<title>Application</title>
+
+<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- jQuery -->
+<script type='text/javascript' src='bower_components/jquery/dist/jquery.min.js'></script>
+
+<!-- Bootstrap -->
+<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+<!-- AngularJS -->
+<script src="bower_components/angular/angular.min.js"></script>
+<script src="js/myscript.js"></script>
+
+<!-- Ng-tags-input-->
+<link rel="stylesheet" href="bower_components/ng-tags-input/ng-tags-input.min.css"/>
+<script src="bower_components/ng-tags-input/ng-tags-input.min.js"></script>
+
+<!-- Custom styles -->
+<link rel="stylesheet" href="css/style.css">
+
+<!-- Wenzhinxin Table -->
+<link rel="stylesheet" href="bower_components/bootstrap-table/dist/bootstrap-table.min.css">
+<script src="bower_components/bootstrap-table/dist/bootstrap-table.min.js"></script>
+
+</head>
+
+<body ng-controller="MainCtrl">
+<h1></h1>
+
+<div class="container">
+    <div class="row">
+        <p class="span8 offset2">
+
+        <div class="control-group">
+            <form ng-submit="add()">
+                <div class="row">
+                    <div class="controls  col-sm-8" ng-click="tagInputClicked()">
+                        <tags-input ng-model="tags" class="bootstrap" placeholder={{searchText}}>
+                            <auto-complete source="loadTags($query)"
+                                           min-length="0"
+                            load-on-empty="true"
+                            max-results-to-show="90"
+                            debounce-delay="0">
+                            </auto-complete>
+                        </tags-input>
+                    </div>
+
+                    <!-- Split button -->
+                    <div class="btn-group col-sm-2" style="top: 5px;">
+                        <input type="submit" value="Search assays" class="btn btn-primary"/>
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                            <span class="caret"></span>
+                            <span class="sr-only">Toggle option</span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#" target="_blank">Advanced search</a></li>
+                        </ul>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+        <h1></h1>
+
+        <div class="row">
+        <div ng-hide="hideRecommend" class="col-sm-offset-1">
+            <span>You may like:</span>
+            <span ng-repeat="item in recommended">
+                        <button ng-click="updateTags(item)" class="btn btn-default btn-xs" type="button">{{item}}</button>
+                    </span>
+            </div>
+        </div>
+        <h1></h1>
+        <table class="table table-bordered table-striped">
+            <tbody>
+            <tr>
+                <td align="center"><h4><a href="#" style="color: #286090;">Show as Table </a></h4></td>
+                <td align="center"><h4><a href="#">Show as Network </a></h4></td>
+                <td align="center"><h4><a href="#">Show as HeatMap </a></h4></td>
+                <td align="center"><h4><a href="#">Show as OLAP </a></h4></td>
+            </tr>
+            </tbody>
+        </table>
+        <!--<p>{{message}}</p>-->
+        <!--<div ng-show="{{showTable}}">-->
+        <h3>Assays</h3>
+        <table id="table" data-show-columns="true" data-pagination="true"
+               data-page-list="[10, 50, 100, All]"
+               class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th data-field="gcp_p100">Assay</th>
+                <th data-field="cell_id" data-visible="true">cell_id</th>
+                <th data-field="det_plate">det_plate</th>
+                <th data-field="probe_id">probe_id</th>
+                <th data-field="replicate_id">replicate_id</th>
+                <th data-field="canonical_smiles" data-visible="false">canonical_smiles</th>
+
+                <th data-field="det_filename" data-visible="false">det_filename</th>
+
+                <th data-field="det_well" data-visible="false">det_well</th>
+                <th data-field="pert_batch_internal_compound_enumerator" data-visible="false">
+                    pert_batch_internal_compound_enumerator
+                </th>
+                <th data-field="pert_batch_internal_replicate" data-visible="false">pert_batch_internal_replicate
+                </th>
+                <th data-field="pert_dose" data-visible="true">pert_dose</th>
+                <th data-field="pert_id" data-visible="true">pert_id</th>
+                <th data-field="pert_iname">pert_iname</th>
+                <th data-field="pert_time" data-visible="true">pert_time</th>
+                <th data-field="pert_type" data-visible="false">pert_type</th>
+                <th data-field="pert_vehicle" data-visible="false">pert_vehicle</th>
+                <th data-field="pubchem_cid" data-visible="false">pubchem_cid</th>
+
+                <th data-field="entrezGeneId" data-visible="false">entrezGeneId</th>
+                <th data-field="geneName" data-visible="true">geneName</th>
+                <th data-field="p100_BasePeptide" data-visible="false">p100_BasePeptide</th>
+                <th data-field="p100_Cluster" data-visible="false">p100_Cluster</th>
+                <th data-field="p100_GeneClusterCode" data-visible="false">p100_GeneClusterCode</th>
+                <th data-field="p100_ModifiedPeptideCode" data-visible="false">p100_ModifiedPeptideCode</th>
+                <th data-field="p100_OriginalGeneSiteCode" data-visible="false">p100_OriginalGeneSiteCode</th>
+                <th data-field="p100_OriginalProbeID" data-visible="false">p100_OriginalProbeID</th>
+                <th data-field="phosphoSite" data-visible="false">phosphoSite</th>
+                <th data-field="pr_gene_id" data-visible="false">pr_gene_id</th>
+                <th data-field="pr_gene_symbol" data-visible="false">pr_gene_symbol</th>
+                <th data-field="pr_p100_base_peptide" data-visible="false">pr_p100_base_peptide</th>
+                <th data-field="pr_p100_cluster" data-visible="false">pr_p100_cluster</th>
+                <th data-field="pr_p100_gene_cluster_code" data-visible="false">pr_p100_gene_cluster_code</th>
+                <th data-field="pr_p100_modified_peptide_code" data-visible="false">pr_p100_modified_peptide_code
+                </th>
+                <th data-field="pr_P100_original_gene_site_code" data-visible="false">
+                    pr_P100_original_gene_site_code
+                </th>
+                <th data-field="pr_p100_original_probe_id" data-visible="false">pr_p100_original_probe_id</th>
+                <th data-field="pr_p100_phosphosite" data-visible="false">pr_p100_phosphosite</th>
+                <th data-field="pr_uniprot_id" data-visible="false">pr_uniprot_id</th>
+                <th data-field="uniprotAC" data-visible="false">uniprotAC</th>
+                <th data-field="pickArea" data-switchable="false">Peak area</th>
+                <th data-field="source" data-switchable="false">Chromatogram</th>
+                <th data-field="runId" data-switchable="false">Skyline</th>
+
+            </tr>
+            </thead>
+        </table>
+        </div>
+    </div>
+</div>
+</div>
+
+</body>
+</html>
