@@ -51,7 +51,7 @@ public class ConnectPanorama {
         for(String folderName:folderNames) {
             for (Integer runId : getRunIds(folderName)) {
                 gcpOrP100 = folderName.contains("GCP") ? "GCP" : "P100";
-                output.add(String.format(gctUrl,gcpOrP100,runId));
+                output.add(String.format(gctUrl,gcpOrP100,runId,gcpOrP100));
             }
         }
         return output;
@@ -81,14 +81,37 @@ public class ConnectPanorama {
         String escapedPeptideId = peakArea.getPeptideAnnotation().escapedPeptideId();
         String replicateId = peakArea.getReplicateAnnotation().getReplicateId();
 
-        String stepOne = String.format(intermediateLink,assayType,escapedPeptideId,runId);
+        String stepOne = String.format(intermediateLink, assayType, escapedPeptideId, runId);
+        log.warn(stepOne);
 
-        Integer peptide = NetworkUtils.parsePeptideNumber(stepOne);
+        Integer peptide = Utils.parsePeptideNumber(stepOne);
 
         if(peptide!=null){
             return String.format(detailedLink,assayType,peptide,replicateId);
         }
             return null;
+    }
+
+    public HashMap<String, Integer> getPeptideIds(List<String> peptideIds, AssayType assayType, int runId) throws IOException {
+
+        HashMap<String,Integer> output;
+
+        StringBuilder sb = new StringBuilder();
+
+        for(String peptideId : peptideIds){
+            String escapedPeptideId = peptideId.replaceAll("\\+", "%2B");
+            if(sb.length()==0){
+                sb.append(escapedPeptideId);
+            }else{
+                sb.append(";").append(escapedPeptideId);
+            }
+        }
+
+        String stepOne = String.format(intermediateLink,assayType,sb.toString(),runId);
+
+        output= Utils.parsePeptideNumbers(stepOne,peptideIds);
+
+        return output;
     }
 
     public String getRunIdLink(GctFile gctFile){
@@ -99,4 +122,7 @@ public class ConnectPanorama {
         return String.format(runIdUrl,assayType,runId);
     }
 
+    public String getSourceUrlFast(AssayType assayType, Integer peptide, String replicateId) {
+        return String.format(detailedLink,assayType,peptide,replicateId);
+    }
 }

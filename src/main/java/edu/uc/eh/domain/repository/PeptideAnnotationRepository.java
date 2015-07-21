@@ -2,7 +2,6 @@ package edu.uc.eh.domain.repository;
 
 import edu.uc.eh.domain.PeptideAnnotation;
 import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.Collection;
 
 
@@ -11,4 +10,7 @@ import java.util.Collection;
  */
 public interface PeptideAnnotationRepository extends JpaRepository<PeptideAnnotation,Long> {
     Collection<PeptideAnnotation> findByPeptideId(String peptide);
+    PeptideAnnotation findFirstByPeptideId(String peptide);
+
+
 }

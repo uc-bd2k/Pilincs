@@ -6,8 +6,8 @@ panorama:
   connectionUrl: https://panoramaweb.org/labkey
   folders: LINCS/P100,LINCS/GCP
   runIdUrl: https://panoramaweb.org/labkey/targetedms/LINCS/%s/showPrecursorList.view?id=%d
-  gctUrl: https://panoramaweb.org/labkey/targetedms/LINCS/%s/RunGCTReport.view?runId=%d&reportName=GCT%%20File%%20GCP&processed=true
-  detailedLink1: https://panoramaweb.org/labkey/query/LINCS/%s/selectRows.view?schemaName=targetedms&query.queryName=PeptideAnnotation&query.Name~eq=pr_id&query.Value~eq=%s&query.PeptideId/PeptideGroupId/RunId/Id~eq=%d
+  gctUrl: https://panoramaweb.org/labkey/targetedms/LINCS/%s/RunGCTReport.view?runId=%d&reportName=GCT%%20File%%20%s&processed=true
+  detailedLink1: https://panoramaweb.org/labkey/query/LINCS/%s/selectRows.view?schemaName=targetedms&query.queryName=PeptideAnnotation&query.Name~eq=pr_id&query.Value~in=%s&query.PeptideId/PeptideGroupId/RunId/Id~eq=%d
   detailedLink2: https://panoramaweb.org/labkey/targetedms/LINCS/%s/showPeptide.view?id=%d&annotationsFilter=id%%20%%3A%%20%s
 
 ---

@@ -36,11 +36,9 @@ public class GctFile {
     GctFile(){}
 
     public GctFile(String DownloadUrl) {
-
         this.downloadUrl = DownloadUrl;
         this.assayType = DownloadUrl.contains("GCP") ? AssayType.GCP : AssayType.P100;
         this.processingDate = new Date();
-
     }
 
     @Override

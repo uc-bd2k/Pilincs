@@ -1,5 +1,6 @@
 package edu.uc.eh.domain.repository;
 
+import edu.uc.eh.domain.AssayType;
 import edu.uc.eh.domain.PeakArea;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -13,4 +14,5 @@ public interface PeakAreaRepository extends JpaRepository<PeakArea,Long> {
 
     Collection<PeakArea> findByGctFileDownloadUrl(String url);
     Collection<PeakArea> findByGctFileId(Long id);
+    Collection<PeakArea> findByReplicateAnnotationPertInameAndGctFileAssayType(String pertIname, AssayType type);
 }

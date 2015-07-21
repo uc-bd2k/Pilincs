@@ -2,8 +2,8 @@ package edu.uc.eh.domain.repository;
 
 import edu.uc.eh.domain.ReplicateAnnotation;
 import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.Collection;
+import java.util.List;;
 
 
 /**
@@ -11,4 +11,7 @@ import java.util.Collection;
  */
 public interface ReplicateAnnotationRepository extends JpaRepository<ReplicateAnnotation,Long>{
     Collection<ReplicateAnnotation> findByReplicateId(String replicate);
+    ReplicateAnnotation findFirstByReplicateId(String replicate);
+
+    List<ReplicateAnnotation> findAll();
 }

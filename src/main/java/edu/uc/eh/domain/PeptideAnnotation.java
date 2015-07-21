@@ -23,6 +23,9 @@ public class PeptideAnnotation {
     private String prGeneSymbol;
     private String prCluster;
     private String prUniprotId;
+    private String prBasePeptide;
+    private String prHistoneMark;
+    private String prModifiedPeptideCode;
 
 
     @OneToMany(mappedBy = "peptideAnnotation")
@@ -37,7 +40,10 @@ public class PeptideAnnotation {
     @Override
     public String toString() {
         return "PeptideAnnotation{" +
-                "prUniprotId='" + prUniprotId + '\'' +
+                "prModifiedPeptideCode='" + prModifiedPeptideCode + '\'' +
+                ", prHistoneMark='" + prHistoneMark + '\'' +
+                ", prBasePeptide='" + prBasePeptide + '\'' +
+                ", prUniprotId='" + prUniprotId + '\'' +
                 ", prCluster='" + prCluster + '\'' +
                 ", prGeneSymbol='" + prGeneSymbol + '\'' +
                 ", prGeneId='" + prGeneId + '\'' +
@@ -88,6 +94,30 @@ public class PeptideAnnotation {
 
     public Set<PeakArea> getPeakAreas() {
         return peakAreas;
+    }
+
+    public String getPrBasePeptide() {
+        return prBasePeptide;
+    }
+
+    public void setPrBasePeptide(String prBasePeptide) {
+        this.prBasePeptide = prBasePeptide;
+    }
+
+    public String getPrHistoneMark() {
+        return prHistoneMark;
+    }
+
+    public void setPrHistoneMark(String prHistoneMark) {
+        this.prHistoneMark = prHistoneMark;
+    }
+
+    public String getPrModifiedPeptideCode() {
+        return prModifiedPeptideCode;
+    }
+
+    public void setPrModifiedPeptideCode(String prModifiedPeptideCode) {
+        this.prModifiedPeptideCode = prModifiedPeptideCode;
     }
 
     public String escapedPeptideId() {
