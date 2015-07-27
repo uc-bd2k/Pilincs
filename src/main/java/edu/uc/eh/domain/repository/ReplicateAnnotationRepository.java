@@ -1,6 +1,8 @@
 package edu.uc.eh.domain.repository;
 
 import edu.uc.eh.domain.ReplicateAnnotation;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Collection;
 import java.util.List;;
@@ -14,4 +16,5 @@ public interface ReplicateAnnotationRepository extends JpaRepository<ReplicateAn
     ReplicateAnnotation findFirstByReplicateId(String replicate);
 
     List<ReplicateAnnotation> findAll();
+    Page<ReplicateAnnotation> findAll(Pageable pageable);
 }

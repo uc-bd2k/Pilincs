@@ -21,7 +21,7 @@ public class ReplicateAnnotation {
     private String detWell;
     private String pertDose;
     private String pertId;
-    private String pertIname;
+    private String pertiname;
     private String pertTime;
     private String pertType;
     private String pertVehicle;
@@ -43,7 +43,7 @@ public class ReplicateAnnotation {
                 ", pertVehicle='" + pertVehicle + '\'' +
                 ", pertType='" + pertType + '\'' +
                 ", pertTime='" + pertTime + '\'' +
-                ", pertIname='" + pertIname + '\'' +
+                ", pertiname='" + pertiname + '\'' +
                 ", pertId='" + pertId + '\'' +
                 ", pertDose='" + pertDose + '\'' +
                 ", detWell='" + detWell + '\'' +
@@ -106,12 +106,12 @@ public class ReplicateAnnotation {
         this.pertId = pertId;
     }
 
-    public String getPertIname() {
-        return pertIname;
+    public String getPertiname() {
+        return pertiname;
     }
 
-    public void setPertIname(String pertIname) {
-        this.pertIname = pertIname;
+    public void setPertiname(String pertiname) {
+        this.pertiname = pertiname;
     }
 
     public String getPertTime() {

@@ -1,15 +1,17 @@
 package edu.uc.eh.service;
 
 import edu.uc.eh.domain.AssayType;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by chojnasm on 7/17/15.
@@ -106,5 +108,24 @@ public class Utils {
 
     public static AssayType parseArrayTypeFromUrl(String url) {
          return url.contains("GCP") ? AssayType.GCP : AssayType.P100;
+    }
+
+    public static Collection<String> parseTags(String tags) throws ParseException {
+
+
+        Collection<String> output = new ArrayList<>();
+        if(tags == null || tags.length() == 0) return output;
+
+        JSONParser parser = new JSONParser();
+        Object obj = parser.parse(tags);
+        JSONArray array = (JSONArray)obj;
+        Iterator<Object> iter = array.iterator();
+        while(iter.hasNext()){
+            JSONObject object = (JSONObject)iter.next();
+            output.add(object.get("name").toString().replace("[","").replace("]",""));
+        }
+
+        return output;
+
     }
 }

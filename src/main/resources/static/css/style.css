@@ -1,3 +1,42 @@
+.left-panel {
+    float: left;
+}
+
+.Peptide {
+    font-weight: normal;
+    background-color: #5cb85c;
+}
+
+.Replicate {
+    font-weight: normal;
+    background-color: #f0ad4e;
+}
+
+.mid-panel {
+    float: left;
+    margin-left: 15px;
+    margin-top: 0px;
+    /*font-size: 10px;*/
+}
+
+.right-panel {
+    float: left;
+    margin-left: 25px;
+    margin-top: 0px;
+}
+
+.right-panel span:first-child {
+    /*font-size: 6px;*/
+}
+
+.right-panel span:nth-child(2) {
+    display: block;
+    font-size: 6px;
+    font-style: italic;
+}
+
+
+
 .bootstrap .tags {
     background-color: #fff;
     border: 1px solid #ccc;
@@ -48,4 +87,38 @@
 .bootstrap .autocomplete .suggestion-item.selected em {
     color: #262626;
     /*background-color: #e9e9e9;*/
+}
+
+.ribbon {
+    background-color: white;
+    overflow: hidden;
+    white-space: nowrap;
+    /* top left corner */
+    position: absolute;
+    right: -60px;
+    top: 45px;
+    /* 45 deg ccw rotation */
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    transform: rotate(45deg);
+    /* shadow */
+    -webkit-box-shadow: 0 0 10px #888;
+    -moz-box-shadow: 0 0 10px #888;
+    box-shadow: 0 0 10px #888;
+    z-index: 999;
+}
+
+.ribbon a {
+    border: 1px solid #fffafe;
+    color: #357ebd;
+    display: block;
+    font: bold 81.25% 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    margin: 1px 0;
+    padding: 10px 50px;
+    text-align: center;
+    text-decoration: none;
+    /* shadow */
+    text-shadow: 0 0 1px #B1A5A5;
 }

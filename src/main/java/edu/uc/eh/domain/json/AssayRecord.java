@@ -1,7 +1,8 @@
-package edu.uc.eh.domain;
+package edu.uc.eh.domain.json;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import edu.uc.eh.domain.AssayType;
+import edu.uc.eh.domain.PeakArea;
+
 import java.util.Date;
 
 /**
@@ -65,7 +66,7 @@ public class AssayRecord {
         this.detWell=peakArea.getReplicateAnnotation().getDetWell();
         this.pertDose=peakArea.getReplicateAnnotation().getPertDose();
         this.pertId=peakArea.getReplicateAnnotation().getPertId();
-        this.pertIname=peakArea.getReplicateAnnotation().getPertIname();
+        this.pertIname=peakArea.getReplicateAnnotation().getPertiname();
         this.pertTime=peakArea.getReplicateAnnotation().getPertTime();
         this.pertType=peakArea.getReplicateAnnotation().getPertType();
         this.pertVehicle=peakArea.getReplicateAnnotation().getPertVehicle();

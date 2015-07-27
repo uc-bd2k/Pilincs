@@ -1,11 +1,10 @@
 package edu.uc.eh.service;
 
-import edu.uc.eh.domain.AssayRecord;
+import edu.uc.eh.domain.json.AssayRecord;
 import edu.uc.eh.domain.AssayType;
 import edu.uc.eh.domain.PeakArea;
-import edu.uc.eh.domain.Query;
+import edu.uc.eh.domain.json.Query;
 import edu.uc.eh.domain.repository.PeakAreaRepository;
-import org.hibernate.action.internal.CollectionAction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,15 +30,13 @@ public class QueryService {
     public List<AssayRecord> getAllAssays(List<Query> tags) {
         List<AssayRecord> output = new ArrayList<>();
 
-
-
         for(Query query : tags){
             int oneTagUpTo100=0;
 
-            Collection<PeakArea> listGCP = peakAreaRepository
-                    .findByReplicateAnnotationPertInameAndGctFileAssayType(query.getText(), AssayType.GCP);
-            Collection<PeakArea> listP100 = peakAreaRepository
-                    .findByReplicateAnnotationPertInameAndGctFileAssayType(query.getText(), AssayType.P100);
+            Collection<PeakArea> listGCP=null;// = peakAreaRepository
+//                    .findByReplicateAnnotationPertInameAndGctFileAssayType(query.getText(), AssayType.GCP);
+            Collection<PeakArea> listP100=null;// = peakAreaRepository
+//                    .findByReplicateAnnotationPertInameAndGctFileAssayType(query.getText(), AssayType.P100);
 
             Iterator<PeakArea> itGCP = listGCP.iterator();
             Iterator<PeakArea> itP100 = listP100.iterator();

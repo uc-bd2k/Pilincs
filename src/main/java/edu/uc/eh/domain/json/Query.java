@@ -1,4 +1,4 @@
-package edu.uc.eh.domain;
+package edu.uc.eh.domain.json;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

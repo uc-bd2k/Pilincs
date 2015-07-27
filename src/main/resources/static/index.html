@@ -19,6 +19,8 @@
 <script src="bower_components/angular/angular.min.js"></script>
 <script src="js/myscript.js"></script>
 
+
+<script>document.write('<base href="' + document.location + '" />');</script>
 <!-- Ng-tags-input-->
 <link rel="stylesheet" href="bower_components/ng-tags-input/ng-tags-input.min.css"/>
 <script src="bower_components/ng-tags-input/ng-tags-input.min.js"></script>
@@ -29,10 +31,17 @@
 <!-- Wenzhinxin Table -->
 <link rel="stylesheet" href="bower_components/bootstrap-table/dist/bootstrap-table.min.css">
 <script src="bower_components/bootstrap-table/dist/bootstrap-table.min.js"></script>
+<script src="bower_components/bootstrap-table/dist/extensions/export/bootstrap-table-export.min.js"></script>
+<script src="bower_components/tableExport/index.js"></script>
+<script src="bower_components/bootstrap-table/dist/extensions/filter-control/bootstrap-table-filter-control.min.js"></script>
+
 
 </head>
 
 <body ng-controller="MainCtrl">
+<div class="ribbon">
+    <a href="https://github.com/sajmmon/Pilincs" target="_blank">View source on GitHub</a>
+</div>
 <h1></h1>
 
 <div class="container">
@@ -40,18 +49,37 @@
         <p class="span8 offset2">
 
         <div class="control-group">
-            <form ng-submit="add()">
-                <div class="row">
-                    <div class="controls  col-sm-8" ng-click="tagInputClicked()">
-                        <tags-input ng-model="tags" class="bootstrap" placeholder={{searchText}}>
-                            <auto-complete source="loadTags($query)"
-                                           min-length="0"
-                            load-on-empty="true"
-                            max-results-to-show="90"
-                            debounce-delay="0">
-                            </auto-complete>
-                        </tags-input>
-                    </div>
+        <form ng-submit="add()">
+            <div class="row">
+                <div class="controls  col-sm-8" ng-click="tagInputClicked()">
+                    <tags-input ng-model="tags"
+                                display-property="name"
+                                class="bootstrap"
+                                placeholder={{searchText}}>
+                        <auto-complete
+                                source="loadTags($query)"
+                                min-length="0"
+                                load-on-empty="false"
+                                max-results-to-show="90"
+                                debounce-delay="100"
+                                template="my-custom-template">
+                        </auto-complete>
+                    </tags-input>
+                </div>
+
+                <script type="text/ng-template" id="my-custom-template">
+                        <div class="left-panel">
+                            <span ng-class="data.flag" class="label label-info">{{data.flag}}</span>
+
+                        </div>
+                        <div class="mid-panel">
+                            <span ng-bind-html="$highlight($getDisplayText())"></span>
+                        </div>
+                        <div class="right-panel">
+                            <!--<span>({{data.rank}})</span>-->
+                            <!--<span>{{data.annotation}}</span>-->
+                        </div>
+                    </script>
 
                     <!-- Split button -->
                     <div class="btn-group col-sm-2" style="top: 5px;">
@@ -82,46 +110,19 @@
         <table class="table table-bordered table-striped">
             <tbody>
             <tr>
-                <td align="center"><h4><a href="#" style="color: #286090;">Show as Table </a></h4></td>
-                <td align="center"><h4><a href="#">Show as Network </a></h4></td>
-                <td align="center"><h4><a href="#">Show as HeatMap </a></h4></td>
-                <td align="center"><h4><a href="#">Show as OLAP </a></h4></td>
+                <td align="center"><h4><a href="#" style="color: #286090;">Show Peaks </a></h4></td>
+                <td align="center"><h4><a href="#">Show Profiles </a></h4></td>
+                <td align="center"><h4><a href="#">Show Relations </a></h4></td>
+                <td align="center"><h4><a href="#">Show API </a></h4></td>
             </tr>
             </tbody>
         </table>
         <!--<p>{{message}}</p>-->
         <!--<div ng-show="{{showTable}}">-->
-        <h3>Assays</h3>
-        <table id="table" data-show-columns="true" data-pagination="true"
-               data-page-list="[10, 50, 100]"
-               class="table table-bordered table-striped">
-            <thead>
-            <tr>
-                <th data-field="assayType">Assay</th>
-                <th data-field="runIdUrl" data-visible="true">runIdUrl</th>
-                <th data-field="peptideId">peptide_Id</th>
-                <th data-field="replicateId">replicate_Id</th>
-                <th data-field="cellId">cell_Id</th>
-                <th data-field="value">Peak area</th>
-                <th data-field="sourceUrl">Chromatogram</th>
-                <th data-field="pertDose" data-visible="false">pert_Dose</th>
 
-                <th data-field="pertId" data-visible="false">pert_Id</th>
-
-                <th data-field="pertIname">pert_Iname</th>
-                <th data-field="pertTime" data-visible="false">
-                    pertTime
-                </th>
-                <th data-field="pertType" data-visible="false">pert_Type
-                </th>
-                <th data-field="pertVehicle" data-visible="false">pertVehicle</th>
-                <th data-field="pubchemCid" data-visible="false">pubchemCid</th>
-                <th data-field="downloadUrl" data-visible="true">GCT file</th>
+        <table id="table1"></table>
 
 
-            </tr>
-            </thead>
-        </table>
         </div>
     </div>
 </div>

@@ -10,12 +10,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.embedded.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.web.config.EnableSpringDataWebSupport;
 
 import javax.annotation.PostConstruct;
 
 
 
 @SpringBootApplication
+@EnableSpringDataWebSupport
 public class Application {
 
     private static final Logger log = LoggerFactory.getLogger(Application.class);

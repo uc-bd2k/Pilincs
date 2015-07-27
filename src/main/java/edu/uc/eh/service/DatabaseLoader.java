@@ -23,7 +23,6 @@ import java.util.*;
 @Service
 public class DatabaseLoader {
 
-
     private final ConnectPanorama connectPanorama;
     private final ParseGCT parser;
     private final GctFileRepository gctFileRepository;
@@ -53,7 +52,7 @@ public class DatabaseLoader {
         List<String> list = connectPanorama.GctUrls();
         int counter = 0;
         for(String url : list){
-//            if(counter++ > 0) continue;
+            //if(counter++ > 0) continue;
             HashMap<String, List<ParseGCT.AnnotationValue>> metaProbes = new HashMap<>();
             HashMap<String, List<ParseGCT.AnnotationValue>> metaReplicas = new HashMap<>();
             ArrayList<ParseGCT.ProbeReplicatePeak> peakValues = new ArrayList<>();
@@ -145,7 +144,7 @@ public class DatabaseLoader {
                                 replicateAnnotation.setPertId(annotationValue);
                                 break;
                             case "pert_iname":
-                                replicateAnnotation.setPertIname(annotationValue);
+                                replicateAnnotation.setPertiname(annotationValue);
                                 break;
                             case "pert_time":
                                 replicateAnnotation.setPertTime(annotationValue);
@@ -176,8 +175,15 @@ public class DatabaseLoader {
 
                 peakAreaRepository.save(peakArea);
 
+
             }
         }
+
+//        Page<PeakArea> users = peakAreaRepository.findAll(new PageRequest(1, 20));
+//        for(PeakArea pa:users){
+//            System.out.println(pa);
+//        }
+//        System.out.println(users.getNumberOfElements());
 
 //        for(String a : list) {
 //            GctFile gctfile = new GctFile(a);

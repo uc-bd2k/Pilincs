@@ -26,6 +26,8 @@
     "angular": "1.4.2",
     "bootstrap": "~3.3.5",
     "ng-tags-input": "~3.0.0",
-    "jquery-1.11.3.min": "https://code.jquery.com/jquery-1.11.3.min.js"
+    "jquery-1.11.3.min": "https://code.jquery.com/jquery-1.11.3.min.js",
+    "tableExport": "http://rawgit.com/hhurz/tableExport.jquery.plugin/master/tableExport.js",
+    "d3.v2": "http://mbostock.github.com/d3/d3.v2.js"
   }
 }
