@@ -48,7 +48,7 @@
         <p class="span8 offset2">
 
         <div class="control-group">
-            <form ng-submit="add()">
+            <form>
                 <div class="row">
                     <!--<p>Assays: </p>-->
                     <div class="btn-group col-sm-2" style="top: 5px; ">
@@ -64,6 +64,8 @@
                                     display-property="name"
                                     class="bootstrap"
                                     placeholder="Add annotation"
+                                    on-tag-added="tagAddedRemoved()"
+                                    on-tag-removed="tagAddedRemoved()"
                                     add-from-autocomplete-only="true">
                             <auto-complete
                                     source="loadTags($query)"
@@ -71,29 +73,23 @@
                                     load-on-empty="false"
                                     max-results-to-show="90"
                                     debounce-delay="100"
-                                    template="my-custom-template">
+                                    template="autocomplete-template">
                             </auto-complete>
                         </tags-input>
                     </div>
 
-
-                    <script type="text/ng-template" id="my-custom-template">
+                    <script type="text/ng-template" id="autocomplete-template">
                         <div class="left-panel">
                             <span ng-class="data.flag" class="label label-info">{{data.flag}}</span>
-
                         </div>
                         <div class="mid-panel">
                             <span ng-bind-html="$highlight($getDisplayText())"></span>
-                        </div>
-                        <div class="right-panel">
-                            <!--<span>({{data.rank}})</span>-->
-                            <!--<span>{{data.annotation}}</span>-->
                         </div>
                     </script>
 
 
                     <div class="btn-group col-sm-2" style="top: 5px;">
-                        <input type="submit" ng-click="tagInputClicked()" value="Search assays" class="btn btn-primary"/>
+                        <input type="submit" ng-click="searchClicked()" value="Search assays" class="btn btn-primary"/>
                         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
                                 aria-expanded="false">
                             <span class="caret"></span>
@@ -113,7 +109,8 @@
             <div class="col-sm-offset-2" style="padding-left: 15px;">
                 <span>You may like:</span>
             <span ng-repeat="item in recommended">
-                        <button ng-click="updateTags(item)" class="btn btn-default btn-xs" type="button">{{item}}</button>
+
+                        <button ng-click="recommendedClicked(item)" class="btn btn-default btn-xs" ng-class="item.flag+'B'" type="button">{{item.name}}</button>
                     </span>
             </div>
         </div>

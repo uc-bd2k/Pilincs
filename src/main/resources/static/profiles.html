@@ -54,7 +54,7 @@
         <div class="control-group">
             <form ng-submit="add()">
                 <div class="row">
-                    <div class="controls  col-sm-8" ng-click="tagInputClicked()">
+                    <div class="controls  col-sm-8" ng-click="searchClicked()">
                         <tags-input ng-model="tags" display-property="name" class="bootstrap" placeholder={{searchText}}>
                             <auto-complete source="loadTags($query)"
                                            min-length="0"
@@ -101,7 +101,7 @@
         <div ng-hide="hideRecommend" class="col-sm-offset-1">
             <span>You may like:</span>
             <span ng-repeat="item in recommended">
-                        <button ng-click="updateTags(item)" class="btn btn-default btn-xs" type="button">{{item}}</button>
+                        <button ng-click="recommendedClicked(item)" class="btn btn-default btn-xs" type="button">{{item}}</button>
                     </span>
             </div>
         </div>

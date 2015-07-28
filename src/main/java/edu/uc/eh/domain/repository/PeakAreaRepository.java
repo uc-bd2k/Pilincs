@@ -18,6 +18,10 @@ public interface PeakAreaRepository extends JpaRepository<PeakArea,Long> {
     Page<PeakArea> findByReplicateAnnotationPertinameIn(Collection<String> pertInames,Pageable pageable);
     long countByReplicateAnnotationPertinameIn(Collection<String> pertInames);
 
+    Page<PeakArea> findByReplicateAnnotationPertinameInAndReplicateAnnotationCellIdIn(Collection<String> pertinames,
+                                                                                     Collection<String> cells, Pageable pageable);
+
+
     Page<PeakArea> findAll(Pageable pageable);
     long count();
 

@@ -8,6 +8,7 @@ import edu.uc.eh.domain.repository.PeptideAnnotationRepository;
 import edu.uc.eh.domain.repository.ReplicateAnnotationRepository;
 import edu.uc.eh.service.ConnectPanorama;
 import edu.uc.eh.service.QueryService;
+import edu.uc.eh.service.Tuples;
 import edu.uc.eh.service.Utils;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.*;
 
 /**
@@ -74,19 +77,35 @@ public class RestController {
         List<AssayRecord> output = new ArrayList<>();
         Collection<String> tagsParsed = Utils.parseTags(tags);
         for(String s: tagsParsed){
-            System.out.println(s);
+            System.out.println("Parsed: "+s);
         }
 
         PageRequest pageRequest = new PageRequest(offset / limit, limit);
-        Page<PeakArea> result = null;
-        Long count = null;
+        Page<PeakArea> result;
+        Long count;
 
         if(tagsParsed.size()==0){
             result = peakAreaRepository.findAll(pageRequest);
             count = peakAreaRepository.count();
         }else{
-            result = peakAreaRepository.findByReplicateAnnotationPertinameIn(tagsParsed, pageRequest);
-            count = peakAreaRepository.countByReplicateAnnotationPertinameIn(tagsParsed);
+
+            List<String> tagsNotParsed = new ArrayList<>();
+
+            List<String> allTags = new ArrayList<>();
+
+            for(TagFormat tagFormat : getTagsForAutocompletion()){
+                allTags.add(tagFormat.getName());
+                if(!tagsParsed.contains(tagFormat.getName()))
+                    tagsNotParsed.add(tagFormat.getName());
+            }
+
+
+
+//            result = peakAreaRepository.findByReplicateAnnotationPertinameIn(tagsParsed, pageRequest);
+//            count = peakAreaRepository.countByReplicateAnnotationPertinameIn(tagsParsed);
+            result = peakAreaRepository.findByReplicateAnnotationPertinameInAndReplicateAnnotationCellIdIn(
+                    tagsParsed,allTags,pageRequest);
+            count = result.getTotalElements();
         }
 
 
@@ -103,32 +122,22 @@ public class RestController {
     @RequestMapping(value = "/api-panorama", method = RequestMethod.GET)
     public
     @ResponseBody
-    List<String> gctUrlsFromPanorama() throws Exception {
-        return connectPanorama.GctUrls();
-    }
+    List<Tuples.Tuple2<String,String>> gctUrlsFromPanorama() throws Exception {
+        List<Tuples.Tuple2<String,String>> output = new ArrayList<>();
 
-    @RequestMapping(value = "/api-assays", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    List<Query> getAssaysForAutocompletion(){
-        HashSet<Query> output = new HashSet<>();
-        for(GctFile gctFile : gctFileRepository.findAll()){
-            output.add(new Query(gctFile.getAssayType().toString()));
+        for(String urlString : connectPanorama.GctUrls()){
+            URL url = new URL(urlString);
+            String fileName = null;
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            String raw = conn.getHeaderField("Content-Disposition");
+            if(raw != null && raw.indexOf("=") != -1) {
+                fileName = raw.split("=")[1].replaceAll("\"","");
+            }
+            output.add(new Tuples.Tuple2<String, String>(fileName,urlString));
         }
-        return new ArrayList<>(output);
+        return output;
     }
 
-    @RequestMapping(value = "/api-cells", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    List<Query> getCellsForAutocompletion(){
-        HashSet<Query> output = new HashSet<>();
-
-        for(ReplicateAnnotation replicateAnnotation : replicateAnnotationRepository.findAll()){
-         output.add(new Query(replicateAnnotation.getCellId()));
-        }
-        return new ArrayList<>(output);
-    }
 
     @RequestMapping(value = "/api-tags",method = RequestMethod.GET)
     public
@@ -141,11 +150,22 @@ public class RestController {
         Iterator<PeptideAnnotation> allPeptides = peptideAnnotationRepository.findAll().iterator();
 
         while(allReplicates.hasNext()){
-            TagFormat tagFormat = new TagFormat(allReplicates.next().getPertiname(),"Peptide","pertIname",21);
+            ReplicateAnnotation replicateAnnotation = allReplicates.next();
+
+            TagFormat tagFormat = new TagFormat(replicateAnnotation.getPertiname(),"Replicate","Pertiname");
+            if(tagFormat.getName() != null && !output.contains(tagFormat))output.add(tagFormat);
+
+            tagFormat = new TagFormat(replicateAnnotation.getCellId(),"Cell","CellId");
             if(tagFormat.getName() != null && !output.contains(tagFormat))output.add(tagFormat);
         }
+
         while(allPeptides.hasNext()){
-            TagFormat tagFormat = new TagFormat(allPeptides.next().getPrCluster(),"Replicate","prCluster",11);
+            PeptideAnnotation peptideAnnotation = allPeptides.next();
+
+            TagFormat tagFormat = new TagFormat(peptideAnnotation.getPrCluster(),"Peptide","PrCluster");
+            if(tagFormat.getName() != null && !output.contains(tagFormat))output.add(tagFormat);
+
+            tagFormat = new TagFormat(peptideAnnotation.getPrGeneSymbol(),"Peptide","PrGeneSymbol");
             if(tagFormat.getName() != null && !output.contains(tagFormat))output.add(tagFormat);
         }
         return output;
@@ -154,19 +174,21 @@ public class RestController {
     @RequestMapping(value = "/api-recommend",method = RequestMethod.GET)
     public
     @ResponseBody
-    List<String> getTagsFromRecommender(){
-        List<ReplicateAnnotation> all = replicateAnnotationRepository.findAll();
-        List<String> output = new ArrayList<>();
-        for(ReplicateAnnotation ra : all){
-            String label = ra.getPertiname();
-            if(!output.contains(label))output.add(label);
-        }
+    List<TagFormat> getTagsFromRecommender(){
 
-        if(output.size()<5){
-            return output;
-        }else{
-            return output.subList(0,5);
-        }
+        List<TagFormat> output = new ArrayList<>();
+        output.add(new TagFormat("MS-275","Replicate","Pertiname"));
+        return output;
+    }
 
+    @RequestMapping(value = "/api-recommend", method = RequestMethod.POST, consumes = "application/json")
+    public
+    @ResponseBody
+    List<TagFormat> getTagsFromRecommenderPost(@RequestBody String tags) {
+        System.out.println("Tags: "+tags.toString());
+        List<TagFormat> output = new ArrayList<>();
+        output.add(new TagFormat("MS-275","Replicate","Pertiname"));
+        output.add(new TagFormat("PC3","Cell","CellId"));
+        return output;
     }
 }

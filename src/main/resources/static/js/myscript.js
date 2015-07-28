@@ -4,12 +4,18 @@ var app = angular.module('plunker', ['ngTagsInput']);
 app.controller('MainCtrl', ['$scope', '$http', function($scope, $http) {
 
     $scope.recommended = [
-        "methylstat",
-        "UNC1215",
-        "MS-275",
-        "trichostatin A",
-        "BIX-01294"
+        {'name':"PC3",'flag':'Cell','annotation':'CellId'},
+        {'name':"NPC",'flag':'Cell','annotation':'CellId'},
+        {'name':"MCF7",'flag':'Cell','annotation':'CellId'},
+        {'name':"UNC1215",'flag':'Replicate','annotation':'Pertiname'},
+        {'name':"MS-275",'flag':'Replicate','annotation':'Pertiname'},
+        {'name':"methylstat",'flag':'Replicate','annotation':'Pertiname'},
+        {'name':"CL15",'flag':'Peptide','annotation':'PrCluster'},
+        {'name':"CL23",'flag':'Peptide','annotation':'PrCluster'},
+        {'name':"DYRK1A",'flag':'Peptide','annotation':'PrGeneSymbol'},
+        {'name':"HN1",'flag':'Peptide','annotation':'PrGeneSymbol'}
     ];
+
     $scope.tags = [];
     $scope.p100 = true;
     $scope.gcp = false;
@@ -23,15 +29,9 @@ app.controller('MainCtrl', ['$scope', '$http', function($scope, $http) {
         $scope.gcp = !$scope.gcp;
     }
 
-
-
-    $scope.refreshTable = function() {
-        $('#tablePeaks').bootstrapTable('refresh');
-    };
-
+    // ok
     $scope.loadTags = function($query) {
-
-        return $http.get('/pilincs/api-tags').then(function(response) {
+        return $http.get('/pilincs/api-tags', { cache: true}).then(function(response) {
             var annotations = response.data;
             return annotations.filter(function(annotation) {
                 return annotation.name.toLowerCase().indexOf($query.toLowerCase()) != -1;
@@ -39,43 +39,42 @@ app.controller('MainCtrl', ['$scope', '$http', function($scope, $http) {
         });
     };
 
-    $scope.tagInputClicked = function() {
-
-        //alert ($scope.recommended.length > 1);
-        var res = $http.get('/pilincs/api-recommend');//, $scope.tags);
+    $scope.getRecommendation = function(){
+        var res = $http.post('/pilincs/api-recommend', JSON.stringify($scope.tags));
         res.success(function(data, status, headers, config) {
             $scope.recommended = data;
+            //console.log(data);
         });
-        $('#tablePeaks').bootstrapTable('refresh');
-        //res.error(function(data, status, headers, config) {
-        //    alert( "failure message: " + JSON.stringify({data: data}));
-        //});
+    }
 
+    $scope.tagAddedRemoved = function() {
+        $scope.getRecommendation();
     };
 
-    $scope.updateTags = function($newTag) {
 
-        //if ($scope.recommended.length > 1) return;
-        $scope.tags.push({"name":$newTag});
+    $scope.searchClicked = function() {
+        $('#tablePeaks').bootstrapTable('refresh');
+    };
+
+    // ok
+    $scope.recommendedClicked = function($newTag) {
+
+        $scope.tags.push($newTag);
 
         var index = $scope.recommended.indexOf($newTag);
         $scope.recommended.splice(index,1);
 
-        var res = $http.get('/pilincs/api-recommend');//, $scope.tags);
-        //var res = $http.post('http://www.eh3.uc.edu/pilincs/api/recommend', $scope.tags);
-        res.success(function(data, status, headers, config) {
-            $scope.recommend = data;
-        });
-
+        if($scope.recommended.length == 0){
+            $scope.getRecommendation();
+        }
     };
-
 
 }]);
 
 // Table Wenz...
 $(function () {
     $('#tablePeaks').bootstrapTable({
-        url: 'http://localhost:8080/pilincs/api-assays-paged/',
+        url: '/pilincs/api-assays-paged/',
         showColumns: 'true',
         queryParams: 'postQueryParams',
         pagination: 'true',
@@ -103,10 +102,10 @@ $(function () {
             title: 'Pert Iname'
         }, {
             field: 'pertDose',
-            title: 'Dose [uM]'
+            title: 'Dose (uM)'
         }, {
             field: 'pertTime',
-            title: 'Time [h]'
+            title: 'Time (h)'
         }, {
             field: 'pertType',
             title: 'Pert Type',
@@ -132,7 +131,7 @@ $(function () {
             visible: false
         }, {
             field: 'downloadUrl',
-            title: 'Source'
+            title: 'Analyze'
         }],
         responseHandler: function (res) {
             return res;
@@ -144,6 +143,7 @@ function postQueryParams(params) {
     //console.log($scope.tags);
     var scope = angular.element('#tablePeaks').scope();
     params.tags = JSON.stringify(scope.tags);
+    console.log(params.tags);
     return params;
 }
 

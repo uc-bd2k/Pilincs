@@ -95,6 +95,7 @@ public class DatabaseLoader {
                                 peptideAnnotation.setPrGeneId(annotationValue);
                                 break;
                             case "pr_gene_symbol":
+                            case "GeneName":
                                 peptideAnnotation.setPrGeneSymbol(annotationValue);
                                 break;
                             case "pr_p100_cluster":

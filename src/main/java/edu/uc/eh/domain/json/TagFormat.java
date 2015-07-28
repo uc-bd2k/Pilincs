@@ -8,19 +8,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class TagFormat {
     private final String name;
-    private final String flag;
+    private final String flag; // Peptide, Replicate, Cell
     private final String annotation;
-    private final Integer rank;
+    
 
-    @JsonCreator
-    public TagFormat(@JsonProperty("name") String name,
-                     @JsonProperty("flag") String flag,
-                     @JsonProperty("annotation") String annotation,
-                     @JsonProperty("rank") Integer rank) {
+
+    public TagFormat(String name,
+                     String flag,
+                     String annotation) {
         this.name = name;
         this.flag = flag;
         this.annotation = annotation;
-        this.rank = rank;
+
     }
 
     @Override
@@ -49,9 +48,5 @@ public class TagFormat {
 
     public String getAnnotation() {
         return annotation;
-    }
-
-    public Integer getRank() {
-        return rank;
     }
 }
