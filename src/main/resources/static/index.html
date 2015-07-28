@@ -43,31 +43,41 @@
     <a href="https://github.com/sajmmon/Pilincs" target="_blank">View source on GitHub</a>
 </div>
 <h1></h1>
-
 <div class="container">
     <div class="row">
         <p class="span8 offset2">
 
         <div class="control-group">
-        <form ng-submit="add()">
-            <div class="row">
-                <div class="controls  col-sm-8" ng-click="tagInputClicked()">
-                    <tags-input ng-model="tags"
-                                display-property="name"
-                                class="bootstrap"
-                                placeholder={{searchText}}>
-                        <auto-complete
-                                source="loadTags($query)"
-                                min-length="0"
-                                load-on-empty="false"
-                                max-results-to-show="90"
-                                debounce-delay="100"
-                                template="my-custom-template">
-                        </auto-complete>
-                    </tags-input>
-                </div>
+            <form ng-submit="add()">
+                <div class="row">
+                    <!--<p>Assays: </p>-->
+                    <div class="btn-group col-sm-2" style="top: 5px; ">
+                        <button type="button" ng-click="toggleP100()" ng-show="p100" class="btn btn-default" style=" font-weight: bold;padding-left:25px;padding-right:25px;">P100</button>
+                        <button type="button" ng-click="toggleP100()" ng-hide="p100" class="btn btn-default" style=" font-weight: normal;padding-left:25px;padding-right:25px;">P100</button>
+                        <button type="button" ng-click="toggleGcp()" ng-show="gcp" class="btn btn-default" style=" font-weight: bold;padding-left:25px;padding-right:25px;">GCP</button>
+                        <button type="button" ng-click="toggleGcp()" ng-hide="gcp" class="btn btn-default" style=" font-weight: normal;padding-left:25px;padding-right:25px;">GCP</button>
 
-                <script type="text/ng-template" id="my-custom-template">
+                    </div>
+
+                    <div class="controls  col-sm-7">
+                        <tags-input ng-model="tags"
+                                    display-property="name"
+                                    class="bootstrap"
+                                    placeholder="Add annotation"
+                                    add-from-autocomplete-only="true">
+                            <auto-complete
+                                    source="loadTags($query)"
+                                    min-length="0"
+                                    load-on-empty="false"
+                                    max-results-to-show="90"
+                                    debounce-delay="100"
+                                    template="my-custom-template">
+                            </auto-complete>
+                        </tags-input>
+                    </div>
+
+
+                    <script type="text/ng-template" id="my-custom-template">
                         <div class="left-panel">
                             <span ng-class="data.flag" class="label label-info">{{data.flag}}</span>
 
@@ -81,12 +91,13 @@
                         </div>
                     </script>
 
-                    <!-- Split button -->
+
                     <div class="btn-group col-sm-2" style="top: 5px;">
-                        <input type="submit" value="Search assays" class="btn btn-primary"/>
-                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        <input type="submit" ng-click="tagInputClicked()" value="Search assays" class="btn btn-primary"/>
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
+                                aria-expanded="false">
                             <span class="caret"></span>
-                            <span class="sr-only">Toggle option</span>
+                            <!--<span class="sr-only">Toggle option</span>-->
                         </button>
                         <ul class="dropdown-menu" role="menu">
                             <li><a href="#" target="_blank">Advanced search</a></li>
@@ -99,8 +110,8 @@
         <h1></h1>
 
         <div class="row">
-        <div ng-hide="hideRecommend" class="col-sm-offset-1">
-            <span>You may like:</span>
+            <div class="col-sm-offset-2" style="padding-left: 15px;">
+                <span>You may like:</span>
             <span ng-repeat="item in recommended">
                         <button ng-click="updateTags(item)" class="btn btn-default btn-xs" type="button">{{item}}</button>
                     </span>
@@ -110,21 +121,19 @@
         <table class="table table-bordered table-striped">
             <tbody>
             <tr>
-                <td align="center"><h4><a href="#" style="color: #286090;">Show Peaks </a></h4></td>
-                <td align="center"><h4><a href="#">Show Profiles </a></h4></td>
-                <td align="center"><h4><a href="#">Show Relations </a></h4></td>
-                <td align="center"><h4><a href="#">Show API </a></h4></td>
+                <td align="center" width="25%"><h4><a href="#" style="color: #286090;">Show Peaks </a></h4></td>
+                <td align="center" width="25%"><h4><a href="#">Show Profiles </a></h4></td>
+                <td align="center" width="25%"><h4><a href="#">Show Relations </a></h4></td>
+                <td align="center" width="25%"><h4><a href="#">Show API </a></h4></td>
             </tr>
             </tbody>
         </table>
-        <!--<p>{{message}}</p>-->
-        <!--<div ng-show="{{showTable}}">-->
 
-        <table id="table1"></table>
+        <table id="tablePeaks"></table>
 
 
-        </div>
     </div>
+</div>
 </div>
 </div>
 

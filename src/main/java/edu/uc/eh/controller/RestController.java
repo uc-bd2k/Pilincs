@@ -2,6 +2,7 @@ package edu.uc.eh.controller;
 
 import edu.uc.eh.domain.*;
 import edu.uc.eh.domain.json.*;
+import edu.uc.eh.domain.repository.GctFileRepository;
 import edu.uc.eh.domain.repository.PeakAreaRepository;
 import edu.uc.eh.domain.repository.PeptideAnnotationRepository;
 import edu.uc.eh.domain.repository.ReplicateAnnotationRepository;
@@ -15,10 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by chojnasm on 7/15/15.
@@ -29,6 +27,7 @@ public class RestController {
 
 
     private final ConnectPanorama connectPanorama;
+    private final GctFileRepository gctFileRepository;
     private final ReplicateAnnotationRepository replicateAnnotationRepository;
     private final PeptideAnnotationRepository peptideAnnotationRepository;
     private final PeakAreaRepository peakAreaRepository;
@@ -36,18 +35,22 @@ public class RestController {
 
 
     @Autowired
-    public RestController(
-            ConnectPanorama connectPanorama,
-            ReplicateAnnotationRepository replicateAnnotationRepository,
-            PeptideAnnotationRepository peptideAnnotationRepository,
-            PeakAreaRepository peakAreaRepository,
-            QueryService queryService) {
+
+    public RestController(ConnectPanorama connectPanorama,
+                          GctFileRepository gctFileRepository,
+                          ReplicateAnnotationRepository replicateAnnotationRepository,
+                          PeptideAnnotationRepository peptideAnnotationRepository,
+                          PeakAreaRepository peakAreaRepository,
+                          QueryService queryService) {
         this.connectPanorama = connectPanorama;
+        this.gctFileRepository = gctFileRepository;
         this.replicateAnnotationRepository = replicateAnnotationRepository;
         this.peptideAnnotationRepository = peptideAnnotationRepository;
         this.peakAreaRepository = peakAreaRepository;
         this.queryService = queryService;
     }
+
+
 
 
     @RequestMapping(value = "/api-assays", method = RequestMethod.POST, consumes = "application/json")
@@ -104,6 +107,28 @@ public class RestController {
         return connectPanorama.GctUrls();
     }
 
+    @RequestMapping(value = "/api-assays", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    List<Query> getAssaysForAutocompletion(){
+        HashSet<Query> output = new HashSet<>();
+        for(GctFile gctFile : gctFileRepository.findAll()){
+            output.add(new Query(gctFile.getAssayType().toString()));
+        }
+        return new ArrayList<>(output);
+    }
+
+    @RequestMapping(value = "/api-cells", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    List<Query> getCellsForAutocompletion(){
+        HashSet<Query> output = new HashSet<>();
+
+        for(ReplicateAnnotation replicateAnnotation : replicateAnnotationRepository.findAll()){
+         output.add(new Query(replicateAnnotation.getCellId()));
+        }
+        return new ArrayList<>(output);
+    }
 
     @RequestMapping(value = "/api-tags",method = RequestMethod.GET)
     public
@@ -117,11 +142,11 @@ public class RestController {
 
         while(allReplicates.hasNext()){
             TagFormat tagFormat = new TagFormat(allReplicates.next().getPertiname(),"Peptide","pertIname",21);
-            if(!output.contains(tagFormat))output.add(tagFormat);
+            if(tagFormat.getName() != null && !output.contains(tagFormat))output.add(tagFormat);
         }
         while(allPeptides.hasNext()){
             TagFormat tagFormat = new TagFormat(allPeptides.next().getPrCluster(),"Replicate","prCluster",11);
-            if(!output.contains(tagFormat))output.add(tagFormat);
+            if(tagFormat.getName() != null && !output.contains(tagFormat))output.add(tagFormat);
         }
         return output;
     }

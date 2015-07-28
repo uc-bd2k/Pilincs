@@ -1,3 +1,7 @@
+/* Buttons  */
+
+/* Autocomplete view */
+
 .left-panel {
     float: left;
 }
@@ -35,7 +39,11 @@
     font-style: italic;
 }
 
+/* Tags input */
 
+.bootstrap {
+    padding-left:0px;
+}
 
 .bootstrap .tags {
     background-color: #fff;
@@ -88,6 +96,8 @@
     color: #262626;
     /*background-color: #e9e9e9;*/
 }
+
+/* GitHub Ribbon */
 
 .ribbon {
     background-color: white;

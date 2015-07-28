@@ -17,4 +17,5 @@ public interface ReplicateAnnotationRepository extends JpaRepository<ReplicateAn
 
     List<ReplicateAnnotation> findAll();
     Page<ReplicateAnnotation> findAll(Pageable pageable);
+//    Collection<String> findDistinctCellId();
 }

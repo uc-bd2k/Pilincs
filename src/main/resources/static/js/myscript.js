@@ -1,53 +1,33 @@
 
-
-//var $table = $('#table');
-//$(function () {
-//    $table.on('page-change.bs.table', function (e, number, size) {
-//        getData(number, size);
-//    });
-//    var options = $table.bootstrapTable('getOptions');
-//    getData(options.pageNumber, options.pageSize);
-//});
-//function getData(number, size) {
-//    $.get('/pilincs/api-assays-paged/', {
-//        offset: (number - 1) * size,
-//        limit: size
-//    }, function (res) {
-//        $table.bootstrapTable('load', res);
-//    });
-//}
-
 var app = angular.module('plunker', ['ngTagsInput']);
 
 app.controller('MainCtrl', ['$scope', '$http', function($scope, $http) {
 
-    $scope.showTable = true;
-    $scope.searchText = "Add annotation";
+    $scope.recommended = [
+        "methylstat",
+        "UNC1215",
+        "MS-275",
+        "trichostatin A",
+        "BIX-01294"
+    ];
+    $scope.tags = [];
+    $scope.p100 = true;
+    $scope.gcp = false;
 
-    $scope.hideRecommend = true;
 
-    $scope.tags = ['gsk126'];
+    $scope.toggleP100 = function(){
+        $scope.p100 = !$scope.p100;
+    }
 
-    $scope.add = function() {
+    $scope.toggleGcp = function(){
+        $scope.gcp = !$scope.gcp;
+    }
 
-        $('#table1').bootstrapTable('refresh');
-        //$scope.hideRecommend = true;
-        //var res = $http.post('/pilincs/api-assays', $scope.tags);
-        ////var res = $http.post('http://www.eh3.uc.edu/pilincs/api/assays', $scope.tags);
-        //res.success(function(data, status, headers, config) {
-        //    $scope.message = data;
-        //
-        //    $('#table').bootstrapTable('destroy');
-        //    $('#table').bootstrapTable({
-        //        data: data
-        //    });
-        //});
-        //res.error(function(data, status, headers, config) {
-        //    alert( "failure message: " + JSON.stringify({data: data}));
-        //});
+
+
+    $scope.refreshTable = function() {
+        $('#tablePeaks').bootstrapTable('refresh');
     };
-
-
 
     $scope.loadTags = function($query) {
 
@@ -62,22 +42,21 @@ app.controller('MainCtrl', ['$scope', '$http', function($scope, $http) {
     $scope.tagInputClicked = function() {
 
         //alert ($scope.recommended.length > 1);
-        $scope.hideRecommend = true;
         var res = $http.get('/pilincs/api-recommend');//, $scope.tags);
         res.success(function(data, status, headers, config) {
             $scope.recommended = data;
         });
+        $('#tablePeaks').bootstrapTable('refresh');
         //res.error(function(data, status, headers, config) {
         //    alert( "failure message: " + JSON.stringify({data: data}));
         //});
-        $scope.hideRecommend = false;
+
     };
 
     $scope.updateTags = function($newTag) {
 
         //if ($scope.recommended.length > 1) return;
-        $scope.hideRecommend = true;
-        $scope.tags.push({"text":$newTag});
+        $scope.tags.push({"name":$newTag});
 
         var index = $scope.recommended.indexOf($newTag);
         $scope.recommended.splice(index,1);
@@ -87,7 +66,7 @@ app.controller('MainCtrl', ['$scope', '$http', function($scope, $http) {
         res.success(function(data, status, headers, config) {
             $scope.recommend = data;
         });
-        $scope.hideRecommend = false;
+
     };
 
 
@@ -95,7 +74,7 @@ app.controller('MainCtrl', ['$scope', '$http', function($scope, $http) {
 
 // Table Wenz...
 $(function () {
-    $('#table1').bootstrapTable({
+    $('#tablePeaks').bootstrapTable({
         url: 'http://localhost:8080/pilincs/api-assays-paged/',
         showColumns: 'true',
         queryParams: 'postQueryParams',
@@ -163,7 +142,7 @@ $(function () {
 
 function postQueryParams(params) {
     //console.log($scope.tags);
-    var scope = angular.element('#table1').scope();
+    var scope = angular.element('#tablePeaks').scope();
     params.tags = JSON.stringify(scope.tags);
     return params;
 }
