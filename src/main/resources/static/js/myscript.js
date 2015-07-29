@@ -1,32 +1,42 @@
 
 var app = angular.module('plunker', ['ngTagsInput']);
 
-app.controller('MainCtrl', ['$scope', '$http', function($scope, $http) {
+app.controller('MainCtrl', ['$scope', '$http', '$timeout',function($scope, $http, $timeout) {
 
-    $scope.recommended = [
-        {'name':"PC3",'flag':'Cell','annotation':'CellId'},
-        {'name':"NPC",'flag':'Cell','annotation':'CellId'},
-        {'name':"MCF7",'flag':'Cell','annotation':'CellId'},
-        {'name':"UNC1215",'flag':'Replicate','annotation':'Pertiname'},
-        {'name':"MS-275",'flag':'Replicate','annotation':'Pertiname'},
-        {'name':"methylstat",'flag':'Replicate','annotation':'Pertiname'},
-        {'name':"CL15",'flag':'Peptide','annotation':'PrCluster'},
-        {'name':"CL23",'flag':'Peptide','annotation':'PrCluster'},
-        {'name':"DYRK1A",'flag':'Peptide','annotation':'PrGeneSymbol'},
-        {'name':"HN1",'flag':'Peptide','annotation':'PrGeneSymbol'}
-    ];
 
+    $scope.showRecommend = false;
     $scope.tags = [];
     $scope.p100 = true;
     $scope.gcp = false;
 
+    $timeout(callAtTimeout, 2500);
+    function callAtTimeout() {
+        $scope.showRecommend = true;
+        $scope.recommended = [
+            {'name':"PC3",'flag':'Cell','annotation':'CellId'}];
+        $timeout(function(){ $scope.recommended.push({'name':"NPC",'flag':'Cell','annotation':'CellId'}); }, 300);
+        $timeout(function(){ $scope.recommended.push({'name':"MCF7",'flag':'Cell','annotation':'CellId'}); }, 600);
+        $timeout(function(){ $scope.recommended.push({'name':"UNC1215",'flag':'Replicate','annotation':'Pertiname'}); }, 900);
+        $timeout(function(){ $scope.recommended.push({'name':"MS-275",'flag':'Replicate','annotation':'Pertiname'}); }, 1200);
+        $timeout(function(){ $scope.recommended.push({'name':"methylstat",'flag':'Replicate','annotation':'Pertiname'}); }, 1500);
+        $timeout(function(){ $scope.recommended.push({'name':"DYRK1A",'flag':'Peptide','annotation':'PrGeneSymbol'}); }, 1800);
+        $timeout(function(){ $scope.recommended.push({'name':"HN1",'flag':'Peptide','annotation':'PrGeneSymbol'}); }, 2100);
+    }
 
     $scope.toggleP100 = function(){
         $scope.p100 = !$scope.p100;
+        if($scope.p100 == false && $scope.gcp == false){
+            $scope.gcp = true;
+        }
+        $('#tablePeaks').bootstrapTable('refresh');
     }
 
     $scope.toggleGcp = function(){
         $scope.gcp = !$scope.gcp;
+        if($scope.p100 == false && $scope.gcp == false){
+            $scope.p100 = true;
+        }
+        $('#tablePeaks').bootstrapTable('refresh');
     }
 
     // ok
@@ -39,20 +49,31 @@ app.controller('MainCtrl', ['$scope', '$http', function($scope, $http) {
         });
     };
 
-    $scope.getRecommendation = function(){
-        var res = $http.post('/pilincs/api-recommend', JSON.stringify($scope.tags));
-        res.success(function(data, status, headers, config) {
-            $scope.recommended = data;
-            //console.log(data);
-        });
+    $scope.getRecommendation = function() {
+
+        if ($scope.tags.length < 5) {
+            var res = $http.post('/pilincs/api-recommend', JSON.stringify($scope.tags));
+            res.success(function (data, status, headers, config) {
+                if(data.length == 0){
+                    callAtTimeout();
+                }
+                $scope.recommended = data;
+                $scope.showRecommend = true;
+                //console.log(data);
+            });
+        }else{
+            $scope.showRecommend = false;
+        }
     }
 
     $scope.tagAddedRemoved = function() {
         $scope.getRecommendation();
+        $('#tablePeaks').bootstrapTable('refresh');
     };
 
 
     $scope.searchClicked = function() {
+        $scope.getRecommendation();
         $('#tablePeaks').bootstrapTable('refresh');
     };
 
@@ -67,6 +88,7 @@ app.controller('MainCtrl', ['$scope', '$http', function($scope, $http) {
         if($scope.recommended.length == 0){
             $scope.getRecommendation();
         }
+        $('#tablePeaks').bootstrapTable('refresh');
     };
 
 }]);
@@ -141,8 +163,16 @@ $(function () {
 
 function postQueryParams(params) {
     //console.log($scope.tags);
+
+
     var scope = angular.element('#tablePeaks').scope();
-    params.tags = JSON.stringify(scope.tags);
+
+    var queryContent = [];
+    queryContent.push({"p100":scope.p100});
+    queryContent.push({"gcp":scope.gcp});
+    queryContent = queryContent.concat(scope.tags);
+
+    params.tags = JSON.stringify(queryContent);
     console.log(params.tags);
     return params;
 }

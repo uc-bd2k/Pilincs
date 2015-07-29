@@ -3,6 +3,7 @@ package edu.uc.eh.domain.repository;
 import edu.uc.eh.domain.AssayType;
 import edu.uc.eh.domain.PeakArea;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,11 +19,16 @@ public interface PeakAreaRepository extends JpaRepository<PeakArea,Long> {
     Page<PeakArea> findByReplicateAnnotationPertinameIn(Collection<String> pertInames,Pageable pageable);
     long countByReplicateAnnotationPertinameIn(Collection<String> pertInames);
 
-    Page<PeakArea> findByReplicateAnnotationPertinameInAndReplicateAnnotationCellIdIn(Collection<String> pertinames,
-                                                                                     Collection<String> cells, Pageable pageable);
+    Page<PeakArea> findByGctFileAssayTypeInAndReplicateAnnotationPertinameInAndReplicateAnnotationCellIdInAndPeptideAnnotationPrGeneSymbolIn(
+            List<AssayType> assayTypes,
+            List<String> pertinames,
+            List<String> cells,
+            List<String> geneSymbols,
+            Pageable pageable);
 
 
     Page<PeakArea> findAll(Pageable pageable);
     long count();
 
+    Page<PeakArea> findByGctFileAssayTypeIn(List<AssayType> assayTypes, Pageable pageable);
 }

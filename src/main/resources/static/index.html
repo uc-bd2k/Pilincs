@@ -106,12 +106,14 @@
         <h1></h1>
 
         <div class="row">
-            <div class="col-sm-offset-2" style="padding-left: 15px;">
+            <div ng-show="showRecommend" class="col-sm-offset-2" style="padding-left: 15px;">
                 <span>You may like:</span>
-            <span ng-repeat="item in recommended">
+                <span ng-repeat="item in recommended">
 
-                        <button ng-click="recommendedClicked(item)" class="btn btn-default btn-xs" ng-class="item.flag+'B'" type="button">{{item.name}}</button>
-                    </span>
+                        <button ng-click="recommendedClicked(item)" class="btn btn-default btn-xs"
+                                ng-class="item.flag+'B'" type="button">{{item.name}}
+                        </button>
+                </span>
             </div>
         </div>
         <h1></h1>

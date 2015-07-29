@@ -110,22 +110,57 @@ public class Utils {
          return url.contains("GCP") ? AssayType.GCP : AssayType.P100;
     }
 
-    public static Collection<String> parseTags(String tags) throws ParseException {
+    public static HashMap<String, List<String>> parseTags(String tags) throws ParseException {
 
 
-        Collection<String> output = new ArrayList<>();
-        if(tags == null || tags.length() == 0) return output;
+        HashMap<String, List<String>> output = new HashMap<>();
+        output.put("Pertiname",new ArrayList<String>());
+        output.put("CellId",new ArrayList<String>());
+        output.put("AssayTypes",new ArrayList<String>());
+        output.put("PrGeneSymbol",new ArrayList<String>());
 
         JSONParser parser = new JSONParser();
-        Object obj = parser.parse(tags);
-        JSONArray array = (JSONArray)obj;
-        Iterator<Object> iter = array.iterator();
-        while(iter.hasNext()){
-            JSONObject object = (JSONObject)iter.next();
-            output.add(object.get("name").toString().replace("[","").replace("]",""));
+        JSONArray array = (JSONArray)parser.parse(tags);
+
+        Iterator<Object> iterator = array.iterator();
+
+        while(iterator.hasNext()){
+            JSONObject object = (JSONObject)iterator.next();
+            if(object.get("p100")!=null){
+                if(object.get("p100").toString().equals("true")) {
+                    output.get("AssayTypes").add(AssayType.P100.name());
+                }
+            }else if(object.get("gcp")!=null){
+                if(object.get("gcp").toString().equals("true")) {
+                    output.get("AssayTypes").add(AssayType.GCP.name());
+                }
+            }else {
+
+                String tagName = object.get("name").toString().replace("[", "").replace("]", "");
+                String tagAnnotation = object.get("annotation").toString().replace("[", "").replace("]", "");
+                output.get(tagAnnotation).add(tagName);
+            }
         }
 
         return output;
 
+    }
+
+    public static String lastTag(String tags) throws ParseException {
+
+        String lastTagAnnotation = null;
+
+        JSONParser parser = new JSONParser();
+        JSONArray array = (JSONArray)parser.parse(tags);
+
+        Iterator<Object> iterator = array.iterator();
+
+        while(iterator.hasNext()) {
+            JSONObject object = (JSONObject) iterator.next();
+            if (object.get("name") != null) {
+                lastTagAnnotation = object.get("annotation").toString().replace("[", "").replace("]", "");
+            }
+        }
+        return lastTagAnnotation;
     }
 }
