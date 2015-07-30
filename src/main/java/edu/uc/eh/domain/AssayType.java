@@ -6,3 +6,5 @@ package edu.uc.eh.domain;
 public enum AssayType {
     P100, GCP, L1000
 }
+
+
