@@ -1,6 +1,6 @@
 # Pilincs - interface to [panoramaweb.org](http://www.panoramaweb.org)
 
-See running ipLINCS website on University of Cincinnati server:
+See running piLINCS website on University of Cincinnati server:
 [eh3.uc.edu/pilincs](http://eh3.uc.edu/pilincs)
 
 ## Project's goals
@@ -43,8 +43,8 @@ In the background Tomcat is started as well as H2 database. Your application is 
 
 ### Modify configuration
 
-You modify YAML file to adjust the application to your needs:
+Modify YAML file to adjust the application to your needs:
  ```
  /src/main/resource/application.yml
  ```
- Consider changing database engine (a template of MySQL configuration is included). You may also change deployment path (currently set to /pilincs). Or just select Panorama folders that are relevant to your research.
+ After changing YAML file you need to build sources again. Consider changing database engine (a template of MySQL configuration is included). You may also change deployment path (currently set to /pilincs). Or just select Panorama folders that are relevant to your research.
