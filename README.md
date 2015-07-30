@@ -1,6 +1,6 @@
 # Pilincs - interface to [panoramaweb.org](http://www.panoramaweb.org)
 
-Visit running website on University of Cincinnati server:
+See running ipLINCS on University of Cincinnati server:
 [eh3.uc.edu/pilincs](http://eh3.uc.edu/pilincs)
 
 ## Project's goals
@@ -11,26 +11,17 @@ Visit running website on University of Cincinnati server:
 
 ## Getting Started
 
-To start piLINCS website on your machine you need to: download sources, build project and run created jar.
-
-
-```
-git clone https://github.com/angular/angular-seed.git
-cd angular-seed
-```
-
-## Develope your piLINCS
-
-You need to have current Java installed. Having gradle and git is useful, but not necessary.
+In order to run your own piLINCS you need to have current Java installed. Gradle and git are used to ease building sources.
 
 ### Download sources
 
-You may download sources as a zip file from GitHub or if git is installed on your OS just type:
+If git is installed just type:
 
 ```
 git clone https://github.com/sajmmon/Pilincs.git pilincs
 cd pilincs
 ```
+Otherwise, download sources as a zip file directly from GitHub.
 
 ### Build project
 
@@ -38,21 +29,22 @@ If you have gradle installed, type:
 ```
 gradle clean build
 ```
-If you have no gradle and your OS is *-nix, type:
-```
-gradlew
-```
-If you have no gradle and your OS is Windows, type:
-```
-gradle.bat
-```
+Otherwise, run scripts gradlew or gradle.bat.
 
 ### Run application
 
-Just type:
+Application is bundled as a jar file. Run it with java by:
 ```
-java -jar build/libs/pilincs-0.1.0-SNAPSHOT.jar
+java -jar build/libs/*.jar
 ```
 
 In the background Tomcat is started as well as H2 database. Your application is available in:
 [localhost:8080/pilincs](http://www.localhost:8080/pilincs)
+
+### Modify configuration
+
+You modify YAML file to adjust the application to your needs:
+ ```
+ /src/main/resource/application.yml
+ ```
+ Consider changing database engine (a template of MySQL configuration is included). You may also change deployment path (currently set to /pilincs). Or just select Panorama folders that are relevant to your research.
