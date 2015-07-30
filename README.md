@@ -1,6 +1,6 @@
 # Pilincs - interface to [panoramaweb.org](http://www.panoramaweb.org)
 
-See running ipLINCS on University of Cincinnati server:
+See running ipLINCS website on University of Cincinnati server:
 [eh3.uc.edu/pilincs](http://eh3.uc.edu/pilincs)
 
 ## Project's goals
