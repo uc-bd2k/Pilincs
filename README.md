@@ -3,7 +3,7 @@
 See running piLINCS website on University of Cincinnati server:
 [eh3.uc.edu/pilincs](http://eh3.uc.edu/pilincs)
 
-## Project's goals
+## Goals
 
 * Provide interface and seamless access to LINCS proteomics datasets (P100, GCP, etc.) available in Panorama
 * Build intermediate API layer to enable direct and simple querying and access to proteomics datasets by tools developed within BD2K community
