@@ -1,7 +1,6 @@
 package edu.uc.eh.service;
 
 import edu.uc.eh.domain.json.AssayRecord;
-import edu.uc.eh.domain.AssayType;
 import edu.uc.eh.domain.PeakArea;
 import edu.uc.eh.domain.json.Query;
 import edu.uc.eh.domain.repository.PeakAreaRepository;

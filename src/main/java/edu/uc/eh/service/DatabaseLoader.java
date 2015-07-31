@@ -1,18 +1,19 @@
 package edu.uc.eh.service;
 
 import edu.uc.eh.domain.*;
-import edu.uc.eh.domain.repository.GctFileRepository;
-import edu.uc.eh.domain.repository.PeakAreaRepository;
+import edu.uc.eh.domain.repository.*;
 
-import edu.uc.eh.domain.repository.PeptideAnnotationRepository;
-import edu.uc.eh.domain.repository.ReplicateAnnotationRepository;
+import edu.uc.eh.utils.Tuples;
+import edu.uc.eh.utils.Utils;
 import org.labkey.remoteapi.CommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.awt.print.Pageable;
 import java.io.IOException;
 import java.util.*;
 
@@ -29,6 +30,7 @@ public class DatabaseLoader {
     private final PeakAreaRepository peakAreaRepository;
     private final PeptideAnnotationRepository peptideAnnotationRepository;
     private final ReplicateAnnotationRepository replicateAnnotationRepository;
+    private final ProfileRepository profileRepository;
 
     private static final Logger log = LoggerFactory.getLogger(DatabaseLoader.class);
 
@@ -38,21 +40,58 @@ public class DatabaseLoader {
                           GctFileRepository gctFileRepository,
                           PeakAreaRepository peakAreaRepository,
                           PeptideAnnotationRepository peptideAnnotationRepository,
-                          ReplicateAnnotationRepository replicateAnnotationRepository) {
+                          ReplicateAnnotationRepository replicateAnnotationRepository,
+                          ProfileRepository profileRepository) {
         this.connectPanorama = connectPanorama;
         this.parser = parser;
         this.gctFileRepository = gctFileRepository;
         this.peakAreaRepository = peakAreaRepository;
         this.peptideAnnotationRepository = peptideAnnotationRepository;
         this.replicateAnnotationRepository = replicateAnnotationRepository;
+        this.profileRepository = profileRepository;
     }
 
     @PostConstruct
     private void initDatabase() throws IOException, CommandException {
+        loadRawData();
+        loadProfiles();
+    }
+
+    private void loadProfiles() {
+        log.info("Filling repository with profiles");
+        for(ReplicateAnnotation replicateAnnotation : replicateAnnotationRepository.findAll()){
+            Long replicateId = replicateAnnotation.getId();
+            List<PeakArea> peaksForReplicate = peakAreaRepository.findByReplicateAnnotationId(replicateId);
+            List<Tuples.Tuple2<java.lang.String,Double>> profileVector = new ArrayList<>();
+
+            for(PeakArea peakArea : peaksForReplicate){
+                profileVector.add(new Tuples.Tuple2<>(peakArea.getPeptideAnnotation().getPeptideId(),peakArea.getValue()));
+            }
+
+            Profile profile = new Profile(replicateAnnotation, profileVector);
+
+            profileRepository.save(profile);
+        }
+
+        PageRequest pageable = new PageRequest(0,10);
+        List<String> cells = new ArrayList<>();
+        cells.add("PC3");
+        List<String> pertiname = new ArrayList<>();
+        pertiname.add("methylstat");
+
+        List<Profile> profiles =
+                profileRepository.findByReplicateAnnotationCellIdInAndReplicateAnnotationPertinameIn(cells, pertiname, pageable);
+
+        log.warn(profiles.size()+"");
+
+    }
+
+    private void loadRawData() throws IOException, CommandException {
+        log.info("Loading raw data from panorama etc");
         List<String> list = connectPanorama.GctUrls();
         int counter = 0;
         for(String url : list){
-            //if(counter++ > 0) continue;
+            if(counter++ > 0) continue;
             HashMap<String, List<ParseGCT.AnnotationValue>> metaProbes = new HashMap<>();
             HashMap<String, List<ParseGCT.AnnotationValue>> metaReplicas = new HashMap<>();
             ArrayList<ParseGCT.ProbeReplicatePeak> peakValues = new ArrayList<>();
@@ -179,40 +218,6 @@ public class DatabaseLoader {
 
             }
         }
-
-//        Page<PeakArea> users = peakAreaRepository.findAll(new PageRequest(1, 20));
-//        for(PeakArea pa:users){
-//            System.out.println(pa);
-//        }
-//        System.out.println(users.getNumberOfElements());
-
-//        for(String a : list) {
-//            GctFile gctfile = new GctFile(a);
-//            PeptideAnnotation pepAnn = null;
-//            ReplicateAnnotation repAnn = null;
-//            if (gctfile.getAssayType().equals(AssayType.GCP)) {
-//                gctfile.setRunId(2144);
-//
-//                pepAnn = peptideAnnotationRepository.save(new PeptideAnnotation("BI10007"));
-//                repAnn = replicateAnnotationRepository.save(new ReplicateAnnotation("GM7-49453-003A03"));
-//            } else {
-//                gctfile.setRunId(2108);
-//                pepAnn = peptideAnnotationRepository.save(new PeptideAnnotation("10011_DYRK_Y321_IYQY[+80]IQSR"));
-//                repAnn = replicateAnnotationRepository.save(new ReplicateAnnotation("PA9-79EE-001A01"));
-//            }
-//            gctfile.setRunIdUrl(connectPanorama.getRunIdLink(gctfile));
-//            gctFileRepository.save(gctfile);
-//
-//
-//            PeakArea pa1 = new PeakArea(gctfile, pepAnn, repAnn, 34.2);
-//            PeakArea pa2 = new PeakArea(gctfile, pepAnn, repAnn, -15.1);
-//
-//            pa1.setSourceUrl(connectPanorama.getSourceUrl(pa1));
-//            pa2.setSourceUrl(connectPanorama.getSourceUrl(pa2));
-//
-//            peakAreaRepository.save(pa1);
-//            peakAreaRepository.save(pa2);
-//        }
     }
 
 }

@@ -1,6 +1,6 @@
-package edu.uc.eh.service;
+package edu.uc.eh.utils;
 
-import edu.uc.eh.domain.AssayType;
+import edu.uc.eh.utils.AssayType;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;

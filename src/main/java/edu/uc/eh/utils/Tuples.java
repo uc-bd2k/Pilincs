@@ -1,9 +1,11 @@
-package edu.uc.eh.service;
+package edu.uc.eh.utils;
+
+import java.io.Serializable;
 
 /**
  * Created by chojnasm on 7/28/15.
  */
-public class Tuples {
+public class Tuples implements Serializable{
     public static <T1,T2> Tuple2<T1,T2> tuple2(T1 t1, T2 t2){
         return new Tuples.Tuple2<T1,T2>(t1,t2);
     }
@@ -12,7 +14,7 @@ public class Tuples {
         return new Tuples.Tuple3<T1,T2,T3>(t1,t2,t3);
     }
 
-    public static class Tuple2<T1,T2> {
+    public static class Tuple2<T1,T2> implements Serializable{
         protected T1 t1;
         protected T2 t2;
         public Tuple2(T1 f1, T2 f2) {
@@ -22,7 +24,7 @@ public class Tuples {
         public T2 getT2() {return t2;}
     }
 
-    public static class Tuple3<T1,T2,T3> extends Tuple2{
+    public static class Tuple3<T1,T2,T3> extends Tuple2 implements Serializable{
         protected T3 t3;
         public Tuple3(T1 f1, T2 f2,T3 f3) {
             super(f1,f2);

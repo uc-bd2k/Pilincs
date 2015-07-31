@@ -1,7 +1,6 @@
+var appControllers = angular.module('appControllers', []);
 
-var app = angular.module('plunker', ['ngTagsInput']);
-
-app.controller('MainCtrl', ['$scope', '$http', '$timeout',function($scope, $http, $timeout) {
+appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($scope, $http, $timeout) {
 
 
     $scope.showRecommend = false;

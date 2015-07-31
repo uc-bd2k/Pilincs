@@ -2,6 +2,8 @@ package edu.uc.eh.service;
 
 
 import edu.uc.eh.domain.*;
+import edu.uc.eh.utils.AssayType;
+import edu.uc.eh.utils.Utils;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.SelectRowsCommand;

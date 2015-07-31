@@ -4,6 +4,8 @@ package edu.uc.eh.domain;
  * Created by chojnasm on 7/17/15.
  */
 
+import edu.uc.eh.utils.AssayType;
+
 import javax.persistence.*;
 
 import java.util.Date;

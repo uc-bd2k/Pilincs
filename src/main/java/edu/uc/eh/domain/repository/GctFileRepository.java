@@ -1,6 +1,5 @@
 package edu.uc.eh.domain.repository;
 
-import edu.uc.eh.domain.AssayType;
 import edu.uc.eh.domain.GctFile;
 import org.springframework.data.jpa.repository.JpaRepository;
 
