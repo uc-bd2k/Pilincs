@@ -91,7 +91,7 @@ public class DatabaseLoader {
         List<String> list = connectPanorama.GctUrls();
         int counter = 0;
         for(String url : list){
-            if(counter++ > 0) continue;
+//            if(counter++ > 0) continue;
             HashMap<String, List<ParseGCT.AnnotationValue>> metaProbes = new HashMap<>();
             HashMap<String, List<ParseGCT.AnnotationValue>> metaReplicas = new HashMap<>();
             ArrayList<ParseGCT.ProbeReplicatePeak> peakValues = new ArrayList<>();

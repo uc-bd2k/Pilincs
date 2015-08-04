@@ -1,15 +1,25 @@
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
+//        mavenCentral()
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:1.1.6.RELEASE")
+        classpath("org.springframework:springloaded:1.2.0.RELEASE")
     }
 }
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'idea'
 apply plugin: 'spring-boot'
+
+idea {
+    module {
+        inheritOutputDirs = false
+        outputDir = file("$buildDir/classes/main/")
+    }
+}
+
 jar {
     baseName = 'pilinc'
     version = '0.1.0-SNAPSHOT'

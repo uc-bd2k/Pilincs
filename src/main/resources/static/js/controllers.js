@@ -1,44 +1,92 @@
+function postQueryParams(params) {
+    //console.log($scope.tags);
+
+    var scope = angular.element('#tablePeaks').scope();
+    var queryContent = [];
+    queryContent.push({"p100":scope.p100});
+    queryContent.push({"gcp":scope.gcp});
+    queryContent = queryContent.concat(scope.tags);
+
+    params.tags = JSON.stringify(queryContent);
+    console.log(params.tags);
+    return params;
+}
+
+
 var appControllers = angular.module('appControllers', []);
+//appControllers.service('ItemService', [ItemService]);
 
 appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($scope, $http, $timeout) {
-
 
     $scope.showRecommend = false;
     $scope.tags = [];
     $scope.p100 = true;
     $scope.gcp = false;
+    $scope.l1000 = false;
+
+    $scope.workspaces = [];
+    $scope.workspaces.push({ name: 'Show Data',alias:'tablePeaks' });
+    $scope.workspaces.push({ name: 'Show Profiles', alias: 'tableProfiles' });
+    $scope.workspaces.push({ name: 'Show Relations', alias: 'tableRelations' });
+    $scope.workspaces.push({ name: 'Show API', alias: 'tableAPI' });
+
+    $scope.changeCurrentWorkspace = function (wk) {
+        $scope.currentWorkspace = wk;
+        if(wk == $scope.workspaces[0]){
+            $('#tablePeaks').parent().parent().parent().show();
+            $('#tableProfiles').parent().parent().parent().hide();
+
+        }else if(wk == $scope.workspaces[1]){
+            $('#tablePeaks').parent().parent().parent().hide();
+            $('#tableProfiles').parent().parent().parent().show();
+        }
+    }
+
+
+    $scope.refreshTables = function(){
+        $('#tablePeaks').bootstrapTable('refresh');
+        $('#tableProfiles').bootstrapTable('refresh');
+        $('#tableRelations').bootstrapTable('refresh');
+        $('#tableAPI').bootstrapTable('refresh');
+    }
 
     $timeout(callAtTimeout, 2500);
     function callAtTimeout() {
         $scope.showRecommend = true;
         $scope.recommended = [
-            {'name':"PC3",'flag':'Cell','annotation':'CellId'}];
-        $timeout(function(){ $scope.recommended.push({'name':"NPC",'flag':'Cell','annotation':'CellId'}); }, 300);
-        $timeout(function(){ $scope.recommended.push({'name':"MCF7",'flag':'Cell','annotation':'CellId'}); }, 600);
-        $timeout(function(){ $scope.recommended.push({'name':"UNC1215",'flag':'Replicate','annotation':'Pertiname'}); }, 900);
-        $timeout(function(){ $scope.recommended.push({'name':"MS-275",'flag':'Replicate','annotation':'Pertiname'}); }, 1200);
-        $timeout(function(){ $scope.recommended.push({'name':"methylstat",'flag':'Replicate','annotation':'Pertiname'}); }, 1500);
-        $timeout(function(){ $scope.recommended.push({'name':"DYRK1A",'flag':'Peptide','annotation':'PrGeneSymbol'}); }, 1800);
-        $timeout(function(){ $scope.recommended.push({'name':"HN1",'flag':'Peptide','annotation':'PrGeneSymbol'}); }, 2100);
+            {'name':"PC3",'flag':'Cell','annotation':'CellId'},
+            {'name':"NPC",'flag':'Cell','annotation':'CellId'},
+            {'name':"MCF7",'flag':'Cell','annotation':'CellId'},
+            {'name':"UNC1215",'flag':'Replicate','annotation':'Pertiname'},
+            {'name':"MS-275",'flag':'Replicate','annotation':'Pertiname'},
+            {'name':"methylstat",'flag':'Replicate','annotation':'Pertiname'},
+            {'name':"DYRK1A",'flag':'Peptide','annotation':'PrGeneSymbol'},
+            {'name':"HN1",'flag':'Peptide','annotation':'PrGeneSymbol'}
+        ];
     }
 
-    $scope.toggleP100 = function(){
-        $scope.p100 = !$scope.p100;
-        if($scope.p100 == false && $scope.gcp == false){
-            $scope.gcp = true;
-        }
-        $('#tablePeaks').bootstrapTable('refresh');
+    $scope.toggle = function(el){
+
+            $scope[el] = !$scope[el];
+            if($scope.p100 == false && $scope.gcp == false) {
+                if (el == 'p100') {
+                    $scope.gcp = true;
+                } else {
+                    $scope.p100 = true;
+                }
+            }
+
+        $scope.refreshTables();
+
     }
 
-    $scope.toggleGcp = function(){
-        $scope.gcp = !$scope.gcp;
-        if($scope.p100 == false && $scope.gcp == false){
-            $scope.p100 = true;
-        }
-        $('#tablePeaks').bootstrapTable('refresh');
+    $scope.getToggleClass = function(status){
+            return {
+                toggle: status,
+                untoggle: !status
+            };
     }
 
-    // ok
     $scope.loadTags = function($query) {
         return $http.get('/pilincs/api-tags', { cache: true}).then(function(response) {
             var annotations = response.data;
@@ -67,13 +115,12 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
 
     $scope.tagAddedRemoved = function() {
         $scope.getRecommendation();
-        $('#tablePeaks').bootstrapTable('refresh');
+        $scope.refreshTables();
     };
-
 
     $scope.searchClicked = function() {
         $scope.getRecommendation();
-        $('#tablePeaks').bootstrapTable('refresh');
+        $scope.refreshTables();
     };
 
     // ok
@@ -87,94 +134,106 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
         if($scope.recommended.length == 0){
             $scope.getRecommendation();
         }
-        $('#tablePeaks').bootstrapTable('refresh');
+        $scope.refreshTables();
     };
 
-}]);
+    //
 
-// Table Wenz...
-$(function () {
-    $('#tablePeaks').bootstrapTable({
+    //generate random rows
+    // Tables Wenz...
+    //$(function () {
+        $('#tablePeaks').bootstrapTable({
+            url: '/pilincs/api-assays-paged/',
+            showColumns: 'true',
+            queryParams: 'postQueryParams',
+            pagination: 'true',
+            sidePagination: 'server',
+            showExport: 'true',
+            detailFormatter: 'detailFormatter',
+            columns: [{
+                field: 'assayType',
+                title: 'Assay type'
+            }, {
+                field: 'runIdUrl',
+                title: 'Panorama'
+            }, {
+                field: 'peptideId',
+                title: 'Peptide'
+            }, {
+                field: 'replicateId',
+                title: 'Replicate',
+                visible: false
+            }, {
+                field: 'cellId',
+                title: 'Cell'
+            }, {
+                field: 'pertIname',
+                title: 'Pert Iname'
+            }, {
+                field: 'pertDose',
+                title: 'Dose (uM)'
+            }, {
+                field: 'pertTime',
+                title: 'Time (h)'
+            }, {
+                field: 'pertType',
+                title: 'Pert Type',
+                visible: false
+            }, {
+                field: 'pertVehicle',
+                title: 'Vehicle',
+                visible: false
+            }, {
+                field: 'pubchemCid',
+                title: 'PubchemCid',
+                visible: false
+            }, {
+                field: 'value',
+                title: 'Peak Area'
+            }, {
+                field: 'sourceUrl',
+                title: 'Chromatograms',
+                halign: 'center'
+            }, {
+                field: 'pertId',
+                title: 'Pert Id',
+                visible: false
+            }, {
+                field: 'downloadUrl',
+                title: 'Analyze'
+            }],
+            responseHandler: function (res) {
+                return res;
+            }
+        });
+    //});
+
+    //$(function () {
+    $('#tableProfiles').bootstrapTable({
         url: '/pilincs/api-assays-paged/',
-        showColumns: 'true',
         queryParams: 'postQueryParams',
         pagination: 'true',
         sidePagination: 'server',
         showExport: 'true',
-        detailFormatter: 'detailFormatter',
         columns: [{
             field: 'assayType',
-            title: 'Assay type'
-        }, {
-            field: 'runIdUrl',
-            title: 'Panorama'
-        }, {
-            field: 'peptideId',
-            title: 'Peptide'
-        }, {
-            field: 'replicateId',
-            title: 'Replicate',
-            visible: false
+            title: 'Profile'
         }, {
             field: 'cellId',
             title: 'Cell'
-        }, {
-            field: 'pertIname',
-            title: 'Pert Iname'
-        }, {
-            field: 'pertDose',
-            title: 'Dose (uM)'
-        }, {
-            field: 'pertTime',
-            title: 'Time (h)'
-        }, {
-            field: 'pertType',
-            title: 'Pert Type',
-            visible: false
-        }, {
-            field: 'pertVehicle',
-            title: 'Vehicle',
-            visible: false
-        }, {
-            field: 'pubchemCid',
-            title: 'PubchemCid',
-            visible: false
-        }, {
-            field: 'value',
-            title: 'Peak Area'
-        }, {
-            field: 'sourceUrl',
-            title: 'Chromatograms',
-            halign: 'center'
-        }, {
-            field: 'pertId',
-            title: 'Pert Id',
-            visible: false
-        }, {
-            field: 'downloadUrl',
-            title: 'Analyze'
         }],
         responseHandler: function (res) {
             return res;
         }
     });
-});
 
-function postQueryParams(params) {
-    //console.log($scope.tags);
+    $('#tableProfiles').parent().parent().parent().hide();
+
+}]);
 
 
-    var scope = angular.element('#tablePeaks').scope();
 
-    var queryContent = [];
-    queryContent.push({"p100":scope.p100});
-    queryContent.push({"gcp":scope.gcp});
-    queryContent = queryContent.concat(scope.tags);
 
-    params.tags = JSON.stringify(queryContent);
-    console.log(params.tags);
-    return params;
-}
 
 
 

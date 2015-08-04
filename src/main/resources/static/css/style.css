@@ -1,3 +1,7 @@
+/* P100 GCP Toggle*/
+.toggle {font-weight: bold;padding-left:25px;padding-right:25px;}
+.untoggle {font-weight: normal;padding-left:25px;padding-right:25px;}
+
 /* Autocomplete view */
 
 .left-panel {
