@@ -37,6 +37,8 @@
         <script src="bower_components/tableExport/index.js"></script>
         <script src="bower_components/bootstrap-table/dist/extensions/filter-control/bootstrap-table-filter-control.min.js"></script>
 
+        <!-- Sparkline -->
+        <script src="bower_components/peity/minified.js"></script>
     </head>
     <body ng-app="pilincs">
 
@@ -106,10 +108,11 @@
         </div>
 
         <!-- Recommendations -->
+
         <div class="row col-sm-offset-1" style="padding-left: 10px;">
             <div ng-show="showRecommend && recommended.length > 0" class="col-sm-offset-2"
                  style="padding-left: 15px; padding-bottom: 30px;">
-                <span>You may like:</span>
+                <span>{{recommendText}}</span>
                 <span ng-repeat="item in recommended">
 
                         <button ng-click="recommendedClicked(item)" class="btn btn-default btn-xs"
@@ -123,9 +126,10 @@
         <table class="table table-bordered table-striped" style="padding-top: 30px;">
             <tbody>
             <tr>
-                <td align="center" width="25%" ng-repeat="wk in workspaces" ng-class="{active: currentWorkspace==wk}"
+                <td align="center" width="25%" ng-repeat="wk in workspaces" ng-class="{thisTab: currentWorkspace==wk}"
+
                     ng-click="changeCurrentWorkspace(wk)">
-                    <h4><a href="#">{{wk.name}}</a></h4>
+                    <h4 ng-class="{disabled: wk.active}"><a href="#">{{wk.name}}</a></h4>
                 </td>
             </tr>
             </tbody>

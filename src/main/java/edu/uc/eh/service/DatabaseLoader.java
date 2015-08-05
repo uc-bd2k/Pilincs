@@ -3,8 +3,10 @@ package edu.uc.eh.service;
 import edu.uc.eh.domain.*;
 import edu.uc.eh.domain.repository.*;
 
+import edu.uc.eh.utils.AssayType;
 import edu.uc.eh.utils.Tuples;
 import edu.uc.eh.utils.Utils;
+import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 import org.labkey.remoteapi.CommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.awt.print.Pageable;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -60,29 +63,71 @@ public class DatabaseLoader {
     private void loadProfiles() {
         log.info("Filling repository with profiles");
         for(ReplicateAnnotation replicateAnnotation : replicateAnnotationRepository.findAll()){
+
+            AssayType assayType;
             Long replicateId = replicateAnnotation.getId();
             List<PeakArea> peaksForReplicate = peakAreaRepository.findByReplicateAnnotationId(replicateId);
             List<Tuples.Tuple2<java.lang.String,Double>> profileVector = new ArrayList<>();
 
             for(PeakArea peakArea : peaksForReplicate){
-                profileVector.add(new Tuples.Tuple2<>(peakArea.getPeptideAnnotation().getPeptideId(),peakArea.getValue()));
+
+                profileVector.add(new Tuples.Tuple2<>(peakArea.getPeptideAnnotation().getPeptideId(),
+                        peakArea.getValue() == null ? 0.0 : peakArea.getValue()));
             }
 
-            Profile profile = new Profile(replicateAnnotation, profileVector);
+            assayType = peaksForReplicate.get(0).getGctFile().getAssayType();
+
+            Profile profile = new Profile(replicateAnnotation, assayType, profileVector);
 
             profileRepository.save(profile);
         }
 
-        PageRequest pageable = new PageRequest(0,10);
-        List<String> cells = new ArrayList<>();
-        cells.add("PC3");
-        List<String> pertiname = new ArrayList<>();
-        pertiname.add("methylstat");
+        HashMap<Integer,ArrayList<Profile>> profilesByLength = new HashMap<>();
+        for(Profile profile : profileRepository.findAll()){
 
-        List<Profile> profiles =
-                profileRepository.findByReplicateAnnotationCellIdInAndReplicateAnnotationPertinameIn(cells, pertiname, pageable);
+            Integer length = profile.getVector().size();
+            if (!profilesByLength.containsKey(length)) {
+                profilesByLength.put(length, new ArrayList<Profile>());
+            }
+            profilesByLength.get(length).add(profile);
+        }
 
-        log.warn(profiles.size()+"");
+        DecimalFormat df = new DecimalFormat("0.0000");
+        Iterator it = profilesByLength.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            ArrayList<Profile> profiles = (ArrayList<Profile>) pair.getValue();
+            for(Profile profileA : profiles){
+                double[] doublesA = profileA.getVectorDoubles();
+                Double maxSoFar = -1.0;
+                Double minSoFar = 1.0;
+                Profile maxProfile = profileA;
+                Profile minProfile = profileA;
+
+                for(Profile profileB : profiles){
+                    if(profileA.equals(profileB))continue;
+
+                    double[] doublesB = profileB.getVectorDoubles();
+
+                    PearsonsCorrelation pearson = new PearsonsCorrelation();
+                    Double correlation = pearson.correlation(doublesA,doublesB);
+                    if(correlation >= maxSoFar){
+                        maxSoFar = correlation;
+                        maxProfile = profileB;
+                    }
+                    if(correlation <= minSoFar){
+                        minSoFar = correlation;
+                        minProfile = profileB;
+                    }
+                }
+
+                profileA.setPositiveCorrelation(maxProfile.toString() + " <br/><br/><b style=\"color: #23527c;\">" + df.format(maxSoFar) + "</b>" );
+                profileA.setNegativeCorrelation(minProfile.toString() + " <br/><br/><b style=\"color: #23527c;\">" + df.format(minSoFar) + "</b>" );
+
+                profileRepository.save(profileA);
+            }
+        }
+
 
     }
 

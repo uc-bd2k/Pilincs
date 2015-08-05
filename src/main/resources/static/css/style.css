@@ -136,3 +136,10 @@
     /* shadow */
     text-shadow: 0 0 1px #B1A5A5;
 }
+
+/* Selected Tab */
+.thisTab {
+    color: #23527c;
+    text-decoration: underline;
+
+}

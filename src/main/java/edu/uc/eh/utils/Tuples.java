@@ -22,6 +22,11 @@ public class Tuples implements Serializable{
         }
         public T1 getT1() {return t1;}
         public T2 getT2() {return t2;}
+
+        @Override
+        public String toString() {
+            return t2+"";
+        }
     }
 
     public static class Tuple3<T1,T2,T3> extends Tuple2 implements Serializable{

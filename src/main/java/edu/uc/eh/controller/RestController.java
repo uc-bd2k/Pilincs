@@ -2,10 +2,7 @@ package edu.uc.eh.controller;
 
 import edu.uc.eh.domain.*;
 import edu.uc.eh.domain.json.*;
-import edu.uc.eh.domain.repository.GctFileRepository;
-import edu.uc.eh.domain.repository.PeakAreaRepository;
-import edu.uc.eh.domain.repository.PeptideAnnotationRepository;
-import edu.uc.eh.domain.repository.ReplicateAnnotationRepository;
+import edu.uc.eh.domain.repository.*;
 import edu.uc.eh.service.ConnectPanorama;
 import edu.uc.eh.service.QueryService;
 import edu.uc.eh.utils.Tuples;
@@ -35,6 +32,7 @@ public class RestController {
     private final PeptideAnnotationRepository peptideAnnotationRepository;
     private final PeakAreaRepository peakAreaRepository;
     private final QueryService queryService;
+    private final ProfileRepository profileRepository;
 
     @Autowired
     public RestController(ConnectPanorama connectPanorama,
@@ -42,13 +40,15 @@ public class RestController {
                           ReplicateAnnotationRepository replicateAnnotationRepository,
                           PeptideAnnotationRepository peptideAnnotationRepository,
                           PeakAreaRepository peakAreaRepository,
-                          QueryService queryService) {
+                          QueryService queryService,
+                          ProfileRepository profileRepository) {
         this.connectPanorama = connectPanorama;
         this.gctFileRepository = gctFileRepository;
         this.replicateAnnotationRepository = replicateAnnotationRepository;
         this.peptideAnnotationRepository = peptideAnnotationRepository;
         this.peakAreaRepository = peakAreaRepository;
         this.queryService = queryService;
+        this.profileRepository = profileRepository;
     }
 
 
@@ -113,6 +113,66 @@ public class RestController {
         }
 
         return new TableResponse(count,output);
+    }
+
+
+    @RequestMapping(value = "/api-profiles-paged", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    ProfileResponse profilesAsJsonPaged(
+            @RequestParam String order,
+            @RequestParam Integer limit,
+            @RequestParam Integer offset,
+            @RequestParam String tags) throws ParseException {
+
+        List<ProfileRecord> output = new ArrayList<>();
+
+        HashMap<String,List<String>> tagsParsed = Utils.parseTags(tags);
+
+        PageRequest pageRequest = new PageRequest(offset / limit, limit);
+        Page<Profile> result;
+        Long count;
+
+        List<String> allTagsForPertiname = new ArrayList<>();
+        List<String> allTagsForcell = new ArrayList<>();
+        List<String> allTagsForgenesymbol = new ArrayList<>();
+
+        for (TagFormat tagFormat : getTagsForAutocompletion()) {
+            String annotation = tagFormat.getAnnotation();
+            switch (annotation) {
+                case "Pertiname":
+                    allTagsForPertiname.add(tagFormat.getName());
+                    break;
+                case "CellId":
+                    allTagsForcell.add(tagFormat.getName());
+                    break;
+                case "PrGeneSymbol":
+                    allTagsForgenesymbol.add(tagFormat.getName());
+                    break;
+            }
+        }
+
+        List<String> assayTypesString = tagsParsed.get("AssayTypes");
+        List<AssayType> assayTypes = new ArrayList<>();
+
+        for(String string : assayTypesString){
+            assayTypes.add(AssayType.valueOf(string));
+        }
+
+        List<String> pertinameTags = tagsParsed.get("Pertiname").size() > 0 ? tagsParsed.get("Pertiname") : allTagsForPertiname;
+        List<String> cellTags = tagsParsed.get("CellId").size() > 0 ? tagsParsed.get("CellId") : allTagsForcell;
+        List<String> genesymbolTags = tagsParsed.get("PrGeneSymbol").size() > 0 ? tagsParsed.get("PrGeneSymbol") : allTagsForgenesymbol;
+
+        result = profileRepository.findByAssayTypeInAndReplicateAnnotationCellIdInAndReplicateAnnotationPertinameIn(
+                assayTypes,cellTags,pertinameTags,pageRequest);
+
+        count = result.getTotalElements();
+
+        for(Profile profile : result){
+            output.add(new ProfileRecord(profile));
+        }
+
+        return new ProfileResponse(count,output);
     }
 
 

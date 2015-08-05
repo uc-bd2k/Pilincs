@@ -25,8 +25,8 @@ public class ConnectPanorama {
 
     private static final Logger log = LoggerFactory.getLogger(ConnectPanorama.class);
 
-    @Value("${panorama.folders}")
-    private String panoramaFolders;
+//    @Value("${panorama.folders}")
+    private String panoramaFolders = "LINCS/P100,LINCS/GCP";
 
     @Value("${panorama.runIdUrl}")
     private String runIdUrl;

@@ -16,4 +16,6 @@ public class ListWrapper implements Serializable {
     public List<Tuples.Tuple2<String,Double>> getList() {
         return list;
     }
+
+
 }

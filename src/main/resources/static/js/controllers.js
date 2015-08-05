@@ -1,6 +1,7 @@
 function postQueryParams(params) {
     //console.log($scope.tags);
 
+
     var scope = angular.element('#tablePeaks').scope();
     var queryContent = [];
     queryContent.push({"p100":scope.p100});
@@ -18,6 +19,7 @@ var appControllers = angular.module('appControllers', []);
 
 appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($scope, $http, $timeout) {
 
+    $scope.recommendText = 'You may like: ';
     $scope.showRecommend = false;
     $scope.tags = [];
     $scope.p100 = true;
@@ -25,10 +27,12 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
     $scope.l1000 = false;
 
     $scope.workspaces = [];
-    $scope.workspaces.push({ name: 'Show Data',alias:'tablePeaks' });
-    $scope.workspaces.push({ name: 'Show Profiles', alias: 'tableProfiles' });
-    $scope.workspaces.push({ name: 'Show Relations', alias: 'tableRelations' });
-    $scope.workspaces.push({ name: 'Show API', alias: 'tableAPI' });
+    $scope.workspaces.push({ name: 'Show Data',alias:'tablePeaks',active:true });
+    $scope.workspaces.push({ name: 'Show Profiles', alias: 'tableProfiles',active:true });
+    $scope.workspaces.push({ name: 'Show Relations', alias: 'tableRelations',active:false });
+    $scope.workspaces.push({ name: 'Show API', alias: 'tableAPI',active:false });
+
+    $scope.currentWorkspace = $scope.workspaces[1];
 
     $scope.changeCurrentWorkspace = function (wk) {
         $scope.currentWorkspace = wk;
@@ -46,11 +50,9 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
     $scope.refreshTables = function(){
         $('#tablePeaks').bootstrapTable('refresh');
         $('#tableProfiles').bootstrapTable('refresh');
-        $('#tableRelations').bootstrapTable('refresh');
-        $('#tableAPI').bootstrapTable('refresh');
     }
 
-    $timeout(callAtTimeout, 2500);
+    $timeout(callAtTimeout, 0);
     function callAtTimeout() {
         $scope.showRecommend = true;
         $scope.recommended = [
@@ -98,11 +100,30 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
 
     $scope.getRecommendation = function() {
 
+        if($scope.currentWorkspace == $scope.workspaces[1]){
+            if($scope.tags[$scope.tags.length - 1].annotation=='PrGeneSymbol'){
+                $scope.recommendText = 'Ups! GeneSymbol can\'t be used to filter profiles. ';
+                $scope.recommended = [{'name':"PC3",'flag':'Cell','annotation':'CellId'}];
+                return;
+            }else{
+                $scope.recommendText = 'You may like: ';
+            }
+        }
+
         if ($scope.tags.length < 5) {
             var res = $http.post('/pilincs/api-recommend', JSON.stringify($scope.tags));
             res.success(function (data, status, headers, config) {
                 if(data.length == 0){
                     callAtTimeout();
+                }
+                if($scope.currentWorkspace == $scope.workspaces[1]){
+                    data = data.filter(function(value){
+                        if(value.annotation=='PrGeneSymbol'){
+                            return false;
+                        }else{
+                            return true;
+                        }
+                    })
                 }
                 $scope.recommended = data;
                 $scope.showRecommend = true;
@@ -207,27 +228,73 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
             }
         });
     //});
+    $('#tablePeaks').parent().parent().parent().hide();
 
     //$(function () {
     $('#tableProfiles').bootstrapTable({
-        url: '/pilincs/api-assays-paged/',
+        url: '/pilincs/api-profiles-paged/',
         queryParams: 'postQueryParams',
         pagination: 'true',
         sidePagination: 'server',
-        showExport: 'true',
-        columns: [{
-            field: 'assayType',
-            title: 'Profile'
-        }, {
-            field: 'cellId',
-            title: 'Cell'
-        }],
+        showColumns: true,
+        detailView: true,
+        detailFormatter: function(index,row){
+          return "<div class=\"col-md-3\"><b style=\"color: #23527c;\">Selected profile</b> <br/>" +
+            "<br/><b>Assay: </b>" + row.assayType +
+            "<br/><b>ReplicateId: </b>" + row.replicateId +
+            "<br/><b>PertIname: </b>" + row.pertIname +
+            "<br/><b>CellId: </b>" + row.cellId +
+            "<br/><b>Dose: </b>" + row.pertDose +
+            "<br/><b>Time: </b>" + row.pertTime +
+              "<br/><br/><b style=\"color: #23527c;\">Spearmann correlation:</b>" +
+            "</div>" +
+              "<div class=\"col-md-3\"><b style=\"color: #23527c;\">Most correlated profile</b><br/><br/> " + row.positiveCorrelation + "</div>" +
+              "<div class=\"col-md-3\"><b style=\"color: #23527c;\">Most anty-correlated profile </b><br/><br/> " + row.negativeCorrelation +"</div>";
+        },
+        onLoadSuccess: function(){$(".barchart").peity("bar",{width:700});},
+        onColumnSwitch: function(){$(".barchart").peity("bar",{width:700});},
+        columns: [
+            {
+                field: 'assayType',
+                title: 'Assay'
+            },
+            {
+                field: 'replicateId',
+                title: 'ReplicateId',
+                visible: false
+            },
+            {
+                field: 'pertIname',
+                title: 'PertIname'
+            }
+            , {
+                field: 'cellId',
+                title: 'Cell'
+            },
+            {
+                field: 'pertDose',
+                title: 'Dose',
+                visible: false
+            },
+            {
+                field: 'pertTime',
+                title: 'Time',
+                visible: false
+            },
+            {
+                field: 'vector',
+                title: 'Profile'
+            },
+            {
+                field: 'sth',
+                title: 'Panorama'
+            }],
         responseHandler: function (res) {
             return res;
         }
     });
 
-    $('#tableProfiles').parent().parent().parent().hide();
+    //$('#tableProfiles').parent().parent().parent().hide();
 
 }]);
 
