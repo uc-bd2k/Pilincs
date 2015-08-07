@@ -48,4 +48,9 @@ Modify configuration files to adjust the application to your needs:
  /src/main/resource/application.properties
  /src/main/resource/application-mysql.properties
  ```
- After changing properties file you need to build sources again. Consider changing database engine (a template of MySQL configuration is included). You may also change deployment path (currently set to /pilincs). Or just select Panorama folders that are relevant to your research.
+ After changing properties file you need to build sources again. To run `mysql` profile type: 
+ 
+ ```
+ java --spring.profiles.active=mysql -jar build/libs/*.jar
+ ```
+ Consider changing database engine (a template of MySQL configuration is included). You may also change deployment path (currently set to /pilincs). Or just select Panorama folders that are relevant to your research.
