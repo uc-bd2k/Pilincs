@@ -1,4 +1,4 @@
-package edu.uc.eh.service;
+package edu.uc.eh.utils;
 
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;

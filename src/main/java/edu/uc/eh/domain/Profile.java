@@ -1,12 +1,12 @@
 package edu.uc.eh.domain;
 
-import edu.uc.eh.utils.AssayType;
-import edu.uc.eh.utils.ListWrapper;
-import edu.uc.eh.utils.Tuples;
+import edu.uc.eh.datatypes.AssayType;
+import edu.uc.eh.datatypes.ListWrapper;
+import edu.uc.eh.datatypes.StringDouble;
+import edu.uc.eh.datatypes.Tuples;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,8 +31,14 @@ public class Profile implements Serializable{
     private String positiveCorrelation;
     private String negativeCorrelation;
 
+    @Lob
+    private String positivePeptides;
+
+    @Lob
+    private String negativePeptides;
+
     public Profile(ReplicateAnnotation replicateAnnotation, AssayType assayType,
-                   List<Tuples.Tuple2<String, Double>> vector) {
+                   List<StringDouble> vector) {
 
         this.replicateAnnotation = replicateAnnotation;
         this.assayType = assayType;
@@ -80,33 +86,32 @@ public class Profile implements Serializable{
         return assayType;
     }
 
-    public List<Tuples.Tuple2<String, Double>> getVector() {
+    public List<StringDouble> getVector() {
         return vector.getList();
     }
 
     public double[] getVectorDoubles() {
         double[] doubles = new double[vector.getList().size()];
         for(int i=0; i<doubles.length; i++){
-            Tuples.Tuple2 tuple2 = vector.getList().get(i);
-            doubles[i]=((Double) tuple2.getT2());
+            StringDouble tuple2 = vector.getList().get(i);
+            doubles[i]= tuple2.getaDouble();
         }
         return doubles;
     }
 
+    public void setPositivePeptides(String positivePeptides) {
+        this.positivePeptides = positivePeptides;
+    }
 
-//    public List<Tuples.Tuple2<String, Double>> getPositiveCorrelation() {
-//        return positiveCorrelation;
-//    }
-//
-//    public void setPositiveCorrelation(List<Tuples.Tuple2<String, Double>> positiveCorrelation) {
-//        this.positiveCorrelation = positiveCorrelation;
-//    }
-//
-//    public List<Tuples.Tuple2<String, Double>> getNegativeCorrelation() {
-//        return negativeCorrelation;
-//    }
-//
-//    public void setNegativeCorrelation(List<Tuples.Tuple2<String, Double>> negativeCorrelation) {
-//        this.negativeCorrelation = negativeCorrelation;
-//    }
+    public String getPositivePeptides() {
+        return positivePeptides;
+    }
+
+    public String getNegativePeptides() {
+        return negativePeptides;
+    }
+
+    public void setNegativePeptides(String negativePeptides) {
+        this.negativePeptides = negativePeptides;
+    }
 }

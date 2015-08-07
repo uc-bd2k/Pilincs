@@ -3,11 +3,11 @@ package edu.uc.eh.controller;
 import edu.uc.eh.domain.*;
 import edu.uc.eh.domain.json.*;
 import edu.uc.eh.domain.repository.*;
-import edu.uc.eh.service.ConnectPanorama;
+import edu.uc.eh.utils.ConnectPanorama;
 import edu.uc.eh.service.QueryService;
-import edu.uc.eh.utils.Tuples;
-import edu.uc.eh.utils.Utils;
-import edu.uc.eh.utils.AssayType;
+import edu.uc.eh.datatypes.Tuples;
+import edu.uc.eh.utils.ParseUtils;
+import edu.uc.eh.datatypes.AssayType;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -63,7 +63,7 @@ public class RestController {
 
         List<AssayRecord> output = new ArrayList<>();
 
-        HashMap<String,List<String>> tagsParsed = Utils.parseTags(tags);
+        HashMap<String,List<String>> tagsParsed = ParseUtils.parseTags(tags);
 
         PageRequest pageRequest = new PageRequest(offset / limit, limit);
         Page<PeakArea> result;
@@ -127,7 +127,7 @@ public class RestController {
 
         List<ProfileRecord> output = new ArrayList<>();
 
-        HashMap<String,List<String>> tagsParsed = Utils.parseTags(tags);
+        HashMap<String,List<String>> tagsParsed = ParseUtils.parseTags(tags);
 
         PageRequest pageRequest = new PageRequest(offset / limit, limit);
         Page<Profile> result;
@@ -209,7 +209,7 @@ public class RestController {
         while(allReplicates.hasNext()){
             ReplicateAnnotation replicateAnnotation = allReplicates.next();
 
-            TagFormat tagFormat = new TagFormat(replicateAnnotation.getPertiname(),"Replicate","Pertiname");
+            TagFormat tagFormat = new TagFormat(replicateAnnotation.getPertiname(),"Perturbation","Pertiname");
             if(tagFormat.getName() != null && !output.contains(tagFormat))output.add(tagFormat);
 
             tagFormat = new TagFormat(replicateAnnotation.getCellId(),"Cell","CellId");
@@ -232,8 +232,8 @@ public class RestController {
 
         List<TagFormat> output = new ArrayList<>();
 
-        HashMap<String,List<String>> tagsParsed = Utils.parseTags(tags);
-        String lastTagAnnotation = Utils.lastTag(tags);
+        HashMap<String,List<String>> tagsParsed = ParseUtils.parseTags(tags);
+        String lastTagAnnotation = ParseUtils.lastTag(tags);
         if(lastTagAnnotation == null)return output;
 
         List<String> allTagsForAnnotation = new ArrayList<>();

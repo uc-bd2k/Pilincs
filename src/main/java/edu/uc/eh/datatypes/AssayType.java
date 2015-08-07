@@ -1,4 +1,4 @@
-package edu.uc.eh.utils;
+package edu.uc.eh.datatypes;
 
 /**
  * Created by chojnasm on 7/17/15.

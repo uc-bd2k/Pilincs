@@ -22,7 +22,7 @@ idea {
 
 jar {
     baseName = 'pilinc'
-    version = '0.1.0-SNAPSHOT'
+    version = '0.2.0-SNAPSHOT'
 }
 // tag::version[]
 sourceCompatibility = 1.7

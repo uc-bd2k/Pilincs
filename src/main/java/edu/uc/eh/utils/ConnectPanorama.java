@@ -1,9 +1,8 @@
-package edu.uc.eh.service;
+package edu.uc.eh.utils;
 
 
 import edu.uc.eh.domain.*;
-import edu.uc.eh.utils.AssayType;
-import edu.uc.eh.utils.Utils;
+import edu.uc.eh.datatypes.AssayType;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.SelectRowsCommand;
@@ -28,8 +27,8 @@ public class ConnectPanorama {
 //    @Value("${panorama.folders}")
     private String panoramaFolders = "LINCS/P100,LINCS/GCP";
 
-    @Value("${panorama.runIdUrl}")
-    private String runIdUrl;
+//    @Value("${panorama.runIdUrl}")
+    private String runIdUrl="https://panoramaweb.org/labkey/targetedms/LINCS/%s/showPrecursorList.view?id=%d";
 
     @Value("${panorama.gctUrl}")
     private String gctUrl;
@@ -86,7 +85,7 @@ public class ConnectPanorama {
         String stepOne = String.format(intermediateLink, assayType, escapedPeptideId, runId);
         log.warn(stepOne);
 
-        Integer peptide = Utils.parsePeptideNumber(stepOne);
+        Integer peptide = ParseUtils.parsePeptideNumber(stepOne);
 
         if(peptide!=null){
             return String.format(detailedLink,assayType,peptide,replicateId);
@@ -111,7 +110,7 @@ public class ConnectPanorama {
 
         String stepOne = String.format(intermediateLink,assayType,sb.toString(),runId);
 
-        output= Utils.parsePeptideNumbers(stepOne,peptideIds);
+        output= ParseUtils.parsePeptideNumbers(stepOne, peptideIds);
 
         return output;
     }

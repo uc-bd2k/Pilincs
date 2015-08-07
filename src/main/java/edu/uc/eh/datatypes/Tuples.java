@@ -1,4 +1,4 @@
-package edu.uc.eh.utils;
+package edu.uc.eh.datatypes;
 
 import java.io.Serializable;
 

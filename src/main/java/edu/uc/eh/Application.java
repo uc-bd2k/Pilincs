@@ -1,11 +1,12 @@
 package edu.uc.eh;
 
-import edu.uc.eh.service.DatabaseLoader;
+import edu.uc.eh.utils.DatabaseLoader;
 import org.h2.server.web.WebServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.embedded.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -13,7 +14,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 
 import javax.annotation.PostConstruct;
-
 
 
 @SpringBootApplication

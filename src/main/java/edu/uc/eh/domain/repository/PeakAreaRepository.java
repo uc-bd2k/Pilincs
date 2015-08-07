@@ -1,6 +1,6 @@
 package edu.uc.eh.domain.repository;
 
-import edu.uc.eh.utils.AssayType;
+import edu.uc.eh.datatypes.AssayType;
 import edu.uc.eh.domain.PeakArea;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

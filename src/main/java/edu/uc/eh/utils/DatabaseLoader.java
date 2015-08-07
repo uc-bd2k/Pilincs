@@ -1,21 +1,18 @@
-package edu.uc.eh.service;
+package edu.uc.eh.utils;
 
+import edu.uc.eh.datatypes.StringDouble;
 import edu.uc.eh.domain.*;
 import edu.uc.eh.domain.repository.*;
 
-import edu.uc.eh.utils.AssayType;
-import edu.uc.eh.utils.Tuples;
-import edu.uc.eh.utils.Utils;
+import edu.uc.eh.datatypes.AssayType;
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 import org.labkey.remoteapi.CommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.awt.print.Pageable;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.*;
@@ -67,11 +64,11 @@ public class DatabaseLoader {
             AssayType assayType;
             Long replicateId = replicateAnnotation.getId();
             List<PeakArea> peaksForReplicate = peakAreaRepository.findByReplicateAnnotationId(replicateId);
-            List<Tuples.Tuple2<java.lang.String,Double>> profileVector = new ArrayList<>();
+            List<StringDouble> profileVector = new ArrayList<>();
 
             for(PeakArea peakArea : peaksForReplicate){
 
-                profileVector.add(new Tuples.Tuple2<>(peakArea.getPeptideAnnotation().getPeptideId(),
+                profileVector.add(new StringDouble(peakArea.getPeptideAnnotation().getPeptideId(),
                         peakArea.getValue() == null ? 0.0 : peakArea.getValue()));
             }
 
@@ -99,8 +96,9 @@ public class DatabaseLoader {
             ArrayList<Profile> profiles = (ArrayList<Profile>) pair.getValue();
             for(Profile profileA : profiles){
                 double[] doublesA = profileA.getVectorDoubles();
-                Double maxSoFar = -1.0;
-                Double minSoFar = 1.0;
+                Double maxPearson = -1.0;
+                Double minPearson = 1.0;
+
                 Profile maxProfile = profileA;
                 Profile minProfile = profileA;
 
@@ -110,19 +108,27 @@ public class DatabaseLoader {
                     double[] doublesB = profileB.getVectorDoubles();
 
                     PearsonsCorrelation pearson = new PearsonsCorrelation();
-                    Double correlation = pearson.correlation(doublesA,doublesB);
-                    if(correlation >= maxSoFar){
-                        maxSoFar = correlation;
+
+                    Double pearsonCorrelation = pearson.correlation(doublesA,doublesB);
+                    if(pearsonCorrelation >= maxPearson){
+                        maxPearson = pearsonCorrelation;
                         maxProfile = profileB;
                     }
-                    if(correlation <= minSoFar){
-                        minSoFar = correlation;
+                    if(pearsonCorrelation <= minPearson){
+                        minPearson = pearsonCorrelation;
                         minProfile = profileB;
                     }
                 }
 
-                profileA.setPositiveCorrelation(maxProfile.toString() + " <br/><br/><b style=\"color: #23527c;\">" + df.format(maxSoFar) + "</b>" );
-                profileA.setNegativeCorrelation(minProfile.toString() + " <br/><br/><b style=\"color: #23527c;\">" + df.format(minSoFar) + "</b>" );
+                SortedSet<StringDouble> positivePeptides = CalculateUtils.influentialPeptides(profileA, maxProfile, true);
+                SortedSet<StringDouble> negativePeptides = CalculateUtils.influentialPeptides(profileA, minProfile, false);
+
+
+                profileA.setPositivePeptides(TransformUtils.SortedSetToHTML(positivePeptides,false));
+                profileA.setNegativePeptides(TransformUtils.SortedSetToHTML(negativePeptides,true));
+
+                profileA.setPositiveCorrelation(maxProfile.toString() + " <br/><br/><b style=\"color: #23527c;\">" + df.format(maxPearson) + "</b>" );
+                profileA.setNegativeCorrelation(minProfile.toString() + " <br/><br/><b style=\"color: #23527c;\">" + df.format(minPearson) + "</b>" );
 
                 profileRepository.save(profileA);
             }
@@ -146,8 +152,8 @@ public class DatabaseLoader {
 //            Cache sourceUrls
             List<String> probeIds = new ArrayList<>(metaProbes.keySet());
             HashMap<String,Integer> dbPeptideIds = connectPanorama.getPeptideIds(probeIds,
-                    Utils.parseArrayTypeFromUrl(url),
-                    Utils.parseRunId(url)
+                    ParseUtils.parseArrayTypeFromUrl(url),
+                    ParseUtils.parseRunId(url)
                     );
 //
             if(dbPeptideIds.size()!=probeIds.size()){
@@ -155,7 +161,7 @@ public class DatabaseLoader {
             }
 
             GctFile gctfile = new GctFile(url);
-            gctfile.setRunId(Utils.parseRunId(url));
+            gctfile.setRunId(ParseUtils.parseRunId(url));
             gctfile.setRunIdUrl(connectPanorama.getRunIdLink(gctfile));
             gctFileRepository.save(gctfile);
 
@@ -254,7 +260,7 @@ public class DatabaseLoader {
 
                 PeakArea peakArea = new PeakArea(gctfile,peptideAnnotation,replicateAnnotation,peak.getPeakArea());
                 peakArea.setSourceUrl(connectPanorama.getSourceUrlFast(
-                        Utils.parseArrayTypeFromUrl(url),
+                        ParseUtils.parseArrayTypeFromUrl(url),
                         dbPeptideIds.get(peakArea.getPeptideAnnotation().getPeptideId()),
                         peakArea.getReplicateAnnotation().getReplicateId()));
 

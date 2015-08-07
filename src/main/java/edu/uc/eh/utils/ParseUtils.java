@@ -1,6 +1,6 @@
 package edu.uc.eh.utils;
 
-import edu.uc.eh.utils.AssayType;
+import edu.uc.eh.datatypes.AssayType;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -16,7 +16,7 @@ import java.util.*;
 /**
  * Created by chojnasm on 7/17/15.
  */
-public class Utils {
+public class ParseUtils {
     public static Integer parsePeptideNumber(String stepOne) {
         BufferedReader in = downloadFile(stepOne);
         String line;

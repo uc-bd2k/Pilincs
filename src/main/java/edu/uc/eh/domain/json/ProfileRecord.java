@@ -1,9 +1,8 @@
 package edu.uc.eh.domain.json;
 
+import edu.uc.eh.datatypes.StringDouble;
 import edu.uc.eh.domain.Profile;
-import edu.uc.eh.utils.Tuples;
-
-import java.util.List;
+import edu.uc.eh.datatypes.Tuples;
 
 /**
  * Created by chojnasm on 8/3/15.
@@ -18,6 +17,8 @@ public class ProfileRecord {
     private String vector;
     private String positiveCorrelation;
     private String negativeCorrelation;
+    private String positivePeptides;
+    private String negativePeptides;
 
 
 
@@ -31,13 +32,13 @@ public class ProfileRecord {
 
         StringBuilder sb = new StringBuilder();
         int counter = 0;
-        for(Tuples.Tuple2<String,Double> tuple2 : profile.getVector()){
+        for(StringDouble tuple2 : profile.getVector()){
 
             Double multi;
-            if(tuple2 == null || tuple2.getT2() == null){
+            if(tuple2 == null || tuple2.getaDouble() == null){
                 multi = 0.0;
             }else{
-                multi = tuple2.getT2()*10.0;
+                multi = tuple2.getaDouble()*10.0;
             }
 
             sb.append(multi.intValue());
@@ -48,6 +49,8 @@ public class ProfileRecord {
         this.vector = "<span class=\"barchart\">"+sb.toString().replace("[","").replace("]","")+"</span>";
         this.positiveCorrelation = profile.getPositiveCorrelation();
         this.negativeCorrelation = profile.getNegativeCorrelation();
+        this.positivePeptides = profile.getPositivePeptides();
+        this.negativePeptides = profile.getNegativePeptides();
     }
 
     public String getPositiveCorrelation() {
@@ -106,4 +109,27 @@ public class ProfileRecord {
         return vector;
     }
 
+    public void setPositiveCorrelation(String positiveCorrelation) {
+        this.positiveCorrelation = positiveCorrelation;
+    }
+
+    public void setNegativeCorrelation(String negativeCorrelation) {
+        this.negativeCorrelation = negativeCorrelation;
+    }
+
+    public String getPositivePeptides() {
+        return positivePeptides;
+    }
+
+    public void setPositivePeptides(String positivePeptides) {
+        this.positivePeptides = positivePeptides;
+    }
+
+    public String getNegativePeptides() {
+        return negativePeptides;
+    }
+
+    public void setNegativePeptides(String negativePeptides) {
+        this.negativePeptides = negativePeptides;
+    }
 }

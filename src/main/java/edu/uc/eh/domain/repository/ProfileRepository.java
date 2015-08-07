@@ -1,7 +1,7 @@
 package edu.uc.eh.domain.repository;
 
 import edu.uc.eh.domain.Profile;
-import edu.uc.eh.utils.AssayType;
+import edu.uc.eh.datatypes.AssayType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

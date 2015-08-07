@@ -1,6 +1,6 @@
 package edu.uc.eh.domain;
 
-import edu.uc.eh.service.ConnectPanorama;
+import edu.uc.eh.utils.ConnectPanorama;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;

@@ -1,6 +1,6 @@
 package edu.uc.eh.domain.json;
 
-import edu.uc.eh.utils.AssayType;
+import edu.uc.eh.datatypes.AssayType;
 import edu.uc.eh.domain.PeakArea;
 
 import java.util.Date;

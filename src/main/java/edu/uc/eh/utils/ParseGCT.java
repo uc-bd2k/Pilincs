@@ -1,6 +1,5 @@
-package edu.uc.eh.service;
+package edu.uc.eh.utils;
 
-import edu.uc.eh.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -15,7 +14,7 @@ import java.util.*;
 
 @Service
 public class ParseGCT {
-    Logger logger = LoggerFactory.getLogger("edu.uc.eh.service.ParseGCT");
+    Logger logger = LoggerFactory.getLogger("edu.uc.eh.utils.ParseGCT");
 
     public void parseToRepository(String url,
                                   List peakValues,
@@ -26,7 +25,7 @@ public class ParseGCT {
         List<String> labelsOfProbes = new ArrayList<>();
         List<String> labelsOfReplicates = new ArrayList<>();
 
-        BufferedReader reader = Utils.downloadFile(url);
+        BufferedReader reader = ParseUtils.downloadFile(url);
 
         String line = reader.readLine();
         if (line == null) {

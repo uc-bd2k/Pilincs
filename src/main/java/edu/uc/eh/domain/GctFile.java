@@ -4,7 +4,7 @@ package edu.uc.eh.domain;
  * Created by chojnasm on 7/17/15.
  */
 
-import edu.uc.eh.utils.AssayType;
+import edu.uc.eh.datatypes.AssayType;
 
 import javax.persistence.*;
 

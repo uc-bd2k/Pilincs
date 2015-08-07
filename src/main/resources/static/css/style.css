@@ -1,3 +1,6 @@
+/* Expanded view */
+span.tab-space {padding-left:3em;}
+
 /* P100 GCP Toggle*/
 .toggle {font-weight: bold;padding-left:25px;padding-right:25px;}
 .untoggle {font-weight: normal;padding-left:25px;padding-right:25px;}
@@ -14,6 +17,11 @@
 }
 
 .Replicate {
+    font-weight: normal;
+    background-color: #7B4EA4;
+}
+
+.Perturbation {
     font-weight: normal;
     background-color: #7B4EA4;
 }

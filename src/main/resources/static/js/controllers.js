@@ -239,17 +239,24 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
         showColumns: true,
         detailView: true,
         detailFormatter: function(index,row){
-          return "<div class=\"col-md-3\"><b style=\"color: #23527c;\">Selected profile</b> <br/>" +
+          return "<div class=\"row\"><div class=\"col-md-3\"><b style=\"color: #23527c;\">Selected profile</b> <br/>" +
             "<br/><b>Assay: </b>" + row.assayType +
             "<br/><b>ReplicateId: </b>" + row.replicateId +
             "<br/><b>PertIname: </b>" + row.pertIname +
             "<br/><b>CellId: </b>" + row.cellId +
             "<br/><b>Dose: </b>" + row.pertDose +
             "<br/><b>Time: </b>" + row.pertTime +
-              "<br/><br/><b style=\"color: #23527c;\">Spearmann correlation:</b>" +
+              "<br/><br/><b style=\"color: #23527c;\">Pearson correlation:</b>" +
             "</div>" +
-              "<div class=\"col-md-3\"><b style=\"color: #23527c;\">Most correlated profile</b><br/><br/> " + row.positiveCorrelation + "</div>" +
-              "<div class=\"col-md-3\"><b style=\"color: #23527c;\">Most anty-correlated profile </b><br/><br/> " + row.negativeCorrelation +"</div>";
+              "<div class=\"col-md-4\"><b style=\"color: #23527c;\">Most correlated profile</b><br/><br/> " + row.positiveCorrelation + "</div>" +
+              "<div class=\"col-md-4\"><b style=\"color: #23527c;\">Most anti-correlated profile </b><br/><br/> " + row.negativeCorrelation +"</div>" +
+              "</div>" +
+              "<div class=\"row\">" +
+              "<div class=\"col-md-3\"><br/><b style=\"color: #23527c;\"><small>Contribution to correlation:</b></div>" +
+              row.positivePeptides +
+              row.negativePeptides +
+              "</small></div>"
+              ;
         },
         onLoadSuccess: function(){$(".barchart").peity("bar",{width:700});},
         onColumnSwitch: function(){$(".barchart").peity("bar",{width:700});},
