@@ -31,21 +31,19 @@ public class Profile implements Serializable {
     private GctFile gctFile;
 
     private AssayType assayType;
-
     /**
      * Values for peptides, size of vector = number of peptides in full profile
      */
     @Lob
     private ListWrapper vector; // should be linked-hash map
 
+    @Lob
+    private ListWrapper correlatedVector;
+
     private String positiveCorrelation;
-    private String negativeCorrelation;
 
     @Lob
     private String positivePeptides;
-
-    @Lob
-    private String negativePeptides;
 
     public Profile(ReplicateAnnotation replicateAnnotation, GctFile gctFile,
                    double[] vector,
@@ -54,9 +52,8 @@ public class Profile implements Serializable {
 
         this.replicateAnnotation = replicateAnnotation;
         this.gctFile = gctFile;
+        this.vector = new ListWrapper(vector, imputes, referenceProfile);
         this.assayType = gctFile.getAssayType();
-        this.vector = new ListWrapper(vector,imputes, referenceProfile);
-
 
     }
 
@@ -83,12 +80,12 @@ public class Profile implements Serializable {
         this.positiveCorrelation = positiveCorrelation;
     }
 
-    public String getNegativeCorrelation() {
-        return negativeCorrelation;
+    public void setCorrelatedVector(ListWrapper correlatedVector) {
+        this.correlatedVector = correlatedVector;
     }
 
-    public void setNegativeCorrelation(String negativeCorrelation) {
-        this.negativeCorrelation = negativeCorrelation;
+    public ListWrapper getCorrelatedVector() {
+        return correlatedVector;
     }
 
     public Long getId() {
@@ -111,6 +108,8 @@ public class Profile implements Serializable {
         return vector.getDoubles();
     }
 
+    public ListWrapper getListWrapper(){return vector;}
+
 
     public void setPositivePeptides(String positivePeptides) {
         this.positivePeptides = positivePeptides;
@@ -120,15 +119,12 @@ public class Profile implements Serializable {
         return positivePeptides;
     }
 
-    public String getNegativePeptides() {
-        return negativePeptides;
-    }
-
-    public void setNegativePeptides(String negativePeptides) {
-        this.negativePeptides = negativePeptides;
-    }
 
     public String getVectorJSON() {
         return vector.getJSON();
+    }
+
+    public String getCorrelatedVectorJSON() {
+        return correlatedVector.getJSON();
     }
 }

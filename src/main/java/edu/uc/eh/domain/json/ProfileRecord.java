@@ -16,10 +16,10 @@ public class ProfileRecord {
     private String pertTime;
     private String pertDose;
     private String vector;
+    private String correlatedVector;
     private String positiveCorrelation;
-    private String negativeCorrelation;
     private String positivePeptides;
-    private String negativePeptides;
+
 
     public ProfileRecord(Profile profile) {
         this.assayType = profile.getAssayType().toString();
@@ -31,10 +31,11 @@ public class ProfileRecord {
         this.pertDose = profile.getReplicateAnnotation().getPertDose();
 
         this.vector = "<svg class=\"barchart\" vector="+ profile.getVectorJSON() +"></div>";
+        this.correlatedVector = "<svg class=\"barchart\" vector="+ profile.getCorrelatedVectorJSON() +"></div>";
         this.positiveCorrelation = profile.getPositiveCorrelation();
-        this.negativeCorrelation = profile.getNegativeCorrelation();
+
         this.positivePeptides = profile.getPositivePeptides();
-        this.negativePeptides = profile.getNegativePeptides();
+
     }
 
     public int getRunId() {
@@ -45,9 +46,7 @@ public class ProfileRecord {
         return positiveCorrelation;
     }
 
-    public String getNegativeCorrelation() {
-        return negativeCorrelation;
-    }
+
 
     public String getAssayType() {
         return assayType;
@@ -97,13 +96,14 @@ public class ProfileRecord {
         return vector;
     }
 
+    public String getCorrelatedVector() {
+        return correlatedVector;
+    }
+
     public void setPositiveCorrelation(String positiveCorrelation) {
         this.positiveCorrelation = positiveCorrelation;
     }
 
-    public void setNegativeCorrelation(String negativeCorrelation) {
-        this.negativeCorrelation = negativeCorrelation;
-    }
 
     public String getPositivePeptides() {
         return positivePeptides;
@@ -113,11 +113,5 @@ public class ProfileRecord {
         this.positivePeptides = positivePeptides;
     }
 
-    public String getNegativePeptides() {
-        return negativePeptides;
-    }
 
-    public void setNegativePeptides(String negativePeptides) {
-        this.negativePeptides = negativePeptides;
-    }
 }

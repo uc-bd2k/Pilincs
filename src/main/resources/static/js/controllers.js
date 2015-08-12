@@ -34,6 +34,8 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
 
     $scope.currentWorkspace = $scope.workspaces[1];
 
+    $scope.heatMap = {};
+
     $scope.changeCurrentWorkspace = function (wk) {
         $scope.currentWorkspace = wk;
         if(wk == $scope.workspaces[0]){
@@ -53,6 +55,7 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
             $('#tableProfiles').parent().parent().parent().hide();
             $('#tableRelations').show();
             $('#tableAPI').hide();
+            $scope.loadHeatMap();
 
         }else if(wk == $scope.workspaces[3]){
             $('#tablePeaks').parent().parent().parent().hide();
@@ -61,9 +64,6 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
             $('#tableAPI').show();
         }
     }
-
-
-
 
     $scope.refreshTables = function(){
         $('#tablePeaks').bootstrapTable('refresh');
@@ -115,6 +115,8 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
             });
         });
     };
+
+
 
     $scope.getRecommendation = function() {
 
@@ -257,30 +259,27 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
         queryParams: 'postQueryParams',
         pagination: 'true',
         sidePagination: 'server',
-        showExport: true,
+        toolbar: '#ilincs',
+        //showExport: true,
+        toolbarAlign: 'right',
         //showColumns: true,
         detailView: true,
-        detailFormatter: function(index,row){
-          return "<div class=\"row\"><div class=\"col-md-3\"><b style=\"color: #23527c;\">Selected profile</b> <br/>" +
-            "<br/><b>Assay: </b>" + row.assayType +
-              "<br/><b>RunId: </b>" + row.runId +
-            "<br/><b>ReplicateId: </b>" + row.replicateId +
-            "<br/><b>PertIname: </b>" + row.pertIname +
-            "<br/><b>CellId: </b>" + row.cellId +
-            "<br/><b>Dose: </b>" + row.pertDose +
-            "<br/><b>Time: </b>" + row.pertTime +
-              "<br/><br/><b style=\"color: #23527c;\">Pearson correlation:</b>" +
-            "</div>" +
-              "<div class=\"col-md-4\"><b style=\"color: #23527c;\">Most correlated profile</b><br/><br/> " + row.positiveCorrelation + "</div>" +
-              "<div class=\"col-md-5\"><small><b style=\"color: #23527c;\">Contribution to correlation </b><br/> " + row.positivePeptides +"</small></div>" +
-              "</div>" //+
-              //"<div class=\"row\">" +
-              //"<div class=\"col-md-3\"><br/><b style=\"color: #23527c;\"><small>Contribution to correlation:</b></div>" +
-              //row.positivePeptides +
-              //row.negativePeptides +
-              //"</small></div>"
-              ;
+        detailFormatter: function (index, row) {
+            return "<div class=\"row\">" +
+                "<div class=\"col-md-3\"><b style=\"color: #23527c;\">Selected profile</b> <br/>" +
+                "<br/><b>Assay: </b>" + row.assayType +
+                "<br/><b>RunId: </b>" + row.runId +
+                "<br/><b>ReplicateId: </b>" + row.replicateId +
+                "<br/><b>PertIname: </b>" + row.pertIname +
+                "<br/><b>CellId: </b>" + row.cellId +
+                "<br/><b>Dose: </b>" + row.pertDose +
+                "<br/><b>Time: </b>" + row.pertTime +
+                "<br/><br/><b style=\"color: #23527c;\">Pearson correlation:</b>" +
+                "</div>" +
+                "<div class=\"col-md-3\"><b style=\"color: #23527c;\">Most correlated profile</b><br/><br/> " + row.positiveCorrelation + "</div>" +
+                "<small><b style=\"color: #23527c;\">Contribution to correlation </b><br/> " + row.positivePeptides + "</small>";
         },
+
         onLoadSuccess: function(){
 
             //  Tooltip Object
@@ -424,6 +423,11 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
                 title: 'Profile'
             },
             {
+                field: 'correlatedVector',
+                title: 'Most correlated',
+                visible: false
+            },
+            {
                 field: 'sth',
                 title: 'Panorama',
                 visible: false
@@ -439,6 +443,23 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
     // --------------
     //UI configuration
 
+    $scope.loadHeatMap = function() {
+
+        var queryContent = [];
+        queryContent.push({"p100":$scope.p100});
+        queryContent.push({"gcp":$scope.gcp});
+        queryContent = queryContent.concat($scope.tags);
+
+
+        var res = $http.post('/pilincs/api-heatmap', JSON.stringify(queryContent));
+        res.success(function (data, status, headers, config) {
+
+            console.log(data);
+            $scope.heatMap = data;
+            d3.select(".heatMap").text("Clicked on: " + Date.now());
+            //console.log(data);
+        });
+    };
 
 }]);
 

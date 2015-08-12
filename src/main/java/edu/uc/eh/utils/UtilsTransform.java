@@ -1,8 +1,15 @@
 package edu.uc.eh.utils;
 
+import edu.uc.eh.datatypes.AssayType;
 import edu.uc.eh.datatypes.StringDouble;
+import edu.uc.eh.domain.Profile;
+import edu.uc.eh.domain.json.HeatMapResponse;
+import edu.uc.eh.domain.json.MatrixCell;
+import edu.uc.eh.domain.json.ProfileRecord;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.SortedSet;
 
 /**
@@ -38,5 +45,25 @@ public class UtilsTransform {
         }
 
         return sb.toString();
+    }
+
+    public static HeatMapResponse profilesToHeatMap(List<Profile> profiles, List<String> referenceProfile) {
+
+        List<String> peptideNames = referenceProfile;
+        List<String> profileNames = new ArrayList<>();
+        List<MatrixCell> cells = new ArrayList<>();
+
+        int rowIndex = 0;
+
+        for( Profile profile : profiles){
+            profileNames.add(profile.getReplicateAnnotation().getReplicateId());
+
+            for(int columnIndex = 0; columnIndex < profile.getVector().length; columnIndex++){
+                cells.add(new MatrixCell(rowIndex,columnIndex,profile.getVector()[columnIndex]));
+            }
+
+            rowIndex++;
+        }
+        return new HeatMapResponse(peptideNames, profileNames, cells);
     }
 }

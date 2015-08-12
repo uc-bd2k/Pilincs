@@ -7,6 +7,8 @@ import edu.uc.eh.domain.PeakArea;
 import edu.uc.eh.domain.PeptideAnnotation;
 import edu.uc.eh.domain.ReplicateAnnotation;
 import edu.uc.eh.domain.repository.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +30,8 @@ public class RepositoryService {
     private final ReplicateAnnotationRepository replicateAnnotationRepository;
     private final ProfileRepository profileRepository;
 
+    private static final Logger log = LoggerFactory.getLogger(RepositoryService.class);
+
     @Autowired
     public RepositoryService(GctFileRepository gctFileRepository,
                              PeakAreaRepository peakAreaRepository,
@@ -42,6 +46,9 @@ public class RepositoryService {
     }
 
     public Set<GctReplicate> getGctReplicatesCombinations() {
+
+        log.info("Get gct - replicate combinations");
+
         Set<GctReplicate> gctReplicatePairs = new HashSet<>();
 
         for (PeakArea peakArea : peakAreaRepository.findAll()) {
@@ -58,8 +65,10 @@ public class RepositoryService {
 
     public List<String> getReferenceProfileVector(AssayType assayType) {
 
+        log.info("Get reference ProfileVector for assay type: {}", assayType);
+
         List<String> output = new ArrayList<>();
-        for(PeptideAnnotation peptideAnnotation : peptideAnnotationRepository.findByAssayType(assayType)){
+        for (PeptideAnnotation peptideAnnotation : peptideAnnotationRepository.findByAssayType(assayType)) {
             output.add(peptideAnnotation.getPeptideId());
         }
         return output;

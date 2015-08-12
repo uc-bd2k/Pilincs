@@ -138,15 +138,55 @@
             </tbody>
         </table>
 
-        <table class="table" id="tablePeaks"></table>
-        <table class="table" id="tableProfiles"></table>
 
-        <div class="days-hours-heatmap" id="tableRelations">
+
+        <table class="table" id="tablePeaks"></table>
+        <table class="table" id="tableProfiles">
+            <div id="ilincs">
+                <div class="form-inline" role="form">
+                    <button id="ok" type="submit" class="btn btn-default disabled">Analyze in iLINCS</button>
+                </div>
+            </div>
+        </table>
+
+        <div id="tableRelations" class="days-hours-heatmap">
+
+            <p>heatmap prototype comimng soon</p>
         </div>
 
         <!--<script type="text/javascript" src="app.js"></script>-->
 
-        <p id="tableAPI">API template ... </p>
+        <div id="tableAPI">
+
+        <h3>HTTP methods</h3>
+        <hr/>
+        <table data-toggle="table">
+            <thead style="background: #D9EDF7">
+            <tr>
+                <th>Method</th>
+                <th>Description</th>
+                <th>Parameters</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td><code>GET</code></td>
+                <td>eh3.uc.edu/pilincs/api-panorama</td>
+
+                <td>-</td>
+            </tr>
+
+            <tr>
+                <td><code>POST</code></td>
+                <td>eh3.uc.edu/pilincs/api-recommend</td>
+
+                <td>-</td>
+            </tr>
+
+            </tbody>
+        </table><br/>
+        <pre><b>Example</b><br/>{API documentation is in progress...}</pre>
+        </div>
 
     </div>
 

@@ -6,8 +6,10 @@ import edu.uc.eh.domain.repository.*;
 import edu.uc.eh.utils.ConnectPanorama;
 import edu.uc.eh.service.QueryService;
 import edu.uc.eh.datatypes.Tuples;
+import edu.uc.eh.utils.DatabaseLoader;
 import edu.uc.eh.utils.UtilsParse;
 import edu.uc.eh.datatypes.AssayType;
+import edu.uc.eh.utils.UtilsTransform;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -33,6 +35,7 @@ public class RestController {
     private final PeakAreaRepository peakAreaRepository;
     private final QueryService queryService;
     private final ProfileRepository profileRepository;
+    private final DatabaseLoader databaseLoader;
 
     @Autowired
     public RestController(ConnectPanorama connectPanorama,
@@ -41,7 +44,8 @@ public class RestController {
                           PeptideAnnotationRepository peptideAnnotationRepository,
                           PeakAreaRepository peakAreaRepository,
                           QueryService queryService,
-                          ProfileRepository profileRepository) {
+                          ProfileRepository profileRepository,
+                          DatabaseLoader databaseLoader) {
 
         this.connectPanorama = connectPanorama;
         this.gctFileRepository = gctFileRepository;
@@ -50,6 +54,7 @@ public class RestController {
         this.peakAreaRepository = peakAreaRepository;
         this.queryService = queryService;
         this.profileRepository = profileRepository;
+        this.databaseLoader = databaseLoader;
     }
 
 
@@ -165,7 +170,7 @@ public class RestController {
         List<String> genesymbolTags = tagsParsed.get("PrGeneSymbol").size() > 0 ? tagsParsed.get("PrGeneSymbol") : allTagsForgenesymbol;
 
         result = profileRepository.findByAssayTypeInAndReplicateAnnotationCellIdInAndReplicateAnnotationPertinameIn(
-                assayTypes,cellTags,pertinameTags,pageRequest);
+                assayTypes, cellTags, pertinameTags, pageRequest);
 
         count = result.getTotalElements();
 
@@ -176,6 +181,56 @@ public class RestController {
         return new ProfileResponse(count,output);
     }
 
+    @RequestMapping(value = "/api-heatmap", method = RequestMethod.POST)
+    public
+    @ResponseBody
+    HeatMapResponse profilesAsHeatMap(
+            @RequestBody String tags) throws ParseException {
+
+        List<ProfileRecord> output = new ArrayList<>();
+
+        HashMap<String,List<String>> tagsParsed = UtilsParse.parseTags(tags);
+
+        List<Profile> result;
+        Long count;
+
+        List<String> allTagsForPertiname = new ArrayList<>();
+        List<String> allTagsForcell = new ArrayList<>();
+        List<String> allTagsForgenesymbol = new ArrayList<>();
+
+        for (TagFormat tagFormat : getTagsForAutocompletion()) {
+            String annotation = tagFormat.getAnnotation();
+            switch (annotation) {
+                case "Pertiname":
+                    allTagsForPertiname.add(tagFormat.getName());
+                    break;
+                case "CellId":
+                    allTagsForcell.add(tagFormat.getName());
+                    break;
+                case "PrGeneSymbol":
+                    allTagsForgenesymbol.add(tagFormat.getName());
+                    break;
+            }
+        }
+
+        List<String> assayTypesString = tagsParsed.get("AssayTypes");
+        List<AssayType> assayTypes = new ArrayList<>();
+
+
+        // Only first Assay Type !!!!
+        assayTypes.add(AssayType.valueOf(assayTypesString.get(0)));
+
+
+        List<String> pertinameTags = tagsParsed.get("Pertiname").size() > 0 ? tagsParsed.get("Pertiname") : allTagsForPertiname;
+        List<String> cellTags = tagsParsed.get("CellId").size() > 0 ? tagsParsed.get("CellId") : allTagsForcell;
+        List<String> genesymbolTags = tagsParsed.get("PrGeneSymbol").size() > 0 ? tagsParsed.get("PrGeneSymbol") : allTagsForgenesymbol;
+
+        result = profileRepository.findByAssayTypeInAndReplicateAnnotationCellIdInAndReplicateAnnotationPertinameIn(
+                assayTypes,cellTags,pertinameTags);
+
+
+        return UtilsTransform.profilesToHeatMap(result,databaseLoader.getReferenceProfile(assayTypes.get(0)));
+    }
 
     @RequestMapping(value = "/api-panorama", method = RequestMethod.GET)
     public
