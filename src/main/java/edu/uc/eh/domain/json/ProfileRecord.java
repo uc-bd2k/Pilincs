@@ -9,6 +9,7 @@ import edu.uc.eh.datatypes.Tuples;
  */
 public class ProfileRecord {
     private String assayType;
+    private int runId;
     private String replicateId;
     private String cellId;
     private String pertIname;
@@ -20,37 +21,24 @@ public class ProfileRecord {
     private String positivePeptides;
     private String negativePeptides;
 
-
-
     public ProfileRecord(Profile profile) {
         this.assayType = profile.getAssayType().toString();
+        this.runId = profile.getRunId();
         this.replicateId = profile.getReplicateAnnotation().getReplicateId();
         this.cellId = profile.getReplicateAnnotation().getCellId();
         this.pertIname = profile.getReplicateAnnotation().getPertiname();
         this.pertTime = profile.getReplicateAnnotation().getPertTime();
         this.pertDose = profile.getReplicateAnnotation().getPertDose();
 
-        StringBuilder sb = new StringBuilder();
-        int counter = 0;
-        for(StringDouble tuple2 : profile.getVector()){
-
-            Double multi;
-            if(tuple2 == null || tuple2.getaDouble() == null){
-                multi = 0.0;
-            }else{
-                multi = tuple2.getaDouble()*10.0;
-            }
-
-            sb.append(multi.intValue());
-            if(profile.getVector().size()-1 == counter++)
-                break;
-            sb.append(",");
-        }
-        this.vector = "<span class=\"barchart\">"+sb.toString().replace("[","").replace("]","")+"</span>";
+        this.vector = "<svg class=\"barchart\" vector="+ profile.getVectorJSON() +"></div>";
         this.positiveCorrelation = profile.getPositiveCorrelation();
         this.negativeCorrelation = profile.getNegativeCorrelation();
         this.positivePeptides = profile.getPositivePeptides();
         this.negativePeptides = profile.getNegativePeptides();
+    }
+
+    public int getRunId() {
+        return runId;
     }
 
     public String getPositiveCorrelation() {

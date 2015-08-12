@@ -1,5 +1,7 @@
 package edu.uc.eh.domain;
 
+import edu.uc.eh.datatypes.AssayType;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -18,6 +20,7 @@ public class PeptideAnnotation {
     @GeneratedValue
     private Long id;
 
+    private AssayType assayType;
     private String peptideId;
     private String prGeneId;
     private String prGeneSymbol;
@@ -33,8 +36,9 @@ public class PeptideAnnotation {
 
     PeptideAnnotation(){}
 
-    public PeptideAnnotation(String peptideId) {
+    public PeptideAnnotation(String peptideId, AssayType assayType) {
         this.peptideId = peptideId;
+        this.assayType = assayType;
     }
 
     @Override
@@ -124,5 +128,13 @@ public class PeptideAnnotation {
 
             return peptideId.replace("+","%2B");
 
+    }
+
+    public AssayType getAssayType() {
+        return assayType;
+    }
+
+    public void setAssayType(AssayType assayType) {
+        this.assayType = assayType;
     }
 }

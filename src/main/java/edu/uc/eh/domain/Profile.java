@@ -4,29 +4,39 @@ import edu.uc.eh.datatypes.AssayType;
 import edu.uc.eh.datatypes.ListWrapper;
 import edu.uc.eh.datatypes.StringDouble;
 import edu.uc.eh.datatypes.Tuples;
+import edu.uc.eh.utils.UtilsFormat;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by chojnasm on 7/31/15.
  */
 
 @Entity
-public class Profile implements Serializable{
+public class Profile implements Serializable {
 
     @Id
     @GeneratedValue
     private Long id;
 
-    @OneToOne
+    @ManyToOne
     private ReplicateAnnotation replicateAnnotation;
+
+    @ManyToOne
+    private GctFile gctFile;
 
     private AssayType assayType;
 
+    /**
+     * Values for peptides, size of vector = number of peptides in full profile
+     */
     @Lob
-    private ListWrapper vector;
+    private ListWrapper vector; // should be linked-hash map
 
     private String positiveCorrelation;
     private String negativeCorrelation;
@@ -37,19 +47,26 @@ public class Profile implements Serializable{
     @Lob
     private String negativePeptides;
 
-    public Profile(ReplicateAnnotation replicateAnnotation, AssayType assayType,
-                   List<StringDouble> vector) {
+    public Profile(ReplicateAnnotation replicateAnnotation, GctFile gctFile,
+                   double[] vector,
+                   boolean[] imputes,
+                   List<String> referenceProfile) {
 
         this.replicateAnnotation = replicateAnnotation;
-        this.assayType = assayType;
-        this.vector = new ListWrapper(vector);
+        this.gctFile = gctFile;
+        this.assayType = gctFile.getAssayType();
+        this.vector = new ListWrapper(vector,imputes, referenceProfile);
+
+
     }
 
-    public Profile() {}
+    public Profile() {
+    }
 
     @Override
     public String toString() {
-        return  "<b>Assay: </b> " + getAssayType() +
+        return "<b>Assay: </b> " + getAssayType() +
+                "<br/><b>RunId: </b> " + getRunId() +
                 "<br/><b>ReplicateId: </b>" + replicateAnnotation.getReplicateId() +
                 "<br/><b>PertIname: </b>" + replicateAnnotation.getPertiname() +
                 "<br/><b>CellId: </b>" + replicateAnnotation.getCellId() +
@@ -83,21 +100,17 @@ public class Profile implements Serializable{
     }
 
     public AssayType getAssayType() {
-        return assayType;
+        return gctFile.getAssayType();
     }
 
-    public List<StringDouble> getVector() {
-        return vector.getList();
+    public int getRunId() {
+        return gctFile.getRunId();
     }
 
-    public double[] getVectorDoubles() {
-        double[] doubles = new double[vector.getList().size()];
-        for(int i=0; i<doubles.length; i++){
-            StringDouble tuple2 = vector.getList().get(i);
-            doubles[i]= tuple2.getaDouble();
-        }
-        return doubles;
+    public double[] getVector() {
+        return vector.getDoubles();
     }
+
 
     public void setPositivePeptides(String positivePeptides) {
         this.positivePeptides = positivePeptides;
@@ -113,5 +126,9 @@ public class Profile implements Serializable{
 
     public void setNegativePeptides(String negativePeptides) {
         this.negativePeptides = negativePeptides;
+    }
+
+    public String getVectorJSON() {
+        return vector.getJSON();
     }
 }

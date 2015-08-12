@@ -8,10 +8,10 @@ import java.util.Date;
 /**
  * Created by chojnasm on 7/20/15.
  */
-public class AssayRecord {
+public class RawDataRecord {
 
     // From PeakArea
-    private String sourceUrl;
+    private String chromatogramsUrl;
     private Double value;
 
     // From GctFile
@@ -44,8 +44,8 @@ public class AssayRecord {
     private String pertVehicle;
     private String pubchemCid;
 
-    public AssayRecord(PeakArea peakArea) {
-        this.sourceUrl = "<a href=\"" + peakArea.getSourceUrl() + "\" target=\"_blank\" \"><img src=\"https://panoramaweb.org/labkey/TargetedMS/images/TransitionGroupLib.gif\"></a>";
+    public RawDataRecord(PeakArea peakArea) {
+        this.chromatogramsUrl = "<a href=\"" + peakArea.getChromatogramsUrl() + "\" target=\"_blank\" \"><img src=\"https://panoramaweb.org/labkey/TargetedMS/images/TransitionGroupLib.gif\"></a>";
         this.value=peakArea.getValue();
         this.downloadUrl= "<a href=\"" + peakArea.getGctFile().getDownloadUrl() + "\" target=\"_blank\"\">gct</a>";
         this.assayType=peakArea.getGctFile().getAssayType();
@@ -73,12 +73,12 @@ public class AssayRecord {
         this.pubchemCid=peakArea.getReplicateAnnotation().getPubchemCid();
     }
 
-    public String getSourceUrl() {
-        return sourceUrl;
+    public String getChromatogramsUrl() {
+        return chromatogramsUrl;
     }
 
-    public void setSourceUrl(String sourceUrl) {
-        this.sourceUrl = sourceUrl;
+    public void setChromatogramsUrl(String chromatogramsUrl) {
+        this.chromatogramsUrl = chromatogramsUrl;
     }
 
     public Double getValue() {

@@ -31,6 +31,10 @@ public class ReplicateAnnotation {
     @OneToMany(mappedBy = "replicateAnnotation")
     private Set<PeakArea> peakAreas = new HashSet<>();
 
+    @OneToMany(mappedBy = "replicateAnnotation")
+    private Set<Profile> profiles = new HashSet<>();
+
+
     ReplicateAnnotation(){}
 
     public ReplicateAnnotation(String replicateId) {

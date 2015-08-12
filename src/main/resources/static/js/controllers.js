@@ -29,8 +29,8 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
     $scope.workspaces = [];
     $scope.workspaces.push({ name: 'Show Data',alias:'tablePeaks',active:true });
     $scope.workspaces.push({ name: 'Show Profiles', alias: 'tableProfiles',active:true });
-    $scope.workspaces.push({ name: 'Show Relations', alias: 'tableRelations',active:false });
-    $scope.workspaces.push({ name: 'Show API', alias: 'tableAPI',active:false });
+    $scope.workspaces.push({ name: 'Show HeatMap', alias: 'tableRelations',active:true });
+    $scope.workspaces.push({ name: 'Show API', alias: 'tableAPI',active:true });
 
     $scope.currentWorkspace = $scope.workspaces[1];
 
@@ -39,12 +39,30 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
         if(wk == $scope.workspaces[0]){
             $('#tablePeaks').parent().parent().parent().show();
             $('#tableProfiles').parent().parent().parent().hide();
+            $('#tableRelations').hide();
+            $('#tableAPI').hide();
 
         }else if(wk == $scope.workspaces[1]){
             $('#tablePeaks').parent().parent().parent().hide();
             $('#tableProfiles').parent().parent().parent().show();
+            $('#tableRelations').hide();
+            $('#tableAPI').hide();
+
+        }else if(wk == $scope.workspaces[2]){
+            $('#tablePeaks').parent().parent().parent().hide();
+            $('#tableProfiles').parent().parent().parent().hide();
+            $('#tableRelations').show();
+            $('#tableAPI').hide();
+
+        }else if(wk == $scope.workspaces[3]){
+            $('#tablePeaks').parent().parent().parent().hide();
+            $('#tableProfiles').parent().parent().parent().hide();
+            $('#tableRelations').hide();
+            $('#tableAPI').show();
         }
     }
+
+
 
 
     $scope.refreshTables = function(){
@@ -212,7 +230,7 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
                 field: 'value',
                 title: 'Peak Area'
             }, {
-                field: 'sourceUrl',
+                field: 'chromatogramsUrl',
                 title: 'Chromatograms',
                 halign: 'center'
             }, {
@@ -228,7 +246,10 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
             }
         });
     //});
-    $('#tablePeaks').parent().parent().parent().hide();
+///    $('#tablePeaks').parent().parent().parent().hide();
+
+
+        //$(".barchart").peity("bar",{width:700});
 
     //$(function () {
     $('#tableProfiles').bootstrapTable({
@@ -236,11 +257,13 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
         queryParams: 'postQueryParams',
         pagination: 'true',
         sidePagination: 'server',
-        showColumns: true,
+        showExport: true,
+        //showColumns: true,
         detailView: true,
         detailFormatter: function(index,row){
           return "<div class=\"row\"><div class=\"col-md-3\"><b style=\"color: #23527c;\">Selected profile</b> <br/>" +
             "<br/><b>Assay: </b>" + row.assayType +
+              "<br/><b>RunId: </b>" + row.runId +
             "<br/><b>ReplicateId: </b>" + row.replicateId +
             "<br/><b>PertIname: </b>" + row.pertIname +
             "<br/><b>CellId: </b>" + row.cellId +
@@ -249,21 +272,129 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
               "<br/><br/><b style=\"color: #23527c;\">Pearson correlation:</b>" +
             "</div>" +
               "<div class=\"col-md-4\"><b style=\"color: #23527c;\">Most correlated profile</b><br/><br/> " + row.positiveCorrelation + "</div>" +
-              "<div class=\"col-md-4\"><b style=\"color: #23527c;\">Most anti-correlated profile </b><br/><br/> " + row.negativeCorrelation +"</div>" +
-              "</div>" +
-              "<div class=\"row\">" +
-              "<div class=\"col-md-3\"><br/><b style=\"color: #23527c;\"><small>Contribution to correlation:</b></div>" +
-              row.positivePeptides +
-              row.negativePeptides +
-              "</small></div>"
+              "<div class=\"col-md-5\"><small><b style=\"color: #23527c;\">Contribution to correlation </b><br/> " + row.positivePeptides +"</small></div>" +
+              "</div>" //+
+              //"<div class=\"row\">" +
+              //"<div class=\"col-md-3\"><br/><b style=\"color: #23527c;\"><small>Contribution to correlation:</b></div>" +
+              //row.positivePeptides +
+              //row.negativePeptides +
+              //"</small></div>"
               ;
         },
-        onLoadSuccess: function(){$(".barchart").peity("bar",{width:700});},
-        onColumnSwitch: function(){$(".barchart").peity("bar",{width:700});},
+        onLoadSuccess: function(){
+
+            //  Tooltip Object
+            var tooltip = d3.select("body")
+                .append("div").attr("id", "tooltip")
+                .style("position", "absolute")
+                .style("z-index", "10")
+                .style("visibility", "hidden") //hidden
+                .text("a simple tooltip");
+
+            function mouseover(d) {
+                if ((d+"").length > 0) {
+                    tooltip.style("visibility", "visible");
+                    tooltip.transition()
+                        .duration(200)
+                        .style("opacity", .9);
+                    tooltip.html(d.name)
+                        .style("left", (d3.event.pageX) + 30 + "px")
+                        .style("top", (d3.event.pageY) + "px");
+                }
+            }
+
+            function mouseout (d) {
+                //tooltip.transition()
+                //    .duration(500)
+                //    .style("opacity", 0);
+                tooltip.style("visibility", "hidden");
+                var $tooltip = $("#tooltip");
+                $tooltip.empty();
+            }
+
+
+            d3.selectAll(".barchart").each( function(d, i){
+
+                var data = JSON.parse(d3.select(this).attr("vector")).data;
+                //console.log(data[0]);
+
+                var min = Number.POSITIVE_INFINITY;
+                var max = Number.NEGATIVE_INFINITY;
+                var tmp;
+                for (var i=data.length-1; i>=0; i--) {
+                    tmp = data[i].value;
+                    if (tmp < min) min = tmp;
+                    if (tmp > max) max = tmp;
+                }
+
+                //console.log(min+" "+max);
+                var range = max - min;
+
+                var chart = d3.select(this);
+                var height = 30; //chart.attr("height");
+                var width = data.length * 5;//chart.attr("width");
+
+                //console.log(height+" "+width);
+                d3.select(this).attr("height" , height);
+                d3.select(this).attr("width" , width);
+
+                var scaling = height / range;
+                max = max * scaling;
+                data = data.map(function(x) {
+                    if(x.imputed === true){
+                        return {"name": "IMPUTED >> "+x.name, "value": x.value * scaling, "imputed": x.imputed};
+                    }else {
+                        return {"name": x.name, "value": x.value * scaling, "imputed": x.imputed};
+                    }
+                });
+
+
+                chart.selectAll("rect")
+                    .data(data)
+                    .enter().append("rect")
+                    .attr("class","bar")
+                    .on("mouseover", mouseover)
+                    .on("mouseout", mouseout)
+                    .attr("fill",function(d){
+                        if(d.imputed === true){
+                            return "grey";
+                        }
+                        if(d.value < 5 && d.value > -5 ){
+                        return "rgb(79,159,207)";
+                    }else{
+                        return "steelblue";
+                    }})
+                    .attr("x", function(d,i){return i*5;})
+                    .attr("width", 4)
+                    .attr("y",function(d){
+                        if(d.value <= 0){
+                            return max;
+                        }else{
+                            return max - d.value;
+                        }})
+                    .attr("height", function(d) {
+                        if(d.value < 0){
+                            return -d.value;
+                        }else{
+                            return d.value;
+                        }
+                    })
+
+                ;
+
+            })},
+       // onColumnSwitch: function(){},//this.onLoadSuccess(),//function(){
+            //$(".barchart").peity("bar",{width:700});
+        //},
         columns: [
             {
                 field: 'assayType',
                 title: 'Assay'
+            },
+            {
+                field: 'runId',
+                title: 'RunId',
+                visible: false
             },
             {
                 field: 'replicateId',
@@ -281,12 +412,12 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
             {
                 field: 'pertDose',
                 title: 'Dose',
-                visible: false
+                visible: true
             },
             {
                 field: 'pertTime',
                 title: 'Time',
-                visible: false
+                visible: true
             },
             {
                 field: 'vector',
@@ -294,7 +425,8 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
             },
             {
                 field: 'sth',
-                title: 'Panorama'
+                title: 'Panorama',
+                visible: false
             }],
         responseHandler: function (res) {
             return res;
@@ -302,8 +434,14 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
     });
 
     //$('#tableProfiles').parent().parent().parent().hide();
+    $scope.changeCurrentWorkspace($scope.workspaces[1]);
+
+    // --------------
+    //UI configuration
+
 
 }]);
+
 
 
 

@@ -1,35 +1,28 @@
 package edu.uc.eh.utils;
 
 import edu.uc.eh.datatypes.StringDouble;
-import edu.uc.eh.domain.Profile;
-import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * Created by chojnasm on 8/6/15.
  */
-public class CalculateUtils {
+public class UtilsStatistics {
 
-    private static final Logger log = LoggerFactory.getLogger(CalculateUtils.class);
-    public static SortedSet<StringDouble> influentialPeptides(Profile profileA, Profile profileB, boolean ifPositiveCorrelation) {
+    private static final Logger log = LoggerFactory.getLogger(UtilsStatistics.class);
 
-        List<StringDouble> list = profileA.getVector();
+    public static SortedSet<StringDouble> influentialPeptides(
+            double[] vectorA,
+            double[] vectorB,
+            List<String> referenceProfile,
+            boolean ifPositiveCorrelation) {
 
-        double[] doublesA = profileA.getVectorDoubles();
-        double[] doublesB = profileB.getVectorDoubles();
 
-        PearsonsCorrelation pearson = new PearsonsCorrelation();
-
-//        log.warn("P "+pearson.correlation(doublesA,doublesB));
-
-        DescriptiveStatistics statisticsA = new DescriptiveStatistics(doublesA);
-        DescriptiveStatistics statisticsB = new DescriptiveStatistics(doublesB);
+        DescriptiveStatistics statisticsA = new DescriptiveStatistics(vectorA);
+        DescriptiveStatistics statisticsB = new DescriptiveStatistics(vectorB);
 
         double meanA = statisticsA.getMean();
         double meanB = statisticsB.getMean();
@@ -40,13 +33,13 @@ public class CalculateUtils {
         SortedSet<StringDouble> output = new TreeSet<>();
         double sumImacts = 0.0;
 
-        int n = list.size();
+        int n = referenceProfile.size();
 
         for(int i = 0; i < n; i++){
-            double impact = ((doublesA[i] - meanA) * (doublesB[i] - meanB)) / ((n - 1) * standardDevA * standardDevB);
+            double impact = ((vectorA[i] - meanA) * (vectorB[i] - meanB)) / ((n - 1) * standardDevA * standardDevB);
 //            log.warn(""+impact);
             sumImacts+=impact;
-            String peptideName = profileA.getVector().get(i).getString();
+            String peptideName = referenceProfile.get(i);
 
             if(output.size() < 7){
                 output.add(new StringDouble(peptideName,impact));
@@ -66,5 +59,27 @@ public class CalculateUtils {
         }
 //        log.warn("S "+sumImacts)sumImacts;
         return output;
+    }
+
+    public static void imputeProfileVector(Double[] profileVector, boolean[] imputeVector) {
+        Double sum = 0.0;
+        int nonEmpty = 0;
+
+        for (int i = 0; i < profileVector.length; i++) {
+            if (profileVector[i] != null) {
+                sum += profileVector[i];
+                nonEmpty++;
+            }
+        }
+
+        for (int i = 0; i < profileVector.length; i++) {
+            if (profileVector[i] == null) {
+                profileVector[i] = sum / nonEmpty;
+                imputeVector[i] = true;
+            }else{
+                imputeVector[i] = false;
+            }
+        }
+
     }
 }

@@ -1,10 +1,14 @@
 package edu.uc.eh.utils;
 
+import edu.uc.eh.controller.RestController;
+import edu.uc.eh.datatypes.GctReplicate;
 import edu.uc.eh.datatypes.StringDouble;
 import edu.uc.eh.domain.*;
 import edu.uc.eh.domain.repository.*;
 
 import edu.uc.eh.datatypes.AssayType;
+import edu.uc.eh.service.RepositoryService;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 import org.labkey.remoteapi.CommandException;
 import org.slf4j.Logger;
@@ -24,6 +28,9 @@ import java.util.*;
 @Service
 public class DatabaseLoader {
 
+    private List<String> referenceP100Profile;
+    private List<String> referenceGCPProfile;
+
     private final ConnectPanorama connectPanorama;
     private final ParseGCT parser;
     private final GctFileRepository gctFileRepository;
@@ -31,6 +38,8 @@ public class DatabaseLoader {
     private final PeptideAnnotationRepository peptideAnnotationRepository;
     private final ReplicateAnnotationRepository replicateAnnotationRepository;
     private final ProfileRepository profileRepository;
+
+    private final RepositoryService repositoryService;
 
     private static final Logger log = LoggerFactory.getLogger(DatabaseLoader.class);
 
@@ -41,7 +50,9 @@ public class DatabaseLoader {
                           PeakAreaRepository peakAreaRepository,
                           PeptideAnnotationRepository peptideAnnotationRepository,
                           ReplicateAnnotationRepository replicateAnnotationRepository,
-                          ProfileRepository profileRepository) {
+                          ProfileRepository profileRepository,
+                          RepositoryService repositoryService
+                          ) {
         this.connectPanorama = connectPanorama;
         this.parser = parser;
         this.gctFileRepository = gctFileRepository;
@@ -49,99 +60,164 @@ public class DatabaseLoader {
         this.peptideAnnotationRepository = peptideAnnotationRepository;
         this.replicateAnnotationRepository = replicateAnnotationRepository;
         this.profileRepository = profileRepository;
+        this.repositoryService = repositoryService;
     }
 
     @PostConstruct
-    private void initDatabase() throws IOException, CommandException {
+    private void initDatabase() throws Exception {
+
+        loadPeptideAnnotations();
+
+        referenceP100Profile = repositoryService.getReferenceProfileVector(AssayType.P100);
+        referenceGCPProfile = repositoryService.getReferenceProfileVector(AssayType.GCP);
+
         loadRawData();
         loadProfiles();
+        loadCorrelations();
+    }
+
+    public List<String> getReferenceProfile(AssayType assayType){
+        if(assayType.equals(AssayType.GCP)){
+            return referenceGCPProfile;
+        }else{
+            return referenceP100Profile;
+        }
     }
 
     private void loadProfiles() {
         log.info("Filling repository with profiles");
-        for(ReplicateAnnotation replicateAnnotation : replicateAnnotationRepository.findAll()){
 
-            AssayType assayType;
-            Long replicateId = replicateAnnotation.getId();
-            List<PeakArea> peaksForReplicate = peakAreaRepository.findByReplicateAnnotationId(replicateId);
-            List<StringDouble> profileVector = new ArrayList<>();
+        List<String> referenceProfile = null;
 
-            for(PeakArea peakArea : peaksForReplicate){
+        Set<GctReplicate> gctReplicatePairs = repositoryService.getGctReplicatesCombinations();
 
-                profileVector.add(new StringDouble(peakArea.getPeptideAnnotation().getPeptideId(),
-                        peakArea.getValue() == null ? 0.0 : peakArea.getValue()));
+        for (GctReplicate gctReplicate : gctReplicatePairs) {
+
+            GctFile gctFile = gctReplicate.getGctFile();
+            ReplicateAnnotation replicateAnnotation = gctReplicate.getReplicateAnnotation();
+
+            List<PeakArea> peakAreas = peakAreaRepository.findByGctFileAndReplicateAnnotation(gctFile, replicateAnnotation);
+
+            AssayType assayType = gctFile.getAssayType();
+
+            if (assayType.equals(AssayType.GCP)) {
+                referenceProfile = referenceGCPProfile;
+            } else if (assayType.equals(AssayType.P100)) {
+                referenceProfile = referenceP100Profile;
             }
 
-            assayType = peaksForReplicate.get(0).getGctFile().getAssayType();
+            Double[] profileVector = new Double[referenceProfile.size()];
+            boolean[] imputeVector = new boolean[referenceProfile.size()];
 
-            Profile profile = new Profile(replicateAnnotation, assayType, profileVector);
+            int index;
+
+            for (PeakArea peakArea : peakAreas) {
+                index = referenceProfile.indexOf(peakArea.getPeptideAnnotation().getPeptideId());
+                profileVector[index] = peakArea.getValue();
+            }
+
+            UtilsStatistics.imputeProfileVector(profileVector, imputeVector);
+
+            Profile profile = new Profile(
+                    replicateAnnotation,
+                    gctFile,
+                    ArrayUtils.toPrimitive(profileVector),
+                    imputeVector,
+                    referenceProfile);
 
             profileRepository.save(profile);
         }
+    }
 
-        HashMap<Integer,ArrayList<Profile>> profilesByLength = new HashMap<>();
-        for(Profile profile : profileRepository.findAll()){
+    private void loadCorrelations(){
+        log.info("Filling repository with correlations");
 
-            Integer length = profile.getVector().size();
-            if (!profilesByLength.containsKey(length)) {
-                profilesByLength.put(length, new ArrayList<Profile>());
+        List<String> referenceProfile = null;
+
+        for (AssayType assayType : AssayType.values()) {
+            if (assayType.equals(AssayType.GCP)) {
+                referenceProfile = referenceGCPProfile;
+            } else if (assayType.equals(AssayType.P100)) {
+                referenceProfile = referenceP100Profile;
             }
-            profilesByLength.get(length).add(profile);
-        }
+            List<Profile> profiles = profileRepository.findByAssayType(assayType);
 
-        DecimalFormat df = new DecimalFormat("0.0000");
-        Iterator it = profilesByLength.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry) it.next();
-            ArrayList<Profile> profiles = (ArrayList<Profile>) pair.getValue();
-            for(Profile profileA : profiles){
-                double[] doublesA = profileA.getVectorDoubles();
+            for (Profile profileA : profiles) {
+//                double[] doublesA = profileA.getVectorDoubles();
                 Double maxPearson = -1.0;
                 Double minPearson = 1.0;
 
                 Profile maxProfile = profileA;
                 Profile minProfile = profileA;
 
-                for(Profile profileB : profiles){
-                    if(profileA.equals(profileB))continue;
+                for (Profile profileB : profiles) {
+                    if (profileA.equals(profileB)) continue;
 
-                    double[] doublesB = profileB.getVectorDoubles();
+                    double[] vectorA = profileA.getVector();
+                    double[] vectorB = profileB.getVector();
 
                     PearsonsCorrelation pearson = new PearsonsCorrelation();
+                    Double pearsonCorrelation = pearson.correlation(vectorA,vectorB);
 
-                    Double pearsonCorrelation = pearson.correlation(doublesA,doublesB);
-                    if(pearsonCorrelation >= maxPearson){
+                    if (pearsonCorrelation >= maxPearson) {
                         maxPearson = pearsonCorrelation;
                         maxProfile = profileB;
                     }
-                    if(pearsonCorrelation <= minPearson){
+
+                    if (pearsonCorrelation <= minPearson) {
                         minPearson = pearsonCorrelation;
                         minProfile = profileB;
                     }
                 }
 
-                SortedSet<StringDouble> positivePeptides = CalculateUtils.influentialPeptides(profileA, maxProfile, true);
-                SortedSet<StringDouble> negativePeptides = CalculateUtils.influentialPeptides(profileA, minProfile, false);
+                SortedSet<StringDouble> positivePeptides = UtilsStatistics.influentialPeptides(
+                        profileA.getVector(), maxProfile.getVector(), referenceProfile, true);
+                SortedSet<StringDouble> negativePeptides = UtilsStatistics.influentialPeptides(
+                        profileA.getVector(), maxProfile.getVector(), referenceProfile, false);
+
+                profileA.setPositivePeptides(UtilsTransform.SortedSetToHTML(positivePeptides, false));
+                profileA.setNegativePeptides(UtilsTransform.SortedSetToHTML(negativePeptides, true));
 
 
-                profileA.setPositivePeptides(TransformUtils.SortedSetToHTML(positivePeptides,false));
-                profileA.setNegativePeptides(TransformUtils.SortedSetToHTML(negativePeptides,true));
+                DecimalFormat df = new DecimalFormat("0.0000");
+                String peptideCorrelation = " <br/><br/><b style=\"color: #23527c;\">%s</b>";
 
-                profileA.setPositiveCorrelation(maxProfile.toString() + " <br/><br/><b style=\"color: #23527c;\">" + df.format(maxPearson) + "</b>" );
-                profileA.setNegativeCorrelation(minProfile.toString() + " <br/><br/><b style=\"color: #23527c;\">" + df.format(minPearson) + "</b>" );
+                profileA.setPositiveCorrelation(maxProfile.toString() + String.format(peptideCorrelation, df.format(maxPearson)));
+                profileA.setNegativeCorrelation(minProfile.toString() + String.format(peptideCorrelation, df.format(minPearson)));
 
                 profileRepository.save(profileA);
             }
         }
+    }
 
 
+
+    private void loadPeptideAnnotations() throws Exception {
+        log.info("Loading peptideAnnotations from panorama etc");
+        List<String> p100Peptides = connectPanorama.getPeptideReferenceIdNames(AssayType.P100);
+        List<String> gcpPeptides = connectPanorama.getPeptideReferenceIdNames(AssayType.GCP);
+
+        for(String peptide : p100Peptides){
+            if(peptideAnnotationRepository.findByPeptideId(peptide).size() == 0) {
+                PeptideAnnotation peptideAnnotation = new PeptideAnnotation(peptide, AssayType.P100);
+                peptideAnnotationRepository.save(peptideAnnotation);
+            }
+        }
+
+        for(String peptide : gcpPeptides){
+            if(peptideAnnotationRepository.findByPeptideId(peptide).size() == 0) {
+                PeptideAnnotation peptideAnnotation = new PeptideAnnotation(peptide, AssayType.GCP);
+                peptideAnnotationRepository.save(peptideAnnotation);
+            }
+        }
     }
 
     private void loadRawData() throws IOException, CommandException {
         log.info("Loading raw data from panorama etc");
-        List<String> list = connectPanorama.GctUrls();
+        List<String> list = connectPanorama.gctDownloadUrls(true);
         int counter = 0;
-        for(String url : list){
+
+        for (String url : list) {
 //            if(counter++ > 0) continue;
             HashMap<String, List<ParseGCT.AnnotationValue>> metaProbes = new HashMap<>();
             HashMap<String, List<ParseGCT.AnnotationValue>> metaReplicas = new HashMap<>();
@@ -150,23 +226,24 @@ public class DatabaseLoader {
             parser.parseToRepository(url, peakValues, metaProbes, metaReplicas);
 
 //            Cache sourceUrls
-            List<String> probeIds = new ArrayList<>(metaProbes.keySet());
-            HashMap<String,Integer> dbPeptideIds = connectPanorama.getPeptideIds(probeIds,
-                    ParseUtils.parseArrayTypeFromUrl(url),
-                    ParseUtils.parseRunId(url)
-                    );
-//
-            if(dbPeptideIds.size()!=probeIds.size()){
-                log.warn("STOP, stop, stop!!!");
-            }
+
 
             GctFile gctfile = new GctFile(url);
-            gctfile.setRunId(ParseUtils.parseRunId(url));
+            gctfile.setRunId(UtilsParse.parseRunId(url));
             gctfile.setRunIdUrl(connectPanorama.getRunIdLink(gctfile));
             gctFileRepository.save(gctfile);
 
+            List<String> probeNameIds = new ArrayList<>(metaProbes.keySet());
+            HashMap<String, Integer> dbPeptideIds = connectPanorama.getPeptideIdsFromJSON(probeNameIds,
+                    UtilsParse.parseArrayTypeFromUrl(url),
+                    UtilsParse.parseRunId(url)
+            );
 
-            for(ParseGCT.ProbeReplicatePeak peak : peakValues) {
+            if (dbPeptideIds.size() != probeNameIds.size()) {
+                log.warn("STOP, stop, stop!!!");
+            }
+
+            for (ParseGCT.ProbeReplicatePeak peak : peakValues) {
 
                 String probeId = peak.getProbeId();
                 String replicateId = peak.getReplicateId();
@@ -174,51 +251,59 @@ public class DatabaseLoader {
                 PeptideAnnotation peptideAnnotation = peptideAnnotationRepository.findFirstByPeptideId(probeId);
                 ReplicateAnnotation replicateAnnotation = replicateAnnotationRepository.findFirstByReplicateId(replicateId);
 
-                if(peptideAnnotation == null){
-                    peptideAnnotation = new PeptideAnnotation(probeId);
-                    for(ParseGCT.AnnotationValue annotationObject : metaProbes.get(probeId)){
+                Double peakAreaValue = peak.getPeakArea();
+
+
+                if (peptideAnnotation.getPrBasePeptide() == null) {
+
+                    for (ParseGCT.AnnotationValue annotationObject : metaProbes.get(probeId)) {
                         String annotationName = annotationObject.getAnnotationName();
                         String annotationValue = annotationObject.getAnnotationValue();
 
-                        switch(annotationName){
-                            case "pr_gene_id":
-                                peptideAnnotation.setPrGeneId(annotationValue);
-                                break;
-                            case "pr_gene_symbol":
-                            case "GeneName":
-                                peptideAnnotation.setPrGeneSymbol(annotationValue);
-                                break;
-                            case "pr_p100_cluster":
-                            case "pr_gcp_cluster":
-                                peptideAnnotation.setPrCluster(annotationValue);
-                                break;
-                            case "pr_uniprot_id":
-                                peptideAnnotation.setPrUniprotId(annotationValue);
-                                break;
-                            case "pr_p100_base_peptide":
-                            case "pr_gcp_base_peptide":
-                                peptideAnnotation.setPrBasePeptide(annotationValue);
-                                break;
-                            case "pr_gcp_histone_mark":
-                                peptideAnnotation.setPrHistoneMark(annotationValue);
-                                break;
-                            case "pr_gcp_modified_peptide_code":
-                            case "pr_p100_modified_peptide_code":
-                                peptideAnnotation.setPrModifiedPeptideCode(annotationValue);
-                                break;
-                            default:
-//                                log.warn("New annotation: {}",annotationName);
-                        }
+                            switch (annotationName) {
+                                case "pr_gene_id":
+                                    peptideAnnotation.setPrGeneId(annotationValue);
+                                    break;
+                                case "pr_gene_symbol":
+                                case "GeneName":
+                                    peptideAnnotation.setPrGeneSymbol(annotationValue);
+                                    break;
+                                case "pr_p100_cluster":
+                                case "pr_gcp_cluster":
+                                    peptideAnnotation.setPrCluster(annotationValue);
+                                    break;
+                                case "pr_uniprot_id":
+                                    peptideAnnotation.setPrUniprotId(annotationValue);
+                                    break;
+                                case "pr_p100_base_peptide":
+                                case "pr_gcp_base_peptide":
+                                    peptideAnnotation.setPrBasePeptide(annotationValue);
+                                    break;
+                                case "pr_gcp_histone_mark":
+                                    peptideAnnotation.setPrHistoneMark(annotationValue);
+                                    break;
+                                case "pr_gcp_modified_peptide_code":
+                                case "pr_p100_modified_peptide_code":
+                                    peptideAnnotation.setPrModifiedPeptideCode(annotationValue);
+                                    break;
+                                case "pr_probe_suitability_manual":
+                                    if(annotationValue.equals("FALSE")) {
+                                        peakAreaValue = null;
+                                    }
+                                    break;
+                                default:
+                            }
                     }
+                    peptideAnnotationRepository.save(peptideAnnotation);
                 }
 
-                if(replicateAnnotation == null){
+                if (replicateAnnotation == null) {
                     replicateAnnotation = new ReplicateAnnotation(replicateId);
-                    for(ParseGCT.AnnotationValue annotationObject : metaReplicas.get(replicateId)){
+                    for (ParseGCT.AnnotationValue annotationObject : metaReplicas.get(replicateId)) {
                         String annotationName = annotationObject.getAnnotationName();
                         String annotationValue = annotationObject.getAnnotationValue();
 
-                        switch(annotationName){
+                        switch (annotationName) {
                             case "cell_id":
                                 replicateAnnotation.setCellId(annotationValue);
                                 break;
@@ -253,19 +338,18 @@ public class DatabaseLoader {
 //                                log.warn("New annotation: {}",annotationName);
                         }
                     }
+                    replicateAnnotationRepository.save(replicateAnnotation);
                 }
 
-                peptideAnnotationRepository.save(peptideAnnotation);
-                replicateAnnotationRepository.save(replicateAnnotation);
+//                peptideAnnotationRepository.save(peptideAnnotation);
 
-                PeakArea peakArea = new PeakArea(gctfile,peptideAnnotation,replicateAnnotation,peak.getPeakArea());
-                peakArea.setSourceUrl(connectPanorama.getSourceUrlFast(
-                        ParseUtils.parseArrayTypeFromUrl(url),
+                PeakArea peakArea = new PeakArea(gctfile, peptideAnnotation, replicateAnnotation, peakAreaValue);
+                peakArea.setChromatogramsUrl(connectPanorama.getChromatogramsUrl(
+                        UtilsParse.parseArrayTypeFromUrl(url),
                         dbPeptideIds.get(peakArea.getPeptideAnnotation().getPeptideId()),
                         peakArea.getReplicateAnnotation().getReplicateId()));
 
                 peakAreaRepository.save(peakArea);
-
 
             }
         }

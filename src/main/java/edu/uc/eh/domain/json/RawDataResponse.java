@@ -1,17 +1,15 @@
 package edu.uc.eh.domain.json;
 
-import edu.uc.eh.domain.json.AssayRecord;
-
 import java.util.List;
 
 /**
  * Created by chojnasm on 7/23/15.
  */
-public class TableResponse {
+public class RawDataResponse {
     private Integer total;
-    private List<AssayRecord> rows;
+    private List<RawDataRecord> rows;
 
-    public TableResponse(Long total, List<AssayRecord> rows) {
+    public RawDataResponse(Long total, List<RawDataRecord> rows) {
         this.total = total.intValue();
         this.rows = rows;
     }
@@ -24,11 +22,11 @@ public class TableResponse {
         this.total = total;
     }
 
-    public List<AssayRecord> getRows() {
+    public List<RawDataRecord> getRows() {
         return rows;
     }
 
-    public void setRows(List<AssayRecord> rows) {
+    public void setRows(List<RawDataRecord> rows) {
         this.rows = rows;
     }
 }

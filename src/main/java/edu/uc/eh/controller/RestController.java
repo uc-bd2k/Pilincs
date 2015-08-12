@@ -6,7 +6,7 @@ import edu.uc.eh.domain.repository.*;
 import edu.uc.eh.utils.ConnectPanorama;
 import edu.uc.eh.service.QueryService;
 import edu.uc.eh.datatypes.Tuples;
-import edu.uc.eh.utils.ParseUtils;
+import edu.uc.eh.utils.UtilsParse;
 import edu.uc.eh.datatypes.AssayType;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +42,7 @@ public class RestController {
                           PeakAreaRepository peakAreaRepository,
                           QueryService queryService,
                           ProfileRepository profileRepository) {
+
         this.connectPanorama = connectPanorama;
         this.gctFileRepository = gctFileRepository;
         this.replicateAnnotationRepository = replicateAnnotationRepository;
@@ -55,15 +56,15 @@ public class RestController {
     @RequestMapping(value = "/api-assays-paged", method = RequestMethod.GET)
     public
     @ResponseBody
-    TableResponse tableAsJsonPaged(
+    RawDataResponse tableAsJsonPaged(
             @RequestParam String order,
             @RequestParam Integer limit,
             @RequestParam Integer offset,
             @RequestParam String tags) throws ParseException {
 
-        List<AssayRecord> output = new ArrayList<>();
+        List<RawDataRecord> output = new ArrayList<>();
 
-        HashMap<String,List<String>> tagsParsed = ParseUtils.parseTags(tags);
+        HashMap<String,List<String>> tagsParsed = UtilsParse.parseTags(tags);
 
         PageRequest pageRequest = new PageRequest(offset / limit, limit);
         Page<PeakArea> result;
@@ -109,10 +110,10 @@ public class RestController {
             count = result.getTotalElements();
 
         for(PeakArea peakArea : result){
-            output.add(new AssayRecord(peakArea));
+            output.add(new RawDataRecord(peakArea));
         }
 
-        return new TableResponse(count,output);
+        return new RawDataResponse(count,output);
     }
 
 
@@ -127,7 +128,7 @@ public class RestController {
 
         List<ProfileRecord> output = new ArrayList<>();
 
-        HashMap<String,List<String>> tagsParsed = ParseUtils.parseTags(tags);
+        HashMap<String,List<String>> tagsParsed = UtilsParse.parseTags(tags);
 
         PageRequest pageRequest = new PageRequest(offset / limit, limit);
         Page<Profile> result;
@@ -182,7 +183,7 @@ public class RestController {
     List<Tuples.Tuple2<String,String>> gctUrlsFromPanorama() throws Exception {
         List<Tuples.Tuple2<String,String>> output = new ArrayList<>();
 
-        for(String urlString : connectPanorama.GctUrls()){
+        for(String urlString : connectPanorama.gctDownloadUrls(true)){
             URL url = new URL(urlString);
             String fileName = null;
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -232,8 +233,8 @@ public class RestController {
 
         List<TagFormat> output = new ArrayList<>();
 
-        HashMap<String,List<String>> tagsParsed = ParseUtils.parseTags(tags);
-        String lastTagAnnotation = ParseUtils.lastTag(tags);
+        HashMap<String,List<String>> tagsParsed = UtilsParse.parseTags(tags);
+        String lastTagAnnotation = UtilsParse.lastTag(tags);
         if(lastTagAnnotation == null)return output;
 
         List<String> allTagsForAnnotation = new ArrayList<>();

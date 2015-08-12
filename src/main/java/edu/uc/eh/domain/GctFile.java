@@ -35,6 +35,9 @@ public class GctFile {
     @OneToMany(mappedBy = "gctFile")
     private Set<PeakArea> peakAreas = new HashSet<>();
 
+    @OneToMany(mappedBy = "gctFile")
+    private Set<Profile> profiles = new HashSet<>();
+
     GctFile(){}
 
     public GctFile(String DownloadUrl) {

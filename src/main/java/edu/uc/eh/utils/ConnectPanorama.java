@@ -1,8 +1,10 @@
 package edu.uc.eh.utils;
 
 
+import edu.uc.eh.datatypes.AnnotationNameValue;
 import edu.uc.eh.domain.*;
 import edu.uc.eh.datatypes.AssayType;
+import org.json.simple.JSONObject;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.SelectRowsCommand;
@@ -24,41 +26,46 @@ public class ConnectPanorama {
 
     private static final Logger log = LoggerFactory.getLogger(ConnectPanorama.class);
 
-//    @Value("${panorama.folders}")
-    private String panoramaFolders = "LINCS/P100,LINCS/GCP";
+    @Value("${panorama.folders}")
+    private String panoramaFolders;// = "LINCS/P100,LINCS/GCP";
 
-//    @Value("${panorama.runIdUrl}")
-    private String runIdUrl="https://panoramaweb.org/labkey/targetedms/LINCS/%s/showPrecursorList.view?id=%d";
+    @Value("${panorama.runIdUrl}")
+    private String runIdUrl;//="https://panoramaweb.org/labkey/targetedms/LINCS/%s/showPrecursorList.view?id=%d";
 
-    @Value("${panorama.gctUrl}")
-    private String gctUrl;
+    @Value("${panorama.gctDownloadUrl}")
+    private String gctDownloadUrl;
 
     @Value("${panorama.connectionUrl}")
     private String panoramaConnectionUrl;
 
-    @Value("${panorama.detailedLink1}")
-    private String intermediateLink;
+    @Value("${panorama.peptideInternalIdUrl}")
+    private String peptideInternalIdsUrl;
 
-    @Value("${panorama.detailedLink2}")
-    private String detailedLink;
+    @Value("${panorama.chromatogramsUrl}")
+    private String chromatogramsUrl;
 
-    public List<String> GctUrls() throws IOException, CommandException {
+    @Value("${panorama.peptideAnnotationsUrl}")
+    private String peptideAnnotationsUrl;
 
+    public List<String> gctDownloadUrls(boolean ifProcessed) throws IOException, CommandException {
 
         List<String> output = new ArrayList<>();
         String[] folderNames = panoramaFolders.split(",");
         String gcpOrP100;
 
         for(String folderName:folderNames) {
-            for (Integer runId : getRunIds(folderName)) {
+            for (Integer runId : getRunIdsFromDatabase(folderName)) {
                 gcpOrP100 = folderName.contains("GCP") ? "GCP" : "P100";
-                output.add(String.format(gctUrl,gcpOrP100,runId,gcpOrP100));
+
+                output.add(String.format(gctDownloadUrl,gcpOrP100,runId,gcpOrP100,ifProcessed));
             }
         }
         return output;
     }
 
-    private List<Integer> getRunIds(String folderName) throws IOException, CommandException {
+
+
+    private List<Integer> getRunIdsFromDatabase(String folderName) throws IOException, CommandException {
         ArrayList<Integer> runIds = new ArrayList<Integer>();
         Connection cn = new Connection(panoramaConnectionUrl);
 
@@ -75,25 +82,25 @@ public class ConnectPanorama {
         return runIds;
     }
 
-    public String getSourceUrl(PeakArea peakArea) {
+//    public String getChromatogramsUrl(PeakArea peakArea) {
+//
+//        AssayType assayType = peakArea.getGctFile().getAssayType();
+//        int runId = peakArea.getGctFile().getRunId();
+//        String escapedPeptideId = peakArea.getPeptideAnnotation().escapedPeptideId();
+//        String replicateId = peakArea.getReplicateAnnotation().getReplicateId();
+//
+//        String stepOne = String.format(intermediateLink, assayType, escapedPeptideId, runId);
+//        log.warn(stepOne);
+//
+//        Integer peptide = UtilsParse.parsePeptideNumber(stepOne);
+//
+//        if(peptide!=null){
+//            return String.format(detailedLink,assayType,peptide,replicateId);
+//        }
+//            return null;
+//    }
 
-        AssayType assayType = peakArea.getGctFile().getAssayType();
-        int runId = peakArea.getGctFile().getRunId();
-        String escapedPeptideId = peakArea.getPeptideAnnotation().escapedPeptideId();
-        String replicateId = peakArea.getReplicateAnnotation().getReplicateId();
-
-        String stepOne = String.format(intermediateLink, assayType, escapedPeptideId, runId);
-        log.warn(stepOne);
-
-        Integer peptide = ParseUtils.parsePeptideNumber(stepOne);
-
-        if(peptide!=null){
-            return String.format(detailedLink,assayType,peptide,replicateId);
-        }
-            return null;
-    }
-
-    public HashMap<String, Integer> getPeptideIds(List<String> peptideIds, AssayType assayType, int runId) throws IOException {
+    public HashMap<String, Integer> getPeptideIdsFromJSON(List<String> peptideIds, AssayType assayType, int runId) throws IOException {
 
         HashMap<String,Integer> output;
 
@@ -108,9 +115,9 @@ public class ConnectPanorama {
             }
         }
 
-        String stepOne = String.format(intermediateLink,assayType,sb.toString(),runId);
+        String stepOne = String.format(peptideInternalIdsUrl, assayType, sb.toString(), runId);
 
-        output= ParseUtils.parsePeptideNumbers(stepOne, peptideIds);
+        output= UtilsParse.parsePeptideNumbers(stepOne, peptideIds);
 
         return output;
     }
@@ -123,7 +130,13 @@ public class ConnectPanorama {
         return String.format(runIdUrl,assayType,runId);
     }
 
-    public String getSourceUrlFast(AssayType assayType, Integer peptide, String replicateId) {
-        return String.format(detailedLink,assayType,peptide,replicateId);
+    public String getChromatogramsUrl(AssayType assayType, Integer peptide, String replicateId) {
+        return String.format(chromatogramsUrl,assayType,peptide,replicateId);
+    }
+
+    public List<String> getPeptideReferenceIdNames(AssayType assayType) throws Exception {
+        String jsonUrl = String.format(peptideAnnotationsUrl, assayType);
+
+        return UtilsParse.getPeptideIdNamesFromJSON(jsonUrl);
     }
 }

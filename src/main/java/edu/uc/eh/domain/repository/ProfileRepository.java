@@ -18,4 +18,6 @@ public interface ProfileRepository extends JpaRepository<Profile,Long> {
 
     Page<Profile> findByAssayTypeInAndReplicateAnnotationCellIdInAndReplicateAnnotationPertinameIn(
             List<AssayType> assays, List<String> cells, List<String> pertiname, Pageable pageable);
+
+    List<Profile> findByAssayType(AssayType assayType);
 }

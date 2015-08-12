@@ -28,7 +28,7 @@ public class PeakArea {
     @ManyToOne
     private ReplicateAnnotation replicateAnnotation;
 
-    private String sourceUrl;
+    private String chromatogramsUrl;
     private Double value;
 
     private PeakArea() {
@@ -47,7 +47,7 @@ public class PeakArea {
     public String toString() {
         return "PeakArea{" +
                 "value=" + value +
-                ", sourceUrl='" + sourceUrl + '\'' +
+                ", chromatogramsUrl='" + chromatogramsUrl + '\'' +
                 ", replicateAnnotation=" + replicateAnnotation +
                 ", peptideAnnotation=" + peptideAnnotation +
                 ", gctFile=" + gctFile +
@@ -56,8 +56,8 @@ public class PeakArea {
     }
 
 
-    public void setSourceUrl(String sourceUrl) {
-        this.sourceUrl = sourceUrl;
+    public void setChromatogramsUrl(String chromatogramsUrl) {
+        this.chromatogramsUrl = chromatogramsUrl;
     }
 
     public Long getId() {
@@ -76,8 +76,8 @@ public class PeakArea {
         return replicateAnnotation;
     }
 
-    public String getSourceUrl() {
-        return sourceUrl;
+    public String getChromatogramsUrl() {
+        return chromatogramsUrl;
     }
 
     public Double getValue() {

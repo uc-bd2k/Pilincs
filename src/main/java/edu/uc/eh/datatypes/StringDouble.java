@@ -40,6 +40,14 @@ public class StringDouble implements Serializable, Comparable{
     }
 
     @Override
+    public String toString() {
+        return "{" +
+                "\"name\":\"" + string + '\"' +
+                ", \"value\":" + aDouble +
+                '}';
+    }
+
+    @Override
     public int compareTo(Object o2) {
         StringDouble sd2 = (StringDouble)o2;
             return this.getaDouble().compareTo(sd2.getaDouble());

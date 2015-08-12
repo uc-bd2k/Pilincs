@@ -8,7 +8,7 @@ import java.util.SortedSet;
 /**
  * Created by chojnasm on 8/6/15.
  */
-public class TransformUtils {
+public class UtilsTransform {
 
     public static String truncate(String text, int number){
         if(text.length() > number){

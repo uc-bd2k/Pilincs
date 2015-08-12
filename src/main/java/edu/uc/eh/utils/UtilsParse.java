@@ -1,24 +1,28 @@
 package edu.uc.eh.utils;
 
+import com.google.gson.*;
+import edu.uc.eh.datatypes.AnnotationNameValue;
 import edu.uc.eh.datatypes.AssayType;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.*;
 
 /**
  * Created by chojnasm on 7/17/15.
  */
-public class ParseUtils {
+public class UtilsParse {
+
+    private static final Logger log = LoggerFactory.getLogger(UtilsParse.class);
+
     public static Integer parsePeptideNumber(String stepOne) {
-        BufferedReader in = downloadFile(stepOne);
+        BufferedReader in = UtilsNetwork.downloadFile(stepOne);
         String line;
         Integer peptide = null;
 
@@ -39,21 +43,6 @@ public class ParseUtils {
     }
 
 
-    public static BufferedReader downloadFile(String link){
-        URL url;
-        BufferedReader in = null;
-        try {
-            url = new URL(link);
-            in = new BufferedReader(new InputStreamReader(url.openStream()));
-
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return in;
-    }
-
     public static int parseRunId(String url) {
         try {
             return Integer.parseInt(url.split("runId=")[1].split("&")[0]);
@@ -67,7 +56,7 @@ public class ParseUtils {
     public static HashMap<String, Integer> parsePeptideNumbers(String stepOne, List<String> peptideIds) throws IOException {
 
         HashMap<String,Integer> output = new HashMap<>();
-        BufferedReader in = downloadFile(stepOne);
+        BufferedReader in = UtilsNetwork.downloadFile(stepOne);
         String line;
         Integer peptideDB = null;
         String peptideString = null;
@@ -162,5 +151,25 @@ public class ParseUtils {
             }
         }
         return lastTagAnnotation;
+    }
+
+    public static List<String> getPeptideIdNamesFromJSON(String jsonUrl) throws Exception {
+        String jsonAsString = UtilsNetwork.readUrl(jsonUrl);
+        List<String> output = new ArrayList<>();
+
+        JsonElement rootElement = new JsonParser().parse(jsonAsString);
+        JsonObject jsonObject = rootElement.getAsJsonObject();
+        JsonArray jsonArray = jsonObject.getAsJsonArray("rows");
+
+        for(int i = 0; i < jsonArray.size(); i++){
+            JsonObject jobject = jsonArray.get(i).getAsJsonObject();
+            String name = jobject.get("Name").toString().replaceAll("\"","");
+            String value = jobject.get("Value").toString().replaceAll("\"","");
+            if(name.equals("pr_id") && !output.contains(value)){
+                output.add(value);
+            }
+        }
+        Collections.sort(output);
+        return output;
     }
 }

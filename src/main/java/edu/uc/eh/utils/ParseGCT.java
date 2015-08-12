@@ -1,7 +1,11 @@
 package edu.uc.eh.utils;
 
+import edu.uc.eh.datatypes.AssayType;
+import edu.uc.eh.domain.PeptideAnnotation;
+import edu.uc.eh.domain.repository.PeptideAnnotationRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -16,16 +20,108 @@ import java.util.*;
 public class ParseGCT {
     Logger logger = LoggerFactory.getLogger("edu.uc.eh.utils.ParseGCT");
 
+    private final PeptideAnnotationRepository peptideAnnotationRepository;
+
+    @Autowired
+    public ParseGCT(PeptideAnnotationRepository peptideAnnotationRepository) {
+        this.peptideAnnotationRepository = peptideAnnotationRepository;
+    }
+
+
+    private void savePeptidesToRepository(String url, AssayType assayType) throws IOException {
+
+        List<String> labelsOfProbes = new ArrayList<>();
+
+        BufferedReader reader = UtilsNetwork.downloadFile(url);
+
+        String line;
+        reader.readLine();
+        line = reader.readLine();
+
+        String[] tokens = line.split("\t", -1);
+        int numberOfProbes = Integer.valueOf(tokens[0]).intValue();
+        int numberOfReplicates = Integer.valueOf(tokens[1]).intValue();
+        int annotationsOfProbes = Integer.valueOf(tokens[2]).intValue() + 1;
+        int annotationsOfReplicates = Integer.valueOf(tokens[3]).intValue() + 1;
+
+        line = reader.readLine();
+        tokens = line.split("\t", -1);
+
+        // first token is Id
+        if (labelsOfProbes.size() == 0) {
+            labelsOfProbes.add(tokens[0]);
+        }
+
+        // Labels of annotations of probes/peptides
+        for (int i = 1; i < annotationsOfProbes; i++) {
+            if (!labelsOfProbes.contains(tokens[i])) {
+                labelsOfProbes.add(tokens[i]);
+            }
+        }
+
+        // lines with meta replicates
+        for (int rowId = 0; rowId < annotationsOfReplicates - 1; rowId++) {
+            reader.readLine();
+        }
+
+        // lines with meta probes and values
+        for (int rowId = 0; rowId < numberOfProbes; rowId++) {
+            line = reader.readLine();
+            tokens = line.split("\t", -1);
+
+            // fill meta probes
+            PeptideAnnotation peptideAnnotation = new PeptideAnnotation(tokens[0],assayType);
+
+            for(int i = 0; i < labelsOfProbes.size() ; i++) {
+
+                String annotationName = labelsOfProbes.get(i);
+                String annotationValue = tokens[i+1];
+
+                switch (annotationName) {
+                    case "pr_gene_id":
+                        peptideAnnotation.setPrGeneId(annotationValue);
+                        break;
+                    case "pr_gene_symbol":
+                    case "GeneName":
+                        peptideAnnotation.setPrGeneSymbol(annotationValue);
+                        break;
+                    case "pr_p100_cluster":
+                    case "pr_gcp_cluster":
+                        peptideAnnotation.setPrCluster(annotationValue);
+                        break;
+                    case "pr_uniprot_id":
+                        peptideAnnotation.setPrUniprotId(annotationValue);
+                        break;
+                    case "pr_p100_base_peptide":
+                    case "pr_gcp_base_peptide":
+                        peptideAnnotation.setPrBasePeptide(annotationValue);
+                        break;
+                    case "pr_gcp_histone_mark":
+                        peptideAnnotation.setPrHistoneMark(annotationValue);
+                        break;
+                    case "pr_gcp_modified_peptide_code":
+                    case "pr_p100_modified_peptide_code":
+                        peptideAnnotation.setPrModifiedPeptideCode(annotationValue);
+                        break;
+                    default:
+                }
+            }
+            peptideAnnotationRepository.save(peptideAnnotation);
+
+        }
+        reader.close();
+    }
+
     public void parseToRepository(String url,
                                   List peakValues,
                                   HashMap<String, List<AnnotationValue>> metaProbes,
                                   HashMap<String, List<AnnotationValue>> metaReplicates) throws IOException {
-        logger.warn("Processing: {}", url);
+        logger.info("Processing: {}", url);
 
         List<String> labelsOfProbes = new ArrayList<>();
         List<String> labelsOfReplicates = new ArrayList<>();
 
-        BufferedReader reader = ParseUtils.downloadFile(url);
+        BufferedReader reader = UtilsNetwork.downloadFile(url);
 
         String line = reader.readLine();
         if (line == null) {
