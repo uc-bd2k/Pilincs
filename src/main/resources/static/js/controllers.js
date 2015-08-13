@@ -68,6 +68,7 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
     $scope.refreshTables = function(){
         $('#tablePeaks').bootstrapTable('refresh');
         $('#tableProfiles').bootstrapTable('refresh');
+        $scope.loadHeatMap();
     }
 
     $timeout(callAtTimeout, 0);
@@ -455,9 +456,84 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
         res.success(function (data, status, headers, config) {
 
             console.log(data);
-            $scope.heatMap = data;
-            d3.select(".heatMap").text("Clicked on: " + Date.now());
-            //console.log(data);
+
+            var topMargin = 60,
+                leftMargin = 90,
+                shortenLabel = 15,
+                grid = 10;
+
+            var peptideNames = data.peptideNames,
+                profileNames = data.profileNames,
+                matrix = data.cells;
+
+            peptideNames = peptideNames.map(function(item,i){
+                if(item.length > shortenLabel){
+                    return item.substring(0,shortenLabel) + '';
+                }else{
+                    return item;
+                }
+            });
+
+
+            console.log(profileNames.length);
+            console.log(peptideNames.length);
+            console.log(matrix.length);
+
+            // Row Labels
+            var rowLabels = d3.select('#heatMap').select('svg').select('g#rowLabels').attr("transform",'translate(0,' + topMargin + ')');
+
+            rowLabels = rowLabels.selectAll('text').data(profileNames);
+            rowLabels.enter()
+                .append('text')
+                .attr('x',0)
+                .attr('y',30)
+                .attr("text-anchor", "start")
+                .attr('transform',function(d,i){ return "translate(0," + i * grid + ") rotate(0)";})
+                .text(function(d){return d;})
+                .style('font-size','8px');
+
+            rowLabels.exit().remove();
+
+            // Column Labels
+            var colLabels = d3.select('#heatMap').select('svg').select('g#colLabels').attr("transform",'translate('+leftMargin+',0)');
+
+            colLabels = colLabels.selectAll('text').data(peptideNames);
+            colLabels.enter()
+                .append('text')
+                .attr('x',0)
+                .attr('y',0)
+                .attr("text-anchor", "start")
+                .attr('transform',function(d,i){ return "translate(" + i * grid + ",0) rotate(90)";})
+                .text(function(d){return d;})
+                .style('font-size','8px');
+
+            colLabels.exit().remove();
+
+            // Matrix
+            var matrixRect = d3.select('#heatMap').select('svg').select('g#matrix').attr("transform",'translate('+leftMargin+','+80+')');
+
+            matrixRect = matrixRect.selectAll('rect').data(matrix);
+            matrixRect.enter()
+                .append('rect')
+                .attr('width',grid)
+                .attr('height',grid)
+                .attr("text-anchor", "start")
+                .attr('transform', function (d, i) {
+                    return "translate(" + d.columnIndex * grid + "," + d.rowIndex * grid + ")";
+                })
+                .style('fill', function (d) {
+                    if (d.discreteValue == 0) {
+                        return '#74c476';
+                    } else {
+                        return '#9e9ac8';
+                    }
+                })
+                .style('font-size', '8px')
+                .style('border-color','grey')
+                .style('border-width','1');
+
+            matrixRect.exit().remove();
+
         });
     };
 

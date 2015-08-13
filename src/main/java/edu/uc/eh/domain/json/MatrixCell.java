@@ -5,13 +5,13 @@ package edu.uc.eh.domain.json;
  */
 public class MatrixCell {
     private int rowIndex;
-    private int columnIndes;
-    private Double discreteValue;
+    private int columnIndex;
+    private int discreteValue;
 
-    public MatrixCell(int rowIndex, int columnIndes, Double discreteValue) {
+    public MatrixCell(int rowIndex, int columnIndex, Double discreteValue) {
         this.rowIndex = rowIndex;
-        this.columnIndes = columnIndes;
-        this.discreteValue = discreteValue;
+        this.columnIndex = columnIndex;
+        this.discreteValue = discreteValue > 0 ? 0 : 1;
     }
 
     public int getRowIndex() {
@@ -22,19 +22,19 @@ public class MatrixCell {
         this.rowIndex = rowIndex;
     }
 
-    public int getColumnIndes() {
-        return columnIndes;
+    public int getColumnIndex() {
+        return columnIndex;
     }
 
-    public void setColumnIndes(int columnIndes) {
-        this.columnIndes = columnIndes;
+    public void setColumnIndex(int columnIndes) {
+        this.columnIndex = columnIndes;
     }
 
-    public Double getDiscreteValue() {
+    public int getDiscreteValue() {
         return discreteValue;
     }
 
-    public void setDiscreteValue(Double discreteValue) {
+    public void setDiscreteValue(int discreteValue) {
         this.discreteValue = discreteValue;
     }
 }

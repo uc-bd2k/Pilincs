@@ -149,9 +149,17 @@
             </div>
         </table>
 
-        <div id="tableRelations" class="days-hours-heatmap">
+        <div id="tableRelations">
+            <!--<label style="font-weight: normal; font-size: smaller;"><input type="radio"> Natural order</label>-->
+            <!--<label style="font-weight: normal; font-size: smaller; padding-left: 3em;"><input type="radio" > Cluster membership</label>-->
 
-            <p>heatmap prototype comimng soon</p>
+            <div id="heatMap" style="padding-top:30px;">
+            <svg width="1170" height="5000">
+                <g id="rowLabels"></g>
+                <g id="colLabels"></g>
+                <g id="matrix"></g>
+            </svg>
+            </div>
         </div>
 
         <!--<script type="text/javascript" src="app.js"></script>-->
@@ -184,7 +192,10 @@
             </tr>
 
             </tbody>
-        </table><br/>
+        </table>
+
+
+            <br/>
         <pre><b>Example</b><br/>{API documentation is in progress...}</pre>
         </div>
 
