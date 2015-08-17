@@ -1,15 +1,107 @@
-.days-hours-heatmap{padding: 20px 0 20px 0;width: 500px;margin: 0 auto;}
-.days-hours-heatmap .calibration{margin-bottom: 15px;width:400px;}
-.days-hours-heatmap .calibration .group{display: inline-block;}
-.days-hours-heatmap .calibration .description{width:108px;}
-.days-hours-heatmap .calibration .description>label:last-child{float:right;}
-.days-hours-heatmap .calibration>.display-control{float:right;}
-.days-hours-heatmap .calibration>.display-control label{vertical-align: top;}
-.days-hours-heatmap .calibration>.display-control input[type='radio']{cursor: pointer;}
+/* Loading heatmap*/
+.glyphicon-refresh-animate {
+    -animation: spin .7s infinite linear;
+    -webkit-animation: spin2 .7s infinite linear;
+}
 
-.days-hours-heatmap .heatmap .axis path{display: none;}
-.days-hours-heatmap .heatmap .axis line{fill: none;stroke: #000;shape-rendering: crispEdges;}
-.days-hours-heatmap .heatmap .axis text{font-size: 12px}
+@-webkit-keyframes spin2 {
+    from {
+        -webkit-transform: rotate(0deg);
+    }
+    to {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: scale(1) rotate(0deg);
+    }
+    to {
+        transform: scale(1) rotate(360deg);
+    }
+}
+
+/* Color scale */
+
+.cs-19 {
+    fill: rgb(127, 39, 4)
+}
+
+.cs-18 {
+    fill: rgb(166, 54, 3)
+}
+
+.cs-17 {
+    fill: rgb(217, 72, 1)
+}
+
+.cs-16 {
+    fill: rgb(241, 105, 19)
+}
+
+.cs-15 {
+    fill: rgb(253, 141, 60)
+}
+
+.cs-14 {
+    fill: rgb(253, 174, 107)
+}
+
+.cs-13 {
+    fill: rgb(253, 208, 162)
+}
+
+.cs-12 {
+    fill: rgb(254, 230, 206)
+}
+
+.cs-11 {
+    fill: rgb(255, 245, 235)
+}
+
+.cs-10 {
+    fill: white
+}
+
+.cs-9 {
+    fill: rgb(247, 251, 255)
+}
+
+.cs-8 {
+    fill: rgb(222, 235, 247)
+}
+
+.cs-7 {
+    fill: rgb(198, 219, 239)
+}
+
+.cs-6 {
+    fill: rgb(158, 202, 225)
+}
+
+.cs-5 {
+    fill: rgb(107, 174, 214)
+}
+
+.cs-4 {
+    fill: rgb(66, 146, 198)
+}
+
+.cs-3 {
+    fill: rgb(33, 113, 181)
+}
+
+.cs-2 {
+    fill: rgb(8, 81, 156)
+}
+
+.cs-1 {
+    fill: rgb(8, 48, 107)
+}
+
+/* Heatmap navigation */
+
 
 /* Bar chart*/
 .bar:hover {

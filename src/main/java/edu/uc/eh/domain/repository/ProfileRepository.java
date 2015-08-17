@@ -1,7 +1,7 @@
 package edu.uc.eh.domain.repository;
 
-import edu.uc.eh.domain.Profile;
 import edu.uc.eh.datatypes.AssayType;
+import edu.uc.eh.domain.Profile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,4 +23,5 @@ public interface ProfileRepository extends JpaRepository<Profile,Long> {
             List<AssayType> assays, List<String> cells, List<String> pertiname);
 
     List<Profile> findByAssayType(AssayType assayType);
+
 }

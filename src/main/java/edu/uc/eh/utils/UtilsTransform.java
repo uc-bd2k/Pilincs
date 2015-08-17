@@ -1,16 +1,13 @@
 package edu.uc.eh.utils;
 
-import edu.uc.eh.datatypes.AssayType;
+import edu.uc.eh.datatypes.PeptideOrder;
 import edu.uc.eh.datatypes.StringDouble;
 import edu.uc.eh.domain.Profile;
 import edu.uc.eh.domain.json.HeatMapResponse;
-import edu.uc.eh.domain.json.MatrixCell;
-import edu.uc.eh.domain.json.ProfileRecord;
+import edu.uc.eh.domain.json.MatrixRow;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.SortedSet;
+import java.util.*;
 
 /**
  * Created by chojnasm on 8/6/15.
@@ -47,23 +44,50 @@ public class UtilsTransform {
         return sb.toString();
     }
 
-    public static HeatMapResponse profilesToHeatMap(List<Profile> profiles, List<String> referenceProfile) {
+    public static HeatMapResponse profilesToHeatMap(List<Profile> profiles, List<String> profileNames) {
 
-        List<String> peptideNames = referenceProfile;
-        List<String> profileNames = new ArrayList<>();
-        List<MatrixCell> cells = new ArrayList<>();
+        List<PeptideOrder> peptideOrders = new ArrayList<>();
+        List<MatrixRow> rows = new ArrayList<>();
 
         int rowIndex = 0;
 
+
+        List<Integer> ordersToRerank = new ArrayList<>();
+        for (Profile profile : profiles) {
+            ordersToRerank.add(profile.getClusteringOrder());
+        }
+
+        HashMap<Integer, Integer> reranking = rerank(ordersToRerank);
+
         for( Profile profile : profiles){
-            profileNames.add(profile.getReplicateAnnotation().getReplicateId());
 
-            for(int columnIndex = 0; columnIndex < profile.getVector().length; columnIndex++){
-                cells.add(new MatrixCell(rowIndex,columnIndex,profile.getVector()[columnIndex]));
-            }
+            String replicateName = profile.getReplicateAnnotation().getReplicateId();
+            Integer newOrder = reranking.get(profile.getClusteringOrder());
 
+            peptideOrders.add(
+                    new PeptideOrder(replicateName, newOrder));
+            rows.add(new MatrixRow(rowIndex, newOrder, profile.getColors()));
             rowIndex++;
         }
-        return new HeatMapResponse(peptideNames, profileNames, cells);
+        return new HeatMapResponse(peptideOrders, profileNames, rows);
+    }
+
+    public static HashMap<Integer, Integer> rerank(List<Integer> inputOrder) {
+
+        HashMap<Integer, Integer> output = new HashMap<>();
+
+        Collections.sort(inputOrder);
+        for (int i = 0; i < inputOrder.size(); i++) {
+            output.put(inputOrder.get(i), i);
+        }
+        return output;
+    }
+
+    public static double[] intArrayToDouble(int[] input) {
+        double[] output = new double[input.length];
+        for (int i = 0; i < input.length; i++) {
+            output[i] = input[i];
+        }
+        return output;
     }
 }

@@ -5,12 +5,15 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * Created by chojnasm on 8/6/15.
  */
 public class UtilsStatistics {
+
 
     private static final Logger log = LoggerFactory.getLogger(UtilsStatistics.class);
 

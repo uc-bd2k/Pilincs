@@ -1,14 +1,17 @@
 package edu.uc.eh.controller;
 
-import edu.uc.eh.domain.*;
+import edu.uc.eh.datatypes.AssayType;
+import edu.uc.eh.datatypes.Tuples;
+import edu.uc.eh.domain.PeakArea;
+import edu.uc.eh.domain.PeptideAnnotation;
+import edu.uc.eh.domain.Profile;
+import edu.uc.eh.domain.ReplicateAnnotation;
 import edu.uc.eh.domain.json.*;
 import edu.uc.eh.domain.repository.*;
-import edu.uc.eh.utils.ConnectPanorama;
 import edu.uc.eh.service.QueryService;
-import edu.uc.eh.datatypes.Tuples;
+import edu.uc.eh.utils.ConnectPanorama;
 import edu.uc.eh.utils.DatabaseLoader;
 import edu.uc.eh.utils.UtilsParse;
-import edu.uc.eh.datatypes.AssayType;
 import edu.uc.eh.utils.UtilsTransform;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +22,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by chojnasm on 7/15/15.
@@ -216,10 +222,8 @@ public class RestController {
         List<String> assayTypesString = tagsParsed.get("AssayTypes");
         List<AssayType> assayTypes = new ArrayList<>();
 
-
         // Only first Assay Type !!!!
         assayTypes.add(AssayType.valueOf(assayTypesString.get(0)));
-
 
         List<String> pertinameTags = tagsParsed.get("Pertiname").size() > 0 ? tagsParsed.get("Pertiname") : allTagsForPertiname;
         List<String> cellTags = tagsParsed.get("CellId").size() > 0 ? tagsParsed.get("CellId") : allTagsForcell;

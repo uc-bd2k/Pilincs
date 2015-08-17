@@ -2,7 +2,7 @@ function postQueryParams(params) {
     //console.log($scope.tags);
 
 
-    var scope = angular.element('#tablePeaks').scope();
+    var scope = angular.element('#assayButtons').scope();
     var queryContent = [];
     queryContent.push({"p100":scope.p100});
     queryContent.push({"gcp":scope.gcp});
@@ -14,8 +14,12 @@ function postQueryParams(params) {
 }
 
 
+
 var appControllers = angular.module('appControllers', []);
 //appControllers.service('ItemService', [ItemService]);
+
+appControllers.controller('ExploreCtrl', ['$scope', function ($scope) {
+}]);
 
 appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($scope, $http, $timeout) {
 
@@ -25,14 +29,18 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
     $scope.p100 = true;
     $scope.gcp = false;
     $scope.l1000 = false;
+    $scope.heatmapMessage = '';
 
     $scope.workspaces = [];
-    $scope.workspaces.push({ name: 'Show Data',alias:'tablePeaks',active:true });
-    $scope.workspaces.push({ name: 'Show Profiles', alias: 'tableProfiles',active:true });
-    $scope.workspaces.push({ name: 'Show HeatMap', alias: 'tableRelations',active:true });
+    $scope.workspaces.push({name: 'Raw Data', alias: 'tablePeaks', active: true});
+    $scope.workspaces.push({name: 'Profiles', alias: 'tableProfiles', active: true});
+    $scope.workspaces.push({name: 'HeatMap', alias: 'tableRelations', active: true});
+    //$scope.workspaces.push({ name: 'Charts', alias: 'tableRelations',active:true });
+    $scope.workspaces.push({name: 'Explore', alias: 'tableAPI', active: true});
     $scope.workspaces.push({ name: 'Show API', alias: 'tableAPI',active:true });
 
     $scope.currentWorkspace = $scope.workspaces[1];
+    $scope.previousWorkspace = $scope.workspaces[1];
 
     $scope.heatMap = {};
 
@@ -42,34 +50,48 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
             $('#tablePeaks').parent().parent().parent().show();
             $('#tableProfiles').parent().parent().parent().hide();
             $('#tableRelations').hide();
+            $('#tableExplore').hide();
             $('#tableAPI').hide();
 
         }else if(wk == $scope.workspaces[1]){
             $('#tablePeaks').parent().parent().parent().hide();
             $('#tableProfiles').parent().parent().parent().show();
             $('#tableRelations').hide();
+            $('#tableExplore').hide();
             $('#tableAPI').hide();
 
         }else if(wk == $scope.workspaces[2]){
             $('#tablePeaks').parent().parent().parent().hide();
             $('#tableProfiles').parent().parent().parent().hide();
             $('#tableRelations').show();
+            $('#tableExplore').hide();
             $('#tableAPI').hide();
+            $('#heatMapRadios').show();
             $scope.loadHeatMap();
 
         }else if(wk == $scope.workspaces[3]){
             $('#tablePeaks').parent().parent().parent().hide();
             $('#tableProfiles').parent().parent().parent().hide();
             $('#tableRelations').hide();
+            $('#tableExplore').show();
+            $('#tableAPI').hide();
+            // $scope.loadHeatMap();
+
+        } else if (wk == $scope.workspaces[4]) {
+            $('#tablePeaks').parent().parent().parent().hide();
+            $('#tableProfiles').parent().parent().parent().hide();
+            $('#tableRelations').hide();
+            $('#tableExplore').hide();
             $('#tableAPI').show();
+            test();
         }
-    }
+    };
 
     $scope.refreshTables = function(){
         $('#tablePeaks').bootstrapTable('refresh');
         $('#tableProfiles').bootstrapTable('refresh');
         $scope.loadHeatMap();
-    }
+    };
 
     $timeout(callAtTimeout, 0);
     function callAtTimeout() {
@@ -99,14 +121,14 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
 
         $scope.refreshTables();
 
-    }
+    };
 
     $scope.getToggleClass = function(status){
             return {
                 toggle: status,
                 untoggle: !status
             };
-    }
+    };
 
     $scope.loadTags = function($query) {
         return $http.get('/pilincs/api-tags', { cache: true}).then(function(response) {
@@ -153,7 +175,7 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
         }else{
             $scope.showRecommend = false;
         }
-    }
+    };
 
     $scope.tagAddedRemoved = function() {
         $scope.getRecommendation();
@@ -210,7 +232,7 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
                 title: 'Cell'
             }, {
                 field: 'pertIname',
-                title: 'Pert Iname'
+                title: 'Perturbation'
             }, {
                 field: 'pertDose',
                 title: 'Dose (uM)'
@@ -403,7 +425,7 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
             },
             {
                 field: 'pertIname',
-                title: 'PertIname'
+                title: 'Perturbation'
             }
             , {
                 field: 'cellId',
@@ -447,26 +469,57 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
     $scope.loadHeatMap = function() {
 
         var queryContent = [];
-        queryContent.push({"p100":$scope.p100});
-        queryContent.push({"gcp":$scope.gcp});
+        queryContent.push({"p100": true});
+        queryContent.push({"gcp": false});
         queryContent = queryContent.concat($scope.tags);
 
+        //$('#heatMapMessage').text('Loading data ...');
+        $('#heatMapMessage').show();
+        //$scope.heatmapMessage = 'Loading data ...';
+
+        // Color scale
+        var scaleData = d3.range(1, 20, 1);
+        var grid = 10;
+
+        var scale = d3.select('#heatMap').select('svg').select('g#colorScale').attr("transform", 'translate(0,0)');
+        scale = scale.selectAll('rect').data(scaleData);
+        scale.enter()
+            .append('rect')
+            .attr('x', 0)
+            .attr('y', 0)
+            //.transition().duration(function(d,i){return (i % 5) * 1000;})
+            .attr('width', grid)
+            .attr('height', grid)
+            .attr('transform', function (d, i) {
+                return "translate(" + (i * (grid + 1)) + ",0)";
+            })
+            .attr('class', function (d, i) {
+                return 'cs-' + (i + 1);
+            })
+        ;
+
+        scale.exit().remove();
+
+        // Query server for profiles
 
         var res = $http.post('/pilincs/api-heatmap', JSON.stringify(queryContent));
         res.success(function (data, status, headers, config) {
 
+
+            //console.log($('#heatMapMessage').text());
             console.log(data);
 
-            var topMargin = 60,
+            var topMargin = 80,
                 leftMargin = 90,
                 shortenLabel = 15,
                 grid = 10;
 
-            var peptideNames = data.peptideNames,
+            var peptideNameOrders = data.peptideNames,
                 profileNames = data.profileNames,
-                matrix = data.cells;
+                rows = data.rows;
 
-            peptideNames = peptideNames.map(function(item,i){
+            // Shorten profile names
+            profileNames = profileNames.map(function (item) {
                 if(item.length > shortenLabel){
                     return item.substring(0,shortenLabel) + '';
                 }else{
@@ -474,73 +527,92 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
                 }
             });
 
-
-            console.log(profileNames.length);
-            console.log(peptideNames.length);
-            console.log(matrix.length);
+            console.log("Profile names: " + profileNames.length);
+            console.log("Peptide name-orders: " + peptideNameOrders.length);
+            console.log("Rows: " + rows.length);
+            //$('#heatMapMessage').text('Rendering data');
 
             // Row Labels
-            var rowLabels = d3.select('#heatMap').select('svg').select('g#rowLabels').attr("transform",'translate(0,' + topMargin + ')');
+            var rowLabels = d3.select('#heatMap').select('svg').select('g#rowLabels').attr("transform", 'translate(0,' + (topMargin + 10) + ')');
 
-            rowLabels = rowLabels.selectAll('text').data(profileNames);
+            rowLabels = rowLabels.selectAll('text').data(peptideNameOrders);
             rowLabels.enter()
                 .append('text')
                 .attr('x',0)
                 .attr('y',30)
                 .attr("text-anchor", "start")
                 .attr('transform',function(d,i){ return "translate(0," + i * grid + ") rotate(0)";})
-                .text(function(d){return d;})
+                .text(function (d) {
+                    return d.peptideName;
+                })
                 .style('font-size','8px');
 
             rowLabels.exit().remove();
 
             // Column Labels
-            var colLabels = d3.select('#heatMap').select('svg').select('g#colLabels').attr("transform",'translate('+leftMargin+',0)');
+            var colLabels = d3.select('#heatMap').select('svg').select('g#colLabels').attr("transform", 'translate(97,100)');
 
-            colLabels = colLabels.selectAll('text').data(peptideNames);
+            colLabels = colLabels.selectAll('text').data(profileNames);
             colLabels.enter()
                 .append('text')
                 .attr('x',0)
                 .attr('y',0)
                 .attr("text-anchor", "start")
-                .attr('transform',function(d,i){ return "translate(" + i * grid + ",0) rotate(90)";})
+                .attr('transform', function (d, i) {
+                    return "translate(" + i * grid + ",0) rotate(270)";
+                })
                 .text(function(d){return d;})
                 .style('font-size','8px');
 
             colLabels.exit().remove();
 
             // Matrix
-            var matrixRect = d3.select('#heatMap').select('svg').select('g#matrix').attr("transform",'translate('+leftMargin+','+80+')');
+            var matrixRect = d3.select('#heatMap').select('svg').select('g#matrix')
+                .attr("transform", 'translate(' + leftMargin + ',' + (topMargin + 30) + ')');
 
-            matrixRect = matrixRect.selectAll('rect').data(matrix);
+            var cells = [];
+
+            for (var rowId = 0; rowId < rows.length; rowId++) {
+                var row = rows[rowId];
+                var colors = row.colors;
+                var rowIndex = row.rowIndex;
+                var clusterOrder = row.clusterOrder;
+
+                for (var columnId = 0; columnId < colors.length; columnId++) {
+                    cells.push({
+                        "rowIndex": rowIndex,
+                        "clusterOrder": clusterOrder,
+                        "columnId": columnId,
+                        "colorId": colors[columnId]
+                    });
+                }
+            }
+            matrixRect = matrixRect.selectAll('rect').data(cells);
             matrixRect.enter()
                 .append('rect')
-                .attr('width',grid)
-                .attr('height',grid)
-                .attr("text-anchor", "start")
-                .attr('transform', function (d, i) {
-                    return "translate(" + d.columnIndex * grid + "," + d.rowIndex * grid + ")";
+                .attr('x', 0)
+                .attr('y', 0)
+                .attr('width', (grid - 1))
+                .attr('height', (grid - 1))
+                .attr('transform', function (d) {
+                    return "translate(" + d.columnId * grid + "," + d.rowIndex * grid + ")";
                 })
-                .style('fill', function (d) {
-                    if (d.discreteValue == 0) {
-                        return '#74c476';
-                    } else {
-                        return '#9e9ac8';
-                    }
-                })
-                .style('font-size', '8px')
-                .style('border-color','grey')
-                .style('border-width','1');
+                .attr('class', function (d) {
+                    return 'cs-' + (d.colorId + 1);
+                });
 
             matrixRect.exit().remove();
+            $('#heatMapMessage').hide();
 
         });
+        //$scope.heatmapMessage ='';
     };
 
 }]);
 
-
-
+function test() {
+    console.log('test');
+}
 
 
 

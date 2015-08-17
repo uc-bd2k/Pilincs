@@ -11,51 +11,48 @@
 
         <!-- Bootstrap -->
         <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
-        <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+        <!--<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>-->
 
         <!-- AngularJS -->
         <script src="bower_components/angular/angular.min.js"></script>
         <script src="bower_components/angular-route/angular-route.min.js"></script>
         <script src="js/app.js"></script>
         <script src="js/controllers.js"></script>
-        <script src="js/services.js"></script>
-        <script src="js/directive.js"></script>
+
+        <!-- Custom User Interaction-->
+        <script src="js/noangular.js"></script>
 
 
         <script>document.write('<base href="' + document.location + '" />');</script>
         <!-- Ng-tags-input-->
         <link rel="stylesheet" href="bower_components/ng-tags-input/ng-tags-input.min.css"/>
-        <script src="bower_components/ng-tags-input/ng-tags-input.min.js"></script>
+        <!--<script src="bower_components/ng-tags-input/ng-tags-input.min.js"></script>-->
 
         <!-- Custom styles -->
         <link rel="stylesheet" href="css/style.css">
 
         <!-- Wenzhinxin Table -->
         <link rel="stylesheet" href="bower_components/bootstrap-table/dist/bootstrap-table.min.css">
-        <script src="bower_components/bootstrap-table/dist/bootstrap-table.min.js"></script>
-        <script src="bower_components/bootstrap-table/dist/extensions/export/bootstrap-table-export.min.js"></script>
-        <script src="bower_components/tableExport/index.js"></script>
-        <script src="bower_components/bootstrap-table/dist/extensions/filter-control/bootstrap-table-filter-control.min.js"></script>
 
-        <!-- Sparkline -->
-        <!--<script src="bower_components/peity/minified.js"></script>-->
-
-        <!-- D3js-->
-        <script src="bower_components/d3.v2/index.js"></script>
     </head>
-    <body ng-app="pilincs">
+<body>
 
-    <div class="container" ng-controller="MainCtrl" style="padding-top: 30px;">
+<div class="container" style="padding-top: 30px;">
 
         <!-- Ribbon -->
         <div class="ribbon">
             <a href="https://github.com/sajmmon/Pilincs" target="_blank">View source on GitHub</a>
         </div>
 
+    <!-- Angular starts here -->
+    <div ng-app="pilincs" ng-controller="MainCtrl">
         <!-- Searching -->
         <div class="row" style="padding-bottom: 25px;">
+
+
+            <!-- Assays -->
             <form>
-                <div class="btn-group col-sm-3" style="top: 5px;">
+                <div id="assayButtons" class="btn-group col-sm-3" style="top: 5px;">
                     <button type="button" ng-click="toggle('p100')" class="btn btn-default"
                             ng-class="getToggleClass(p100)">P100
                     </button>
@@ -69,6 +66,7 @@
 
                 <div class="controls  col-sm-6">
 
+                    <!-- Tags -->
                     <tags-input ng-model="tags"
                                 display-property="name"
                                 class="bootstrap"
@@ -96,6 +94,7 @@
                     </div>
                 </script>
 
+                <!-- Search button -->
                 <div class="btn-group col-sm-2" style="top: 5px;">
                     <input type="submit" ng-click="searchClicked()" value="Search assays"
                            class="btn btn-primary"/>
@@ -115,10 +114,10 @@
         <div class="row col-sm-offset-1" style="padding-left: 10px;">
             <div ng-show="showRecommend && recommended.length > 0" class="col-sm-offset-2"
                  style="padding-left: 15px; padding-bottom: 30px;">
-                <span>{{recommendText}}</span>
+                <span class="ng-cloak">{{recommendText}}</span>
                 <span ng-repeat="item in recommended">
 
-                        <button ng-click="recommendedClicked(item)" class="btn btn-default btn-xs"
+                        <button ng-click="recommendedClicked(item)" class="btn btn-default btn-xs ng-cloak"
                                 ng-class="item.flag+'B'" type="button">{{item.name}}
                         </button>
                 </span>
@@ -129,18 +128,23 @@
         <table class="table table-bordered table-striped" style="padding-top: 30px;">
             <tbody>
             <tr>
-                <td align="center" width="25%" ng-repeat="wk in workspaces" ng-class="{thisTab: currentWorkspace==wk}"
+                <td align="center" width="20%" ng-repeat="wk in workspaces" ng-class="{thisTab: currentWorkspace==wk}"
 
                     ng-click="changeCurrentWorkspace(wk)">
-                    <h4 ng-class="{disabled: wk.active}"><a href="#">{{wk.name}}</a></h4>
+                    <h4 ng-class="{disabled: wk.active}"><a href="#" class="ng-cloak">{{wk.name}}</a></h4>
                 </td>
             </tr>
             </tbody>
         </table>
 
+        <!-- Angular ends here -->
+    </div>
+    <!-- Views -->
 
-
+    <!-- Raw data -->
         <table class="table" id="tablePeaks"></table>
+
+    <!-- Profiles -->
         <table class="table" id="tableProfiles">
             <div id="ilincs">
                 <div class="form-inline" role="form">
@@ -149,12 +153,38 @@
             </div>
         </table>
 
+    <!-- HeatMap -->
         <div id="tableRelations">
             <!--<label style="font-weight: normal; font-size: smaller;"><input type="radio"> Natural order</label>-->
             <!--<label style="font-weight: normal; font-size: smaller; padding-left: 3em;"><input type="radio" > Cluster membership</label>-->
 
-            <div id="heatMap" style="padding-top:30px;">
-            <svg width="1170" height="5000">
+            <div id="heatMap" style="padding-top:10px;">
+                <!--<p id="heatMapMessage" style="text-align: center;">...</p>-->
+                <div class="col-lg-offset-5">
+                    <button id="heatMapMessage" style="align: center; display: none;" class="btn btn-default"><span
+                            class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...
+                    </button>
+                </div>
+
+                <form id="heatMapRadios" class="form-inline col-lg-offset-7" style="display: none;">
+                    <fieldset>
+                        <div class="form-group">
+                            <label class="radio-inline">
+                                <input id="inlineradio1" name="inlineradio" value="0" type="radio" checked="checked">
+                                Natural order </label>
+                            <label class="radio-inline">
+                                <input id="inlineradio2" name="inlineradio" value="1" type="radio">
+                                Cluster profiles </label>
+
+                            <label style="padding-left:50px;"> <!--50 vs 280 if without radio -->
+                                <button class="btn btn-default disabled">Analyze in iLINCS</button>
+                            </label>
+                        </div>
+                        <!--form-group-->
+                    </fieldset>
+                </form>
+                <svg width="1170" height="5000" style="padding-left:35px;">
+                    <g id="colorScale" style="padding-botton:20px;"></g>
                 <g id="rowLabels"></g>
                 <g id="colLabels"></g>
                 <g id="matrix"></g>
@@ -162,8 +192,50 @@
             </div>
         </div>
 
-        <!--<script type="text/javascript" src="app.js"></script>-->
+    <!-- HeatMap -->
+    <div id="tableExplore">
+        <p>Coming soon ...</p>
+        <!--<div class="col-sm-2">-->
+        <!--<p>Legend</p>-->
+        <!--</div>-->
+        <!--<div class="col-sm-8">-->
+        <!--<p>Foci</p>-->
+        <!--</div>-->
+        <!--<div class="col-sm-2">-->
 
+        <!--<div>-->
+        <!--Group by:-->
+        <!--<ul>-->
+        <!--<li><a href="#">Cell Id</a></li>-->
+        <!--</ul>-->
+        <!--</div>-->
+        <!--<br/>-->
+        <!--<div class="dropdown">-->
+        <!--<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">-->
+        <!--Color by-->
+        <!--<span class="caret"></span></button>-->
+        <!--<ul>-->
+        <!--<li><a href="#">Cell Id</a></li>-->
+        <!--<li><a href="#">Perturbation</a></li>-->
+        <!--<li><a href="#">Dose</a></li>-->
+        <!--<li><a href="#">Time</a></li>-->
+        <!--<li><a href="#">Gene Name</a></li>-->
+        <!--</ul>-->
+        <!--</div>-->
+        <!--<br/>-->
+
+        <!--<p>Filter</p>-->
+        <!--<div class="checkbox">-->
+        <!--<label>-->
+
+        <!--<input type="checkbox"> Cell 1 <br/>-->
+        <!--<input type="checkbox"> Cell 2 <br/>-->
+        <!--</label>-->
+        <!--</div>-->
+        <!--</div>-->
+    </div>
+
+    <!-- API -->
         <div id="tableAPI">
 
         <h3>HTTP methods</h3>
@@ -199,7 +271,39 @@
         <pre><b>Example</b><br/>{API documentation is in progress...}</pre>
         </div>
 
+    <!-- -->
+
     </div>
 
 </body>
+<footer>
+    <!-- jQuery -->
+    <!--<script type='text/javascript' src='bower_components/jquery/dist/jquery.min.js'></script>-->
+
+    <!-- Bootstrap -->
+    <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    <!-- AngularJS -->
+    <!--<script src="bower_components/angular/angular.min.js"></script>-->
+    <!--<script src="bower_components/angular-route/angular-route.min.js"></script>-->
+    <!--<script src="js/app.js"></script>-->
+    <!--<script src="js/controllers.js"></script>-->
+    <!--<script src="js/services.js"></script>-->
+    <!--<script src="js/directive.js"></script>-->
+
+
+    <!-- Ng-tags-input-->
+    <script src="bower_components/ng-tags-input/ng-tags-input.min.js"></script>
+
+
+    <!-- Wenzhinxin Table -->
+
+    <script src="bower_components/bootstrap-table/dist/bootstrap-table.min.js"></script>
+    <script src="bower_components/bootstrap-table/dist/extensions/export/bootstrap-table-export.min.js"></script>
+    <script src="bower_components/tableExport/index.js"></script>
+    <script src="bower_components/bootstrap-table/dist/extensions/filter-control/bootstrap-table-filter-control.min.js"></script>
+
+    <!-- D3js-->
+    <script src="bower_components/d3.v2/index.js"></script>
+</footer>
 </html>

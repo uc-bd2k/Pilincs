@@ -1,46 +1,23 @@
 package edu.uc.eh.datatypes;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
 import java.io.Serializable;
-import java.util.List;
 
 /**
- * Created by chojnasm on 7/31/15.
+ * Created by chojnasm on 8/14/15.
  */
 public class ListWrapper implements Serializable {
-    private final double[] list;
-    private final String json;
 
-    public ListWrapper(double[] vector, boolean[] imputes, List<String> referenceProfile) {
+    private int[] list;
 
-        this.list = vector;
-//        List<String> referenceProfile = databaseLoader.getReferenceProfile(assayType);
-
-        JSONArray ja = new JSONArray();
-        for(int i = 0; i < vector.length ; i++){
-            JSONObject jo = new JSONObject();
-            jo.put("name",referenceProfile.get(i));
-            jo.put("value",vector[i]);
-            jo.put("imputed", imputes[i]);
-
-            ja.add(jo);
-        }
-        JSONObject mainObj = new JSONObject();
-        mainObj.put("data", ja);
-        this.json = mainObj.toJSONString();
+    public ListWrapper(int[] list) {
+        this.list = list;
     }
 
-    public double[] getList() {
+    public int[] getList() {
         return list;
     }
 
-    public double[] getDoubles() {
-        return list;
-    }
-
-    public String getJSON() {
-        return json;
+    public void setList(int[] list) {
+        this.list = list;
     }
 }

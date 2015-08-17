@@ -1,17 +1,13 @@
 package edu.uc.eh.domain;
 
 import edu.uc.eh.datatypes.AssayType;
+import edu.uc.eh.datatypes.ListAndJsonWrapper;
 import edu.uc.eh.datatypes.ListWrapper;
-import edu.uc.eh.datatypes.StringDouble;
-import edu.uc.eh.datatypes.Tuples;
-import edu.uc.eh.utils.UtilsFormat;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.commons.math3.stat.StatUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by chojnasm on 7/31/15.
@@ -35,25 +31,47 @@ public class Profile implements Serializable {
      * Values for peptides, size of vector = number of peptides in full profile
      */
     @Lob
-    private ListWrapper vector; // should be linked-hash map
+    private ListAndJsonWrapper vector; // should be linked-hash map
 
     @Lob
-    private ListWrapper correlatedVector;
+    private ListAndJsonWrapper correlatedVector;
 
     private String positiveCorrelation;
 
     @Lob
     private String positivePeptides;
 
+    @Lob
+    private ListWrapper colors;
+    private Integer clusteringOrder;
+
     public Profile(ReplicateAnnotation replicateAnnotation, GctFile gctFile,
                    double[] vector,
                    boolean[] imputes,
-                   List<String> referenceProfile) {
+                   List<String> referenceProfile,
+                   int clusteringOrder) {
 
         this.replicateAnnotation = replicateAnnotation;
         this.gctFile = gctFile;
-        this.vector = new ListWrapper(vector, imputes, referenceProfile);
+        this.vector = new ListAndJsonWrapper(vector, imputes, referenceProfile);
         this.assayType = gctFile.getAssayType();
+
+        this.colors = new ListWrapper(new int[vector.length]);
+
+        double[] percentiles = new double[19];
+        for (int i = 0; i < 19; i++) {
+            percentiles[i] = StatUtils.percentile(vector, 5 * (i + 1));
+        }
+
+        for (int columnIndex = 0; columnIndex < vector.length; columnIndex++) {
+            for (int j = 0; j < percentiles.length; j++) {
+                if (vector[columnIndex] < percentiles[j]) {
+                    colors.getList()[columnIndex] = j;
+                    break;
+                }
+            }
+        }
+        this.clusteringOrder = clusteringOrder;
 
     }
 
@@ -80,12 +98,12 @@ public class Profile implements Serializable {
         this.positiveCorrelation = positiveCorrelation;
     }
 
-    public void setCorrelatedVector(ListWrapper correlatedVector) {
-        this.correlatedVector = correlatedVector;
+    public ListAndJsonWrapper getCorrelatedVector() {
+        return correlatedVector;
     }
 
-    public ListWrapper getCorrelatedVector() {
-        return correlatedVector;
+    public void setCorrelatedVector(ListAndJsonWrapper correlatedVector) {
+        this.correlatedVector = correlatedVector;
     }
 
     public Long getId() {
@@ -108,17 +126,17 @@ public class Profile implements Serializable {
         return vector.getDoubles();
     }
 
-    public ListWrapper getListWrapper(){return vector;}
-
-
-    public void setPositivePeptides(String positivePeptides) {
-        this.positivePeptides = positivePeptides;
+    public ListAndJsonWrapper getListWrapper() {
+        return vector;
     }
 
     public String getPositivePeptides() {
         return positivePeptides;
     }
 
+    public void setPositivePeptides(String positivePeptides) {
+        this.positivePeptides = positivePeptides;
+    }
 
     public String getVectorJSON() {
         return vector.getJSON();
@@ -126,5 +144,22 @@ public class Profile implements Serializable {
 
     public String getCorrelatedVectorJSON() {
         return correlatedVector.getJSON();
+    }
+
+    public int[] getColors() {
+        return colors.getList();
+    }
+
+    public void setColors(ListWrapper colors) {
+        this.colors = colors;
+    }
+
+
+    public Integer getClusteringOrder() {
+        return clusteringOrder;
+    }
+
+    public void setClusteringOrder(Integer clusteringOrder) {
+        this.clusteringOrder = clusteringOrder;
     }
 }

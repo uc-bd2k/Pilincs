@@ -22,7 +22,7 @@ idea {
 
 jar {
     baseName = 'pilinc'
-    version = '0.2.3-SNAPSHOT'
+    version = '0.2.6-SNAPSHOT'
 }
 // tag::version[]
 sourceCompatibility = 1.7
@@ -31,6 +31,7 @@ targetCompatibility = 1.7
 
 repositories {
     mavenCentral()
+    maven { url "https://jitpack.io" }
 }
 
 dependencies {
@@ -46,6 +47,7 @@ exclude(module: 'commons-logging')
     compile group: 'org.apache.commons', name: 'commons-math3', version: '3.0'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
     compile group: 'com.google.code.gson', name: 'gson', version:'1.7.2'
+    compile 'com.github.lbehnke:hierarchical-clustering-java:v1.1.0'
 }
 
 task wrapper(type: Wrapper) {

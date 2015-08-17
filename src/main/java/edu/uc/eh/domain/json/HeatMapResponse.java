@@ -1,5 +1,7 @@
 package edu.uc.eh.domain.json;
 
+import edu.uc.eh.datatypes.PeptideOrder;
+
 import java.util.List;
 
 /**
@@ -7,21 +9,21 @@ import java.util.List;
  */
 public class HeatMapResponse {
 
-    private List<String> peptideNames;
+    private List<PeptideOrder> peptideNames;
     private List<String> profileNames;
-    private List<MatrixCell> cells;
+    private List<MatrixRow> rows;
 
-    public HeatMapResponse(List<String> peptideNames, List<String> profileNames, List<MatrixCell> cells) {
+    public HeatMapResponse(List<PeptideOrder> peptideNames, List<String> profileNames, List<MatrixRow> rows) {
         this.peptideNames = peptideNames;
         this.profileNames = profileNames;
-        this.cells = cells;
+        this.rows = rows;
     }
 
-    public List<String> getPeptideNames() {
+    public List<PeptideOrder> getPeptideNames() {
         return peptideNames;
     }
 
-    public void setPeptideNames(List<String> peptideNames) {
+    public void setPeptideNames(List<PeptideOrder> peptideNames) {
         this.peptideNames = peptideNames;
     }
 
@@ -33,12 +35,11 @@ public class HeatMapResponse {
         this.profileNames = profileNames;
     }
 
-    public List<MatrixCell> getCells() {
-        return cells;
+    public List<MatrixRow> getRows() {
+        return rows;
     }
 
-    public void setCells(List<MatrixCell> cells) {
-        this.cells = cells;
+    public void setRows(List<MatrixRow> rows) {
+        this.rows = rows;
     }
-
 }

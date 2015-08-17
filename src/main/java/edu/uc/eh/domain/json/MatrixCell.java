@@ -8,10 +8,10 @@ public class MatrixCell {
     private int columnIndex;
     private int discreteValue;
 
-    public MatrixCell(int rowIndex, int columnIndex, Double discreteValue) {
+    public MatrixCell(int rowIndex, int columnIndex, int discreteValue) {
         this.rowIndex = rowIndex;
         this.columnIndex = columnIndex;
-        this.discreteValue = discreteValue > 0 ? 0 : 1;
+        this.discreteValue = discreteValue;
     }
 
     public int getRowIndex() {

@@ -1,11 +1,14 @@
 package edu.uc.eh.utils;
 
+import com.apporiented.algorithm.clustering.AverageLinkageStrategy;
+import com.apporiented.algorithm.clustering.Cluster;
+import com.apporiented.algorithm.clustering.ClusteringAlgorithm;
+import com.apporiented.algorithm.clustering.DefaultClusteringAlgorithm;
+import edu.uc.eh.datatypes.AssayType;
 import edu.uc.eh.datatypes.GctReplicate;
 import edu.uc.eh.datatypes.StringDouble;
 import edu.uc.eh.domain.*;
 import edu.uc.eh.domain.repository.*;
-
-import edu.uc.eh.datatypes.AssayType;
 import edu.uc.eh.service.RepositoryService;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
@@ -27,9 +30,7 @@ import java.util.*;
 @Service
 public class DatabaseLoader {
 
-    private List<String> referenceP100Profile;
-    private List<String> referenceGCPProfile;
-
+    private static final Logger log = LoggerFactory.getLogger(DatabaseLoader.class);
     private final ConnectPanorama connectPanorama;
     private final ParseGCT parser;
     private final GctFileRepository gctFileRepository;
@@ -37,10 +38,9 @@ public class DatabaseLoader {
     private final PeptideAnnotationRepository peptideAnnotationRepository;
     private final ReplicateAnnotationRepository replicateAnnotationRepository;
     private final ProfileRepository profileRepository;
-
     private final RepositoryService repositoryService;
-
-    private static final Logger log = LoggerFactory.getLogger(DatabaseLoader.class);
+    private List<String> referenceP100Profile;
+    private List<String> referenceGCPProfile;
 
     @Autowired
     public DatabaseLoader(ConnectPanorama connectPanorama,
@@ -73,6 +73,7 @@ public class DatabaseLoader {
         loadRawData();
         loadProfiles();
         loadCorrelations();
+//        runHierarchicalClustering();
 
         cleanUp();
     }
@@ -246,6 +247,7 @@ public class DatabaseLoader {
 
         Set<GctReplicate> gctReplicatePairs = repositoryService.getGctReplicatesCombinations();
 
+        int dummyClusteringOrder = gctReplicatePairs.size();
         for (GctReplicate gctReplicate : gctReplicatePairs) {
 
             GctFile gctFile = gctReplicate.getGctFile();
@@ -274,10 +276,12 @@ public class DatabaseLoader {
                     gctFile,
                     ArrayUtils.toPrimitive(profileVector),
                     imputeVector,
-                    referenceProfile);
+                    referenceProfile,
+                    dummyClusteringOrder--);
 
             profileRepository.save(profile);
         }
+
     }
 
 
@@ -287,17 +291,32 @@ public class DatabaseLoader {
         List<String> referenceProfile = null;
 
         for (AssayType assayType : AssayType.values()) {
+            if (assayType.equals(AssayType.L1000)) continue;
+
             referenceProfile = getReferenceProfile(assayType);
             List<Profile> profiles = profileRepository.findByAssayType(assayType);
 
-            for (Profile profileA : profiles) {
-//                double[] doublesA = profileA.getVectorDoubles();
-                Double maxPearson = Double.MIN_VALUE;
+            String[] profileNames = new String[profiles.size()];
+            double[][] distanceMatrix = new double[profiles.size()][profiles.size()];
 
+            int i = 0;
+
+            for (Profile profileA : profiles) {
+
+                profileNames[i] = profileA.getId().toString();
+
+
+                Double maxPearson = Double.MIN_VALUE;
                 Profile maxProfile = profileA;
 
+                int j = 0;
+
                 for (Profile profileB : profiles) {
-                    if (profileA.equals(profileB)) continue;
+                    if (profileA.equals(profileB)) {
+                        distanceMatrix[i][j] = 0;
+                        j++;
+                        continue;
+                    }
 
                     double[] vectorA = profileA.getVector();
                     double[] vectorB = profileB.getVector();
@@ -309,6 +328,13 @@ public class DatabaseLoader {
                         maxPearson = pearsonCorrelation;
                         maxProfile = profileB;
                     }
+
+                    double[] profileAasDouble = UtilsTransform.intArrayToDouble(profileA.getColors());
+                    double[] profileBasDouble = UtilsTransform.intArrayToDouble(profileB.getColors());
+
+                    Double pearsonOfColors = pearson.correlation(profileAasDouble, profileBasDouble);
+                    distanceMatrix[i][j] = pearsonOfColors;
+                    j++;
                 }
 
                 profileA.setCorrelatedVector(maxProfile.getListWrapper());
@@ -324,10 +350,38 @@ public class DatabaseLoader {
                 profileA.setPositiveCorrelation(maxProfile.toString() + String.format(peptideCorrelation, df.format(maxPearson)));
 
                 profileRepository.save(profileA);
+                i++;
+            }
+
+            ArrayList<String> clustered = runHierarchicalClustering(profileNames, distanceMatrix);
+
+            for (Profile profile : profiles) {
+                profile.setClusteringOrder(clustered.indexOf(profile.getId().toString()));
+                profileRepository.save(profile);
+
             }
         }
     }
 
+    private ArrayList<String> runHierarchicalClustering(String[] names, double[][] distances) {
+
+        ClusteringAlgorithm alg = new DefaultClusteringAlgorithm();
+        Cluster cluster = alg.performClustering(distances, names,
+                new AverageLinkageStrategy());
+        ArrayList<String> sorted = new ArrayList<>();
+        getLeaves(cluster, sorted);
+        return sorted;
+    }
+
+    private void getLeaves(Cluster cluster, ArrayList<String> sorted) {
+        if (cluster.isLeaf()) {
+            sorted.add(cluster.getName());
+        } else {
+            for (Cluster cluster1 : cluster.getChildren()) {
+                getLeaves(cluster1, sorted);
+            }
+        }
+    }
 
 
     public List<String> getReferenceProfile(AssayType assayType){
