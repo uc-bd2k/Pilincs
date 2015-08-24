@@ -27,11 +27,9 @@ public class Profile implements Serializable {
     private GctFile gctFile;
 
     private AssayType assayType;
-    /**
-     * Values for peptides, size of vector = number of peptides in full profile
-     */
+
     @Lob
-    private ListAndJsonWrapper vector; // should be linked-hash map
+    private ListAndJsonWrapper vector;
 
     @Lob
     private ListAndJsonWrapper correlatedVector;
@@ -162,4 +160,5 @@ public class Profile implements Serializable {
     public void setClusteringOrder(Integer clusteringOrder) {
         this.clusteringOrder = clusteringOrder;
     }
+
 }

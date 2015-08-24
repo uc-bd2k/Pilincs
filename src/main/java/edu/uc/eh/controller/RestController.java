@@ -22,10 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by chojnasm on 7/15/15.
@@ -230,31 +227,11 @@ public class RestController {
         List<String> genesymbolTags = tagsParsed.get("PrGeneSymbol").size() > 0 ? tagsParsed.get("PrGeneSymbol") : allTagsForgenesymbol;
 
         result = profileRepository.findByAssayTypeInAndReplicateAnnotationCellIdInAndReplicateAnnotationPertinameIn(
-                assayTypes,cellTags,pertinameTags);
+                assayTypes, cellTags, pertinameTags);
 
 
         return UtilsTransform.profilesToHeatMap(result,databaseLoader.getReferenceProfile(assayTypes.get(0)));
     }
-
-    @RequestMapping(value = "/api-panorama", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    List<Tuples.Tuple2<String,String>> gctUrlsFromPanorama() throws Exception {
-        List<Tuples.Tuple2<String,String>> output = new ArrayList<>();
-
-        for(String urlString : connectPanorama.gctDownloadUrls(true)){
-            URL url = new URL(urlString);
-            String fileName = null;
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            String raw = conn.getHeaderField("Content-Disposition");
-            if(raw != null && raw.indexOf("=") != -1) {
-                fileName = raw.split("=")[1].replaceAll("\"","");
-            }
-            output.add(new Tuples.Tuple2<>(fileName,urlString));
-        }
-        return output;
-    }
-
 
     @RequestMapping(value = "/api-tags",method = RequestMethod.GET)
     public
@@ -309,5 +286,132 @@ public class RestController {
             }
         }
         return output;
+    }
+
+    @RequestMapping(value = "api-profiles", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    ProfileForExplorer getProfilesForExplorer() {
+
+        ProfileForExplorer output = null;
+        List<Profile> profiles = profileRepository.findByAssayType(AssayType.P100);
+
+        List<String> cells = new ArrayList<>();
+        List<String> perturbations = new ArrayList<>();
+        List<String> doses = new ArrayList<>();
+        List<String> times = new ArrayList<>();
+
+        List<int[]> outputProfiles = new ArrayList<>();
+
+        for (Profile profile : profiles) {
+
+            String cell = profile.getReplicateAnnotation().getCellId();
+            String perturbation = profile.getReplicateAnnotation().getPertiname();
+            String dose = profile.getReplicateAnnotation().getPertDose();
+            String time = profile.getReplicateAnnotation().getPertTime();
+
+            int cellId;
+            int perturbationId;
+            int doseId;
+            int timeId;
+
+            if (!cells.contains(cell)) cells.add(cell);
+            if (!perturbations.contains(perturbation)) perturbations.add(perturbation);
+            if (!doses.contains(dose)) doses.add(dose);
+            if (!times.contains(time)) times.add(time);
+
+            cellId = cells.indexOf(cell);
+            perturbationId = perturbations.indexOf(perturbation);
+            doseId = doses.indexOf(dose);
+            timeId = times.indexOf(time);
+
+            outputProfiles.add(new int[]{cellId, perturbationId, doseId, timeId});
+
+        }
+        return output;
+    }
+
+    @RequestMapping(value = "/api-panorama", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    List<Tuples.Tuple2<String, String>> gctUrlsFromPanorama() throws Exception {
+        List<Tuples.Tuple2<String, String>> output = new ArrayList<>();
+
+        for (String urlString : connectPanorama.gctDownloadUrls(true)) {
+            URL url = new URL(urlString);
+            String fileName = null;
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            String raw = conn.getHeaderField("Content-Disposition");
+            if (raw != null && raw.indexOf("=") != -1) {
+                fileName = raw.split("=")[1].replaceAll("\"", "");
+            }
+            output.add(new Tuples.Tuple2<>(fileName, urlString));
+        }
+        return output;
+    }
+
+    @RequestMapping(value = "api-cells/{assay}", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    List<String> getCells(@PathVariable String assay) {
+        List<String> output = new ArrayList<>();
+
+        for (Profile profile : profileRepository.findByAssayType(AssayType.valueOf(assay))) {
+            if (!output.contains(profile.getReplicateAnnotation().getCellId())) {
+                output.add(profile.getReplicateAnnotation().getCellId());
+            }
+        }
+
+        Collections.sort(output);
+        return output;
+    }
+
+    @RequestMapping(value = "api-perturbations/{assay}", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    List<String> getPerturbations(@PathVariable String assay) {
+        List<String> output = new ArrayList<>();
+
+        for (Profile profile : profileRepository.findByAssayType(AssayType.valueOf(assay))) {
+            if (!output.contains(profile.getReplicateAnnotation().getPertiname())) {
+                output.add(profile.getReplicateAnnotation().getPertiname());
+            }
+        }
+
+        Collections.sort(output);
+        return output;
+    }
+
+
+    @RequestMapping(value = "api-gct/{assay}", method = RequestMethod.GET, produces = "text/plain")
+    public
+    @ResponseBody
+    String getAsGct(@PathVariable String assay, @MatrixVariable(pathVar = "assay") Map<String, List<String>> filterParams) {
+
+
+        AssayType assayType = AssayType.valueOf(assay);
+        List<String> cells = filterParams.get("cells");
+        List<String> perturbations = filterParams.get("perturbations");
+
+        boolean cellsEmpty = cells == null || cells.isEmpty();
+        boolean pertsEmpty = perturbations == null || perturbations.isEmpty();
+
+        List<Profile> output = new ArrayList<>();
+
+        List<Profile> profiles = profileRepository.findByAssayType(assayType);
+
+        for (Profile profile : profiles) {
+            if (!cellsEmpty) {
+                String cellId = profile.getReplicateAnnotation().getCellId();
+                if (!cells.contains(cellId)) continue;
+            }
+            if (!pertsEmpty) {
+                String pertiname = profile.getReplicateAnnotation().getPertiname();
+                if (!perturbations.contains(pertiname)) continue;
+            }
+            output.add(profile);
+        }
+
+        return UtilsTransform.profilesToGct(assayType, output, databaseLoader, peptideAnnotationRepository);
     }
 }

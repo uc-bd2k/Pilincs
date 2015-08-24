@@ -75,7 +75,7 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
             $('#tableRelations').hide();
             $('#tableExplore').show();
             $('#tableAPI').hide();
-            // $scope.loadHeatMap();
+            test();
 
         } else if (wk == $scope.workspaces[4]) {
             $('#tablePeaks').parent().parent().parent().hide();
@@ -264,7 +264,7 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
                 visible: false
             }, {
                 field: 'downloadUrl',
-                title: 'Analyze'
+                title: 'Source'
             }],
             responseHandler: function (res) {
                 return res;
@@ -610,9 +610,7 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
 
 }]);
 
-function test() {
-    console.log('test');
-}
+
 
 
 

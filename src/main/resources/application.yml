@@ -1,5 +1,6 @@
 spring:
   jpa.hibernate.ddl-auto: create-drop
+  jackson.serialization.INDENT_OUTPUT: true
 server:
   contextPath: /pilincs
 panorama:
@@ -8,8 +9,9 @@ panorama:
   runIdUrl: https://panoramaweb.org/labkey/targetedms/LINCS/%s/showPrecursorList.view?id=%d
   gctDownloadUrl: https://panoramaweb.org/labkey/targetedms/LINCS/%s/RunGCTReport.view?runId=%d&reportName=GCT%%20File%%20%s&processed=%s
   peptideInternalIdUrl: https://panoramaweb.org/labkey/query/LINCS/%s/selectRows.view?schemaName=targetedms&query.queryName=PeptideAnnotation&query.Name~eq=pr_id&query.Value~in=%s&query.PeptideId/PeptideGroupId/RunId/Id~eq=%d
-  chromatogramsUrl: https://panoramaweb.org/labkey/targetedms/LINCS/%s/showPeptide.view?id=%d&annotationsFilter=id%%20%%3A%%20%s
+  chromatogramUrl: https://panoramaweb.org/labkey/targetedms/LINCS/%s/showPeptide.view?id=%d&annotationsFilter=id%%20%%3A%%20%s
   peptideAnnotationsUrl: https://panoramaweb.org/labkey/query/LINCS/%s/selectRows.api?schemaName=targetedms&query.queryName=peptideannotation
+  replicateAnnotationsUrl: https://panoramaweb.org/labkey/query/LINCS/%s/selectRows.api?schemaName=targetedms&query.queryName=replicateannotation
 
 ---
 spring:

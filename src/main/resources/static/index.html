@@ -98,13 +98,13 @@
                 <div class="btn-group col-sm-2" style="top: 5px;">
                     <input type="submit" ng-click="searchClicked()" value="Search assays"
                            class="btn btn-primary"/>
-                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
-                            aria-expanded="false">
-                        <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu" role="menu">
-                        <li><a href="#" target="_blank">Advanced search</a></li>
-                    </ul>
+                    <!--<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"-->
+                    <!--aria-expanded="false">-->
+                    <!--<span class="caret"></span>-->
+                    <!--</button>-->
+                    <!--<ul class="dropdown-menu" role="menu">-->
+                    <!--<li><a href="#" target="_blank">Advanced search</a></li>-->
+                    <!--</ul>-->
                 </div>
             </form>
         </div>
@@ -195,13 +195,15 @@
     <!-- HeatMap -->
     <div id="tableExplore">
         <p>Coming soon ...</p>
-        <!--<div class="col-sm-2">-->
+
+        <!--<div class="col-sm-1 well">-->
         <!--<p>Legend</p>-->
         <!--</div>-->
-        <!--<div class="col-sm-8">-->
+        <!--<div class="col-sm-9">-->
         <!--<p>Foci</p>-->
+        <!--<svg id="explorer"></svg>-->
         <!--</div>-->
-        <!--<div class="col-sm-2">-->
+        <!--<div class="col-sm-2 well">-->
 
         <!--<div>-->
         <!--Group by:-->
@@ -243,32 +245,78 @@
         <table data-toggle="table">
             <thead style="background: #D9EDF7">
             <tr>
-                <th>Method</th>
-                <th>Description</th>
-                <th>Parameters</th>
+                <th class="col-md-1">Method</th>
+                <th class="col-md-4">URL</th>
+                <th class="col-md-2">Parameters</th>
+                <th class="col-md-5">Description</th>
             </tr>
             </thead>
             <tbody>
+
             <tr>
                 <td><code>GET</code></td>
-                <td>eh3.uc.edu/pilincs/api-panorama</td>
-
-                <td>-</td>
+                <td><b>api-cells/</b>{assayName}</td>
+                <td>assayName</td>
+                <td>Lists all cells available for specified assay.</td>
             </tr>
 
             <tr>
-                <td><code>POST</code></td>
-                <td>eh3.uc.edu/pilincs/api-recommend</td>
+                <td><code>GET</code></td>
+                <td><b>api-perturbations/</b>{assayName}</td>
+                <td>assayName</td>
+                <td>Lists all perturbations available for specified assay.</td>
+            </tr>
 
+            <tr>
+                <td><code>GET</code></td>
+                <td><b>api-gct/</b>{assayName};cells=;perturbations=</td>
+                <td>assayName <br/>
+                    cells (optional) <br/>
+                    perturbations (optional)
+                </td>
+                <td>Builds a GCT file #1.3 for specified assay with filtering of profiles based on given cells and
+                    perturbations. Cell ids and perturbations names are optional and may be separated by comma.
+                </td>
+            </tr>
+
+            <tr>
+                <td><code>GET</code></td>
+                <td><b>api-panorama</b></td>
                 <td>-</td>
+                <td>Lists all GCT files available in <a href="http://www.panoramaweb.org">Panorama</a>.
+                    In returned json, two fields t1 and t2 stand for file name and file URL.
+                </td>
             </tr>
 
             </tbody>
         </table>
 
 
-            <br/>
-        <pre><b>Example</b><br/>{API documentation is in progress...}</pre>
+            <br/><br/>
+
+            <h3>Examples</h3>
+        <pre style="">
+            <p>1. List of cells in GCP assay: <br/><a href="api-cells/GCP" target="_blank">eh3.uc.edu/pilincs/<b>api-cells/GCP</b></a>
+            </p>
+                <img width="7%" src="img/cells.png">
+            <p style="padding-top: 30px;">2. List of perturbations in P100 assay: <br/><a href="api-perturbations/P100"
+                                                                                          target="_blank">eh3.uc.edu/pilincs/<b>api-perturbations/P100</b></a>
+            </p>
+                <img width="10%" src="img/perturbations.png">
+            <p style="padding-top: 30px;">3. GCT file based on P100 assay with cell PC3 and perturbation equal to DMSO
+                or methylstat. Below, the output was imported into Excel. <br/><a
+                        href="api-gct/P100;cells=PC3;perturbations=DMSO" target="_blank">eh3.uc.edu/pilincs/<b>api-gct/P100;cells=PC3;perturbations=DMSO</b></a>
+            </p>
+                <img width="90%" src="img/prm.png">
+            <p style="padding-top: 60px;">4. GCT file with all profiles from GCP assay. Below, the output was imported
+                into Excel. <br/><a href="api-gct/GCP" target="_blank">eh3.uc.edu/pilincs/<b>api-gct/GCP</b></a></p>
+                <img width="90%" src="img/gcp.png">
+            <p style="padding-top: 60px;">5. List all GCT files in Panorama (slow): <br/><a href="api-panorama"
+                                                                                            target="_blank">eh3.uc.edu/pilincs/<b>api-panorama</b></a>
+            </p>
+                <img width="80%" src="img/panorama.png">
+
+        </pre>
         </div>
 
     <!-- -->

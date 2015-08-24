@@ -1,10 +1,8 @@
 package edu.uc.eh.utils;
 
 
-import edu.uc.eh.datatypes.AnnotationNameValue;
-import edu.uc.eh.domain.*;
 import edu.uc.eh.datatypes.AssayType;
-import org.json.simple.JSONObject;
+import edu.uc.eh.domain.GctFile;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.SelectRowsCommand;
@@ -41,11 +39,14 @@ public class ConnectPanorama {
     @Value("${panorama.peptideInternalIdUrl}")
     private String peptideInternalIdsUrl;
 
-    @Value("${panorama.chromatogramsUrl}")
-    private String chromatogramsUrl;
+    @Value("${panorama.chromatogramUrl}")
+    private String chromatogramUrl;
 
     @Value("${panorama.peptideAnnotationsUrl}")
     private String peptideAnnotationsUrl;
+
+    @Value("${panorama.replicateAnnotationsUrl}")
+    private String replicateAnnotationsUrl;
 
     public List<String> gctDownloadUrls(boolean ifProcessed) throws IOException, CommandException {
 
@@ -53,11 +54,12 @@ public class ConnectPanorama {
         String[] folderNames = panoramaFolders.split(",");
         String gcpOrP100;
 
-        for(String folderName:folderNames) {
+        for (String folderName : folderNames) {
             for (Integer runId : getRunIdsFromDatabase(folderName)) {
+
                 gcpOrP100 = folderName.contains("GCP") ? "GCP" : "P100";
 
-                output.add(String.format(gctDownloadUrl,gcpOrP100,runId,gcpOrP100,ifProcessed));
+                output.add(String.format(gctDownloadUrl, gcpOrP100, runId, gcpOrP100, ifProcessed));
             }
         }
         return output;
@@ -82,7 +84,7 @@ public class ConnectPanorama {
         return runIds;
     }
 
-//    public String getChromatogramsUrl(PeakArea peakArea) {
+//    public String getChromatogramUrl(PeakArea peakArea) {
 //
 //        AssayType assayType = peakArea.getGctFile().getAssayType();
 //        int runId = peakArea.getGctFile().getRunId();
@@ -130,13 +132,28 @@ public class ConnectPanorama {
         return String.format(runIdUrl,assayType,runId);
     }
 
-    public String getChromatogramsUrl(AssayType assayType, Integer peptide, String replicateId) {
-        return String.format(chromatogramsUrl,assayType,peptide,replicateId);
+    public String getChromatogramUrl(AssayType assayType, Integer peptide, String replicateId) {
+        return String.format(chromatogramUrl, assayType, peptide, replicateId);
     }
 
     public List<String> getPeptideReferenceIdNames(AssayType assayType) throws Exception {
+
         String jsonUrl = String.format(peptideAnnotationsUrl, assayType);
 
         return UtilsParse.getPeptideIdNamesFromJSON(jsonUrl);
+    }
+
+//    public void loadPeptideAnnotationsFromJson(PeptideAnnotationRepository peptideAnnotationRepository, AssayType assayType) {
+//
+//        String jsonUrl = String.format(peptideAnnotationsUrl, assayType);
+//
+//    }
+
+    public String getPeptideJsonUrl(AssayType assayType) {
+        return String.format(peptideAnnotationsUrl, assayType);
+    }
+
+    public String getReplicateJsonUrl(AssayType assayType) {
+        return String.format(replicateAnnotationsUrl, assayType);
     }
 }

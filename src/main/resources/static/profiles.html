@@ -219,7 +219,7 @@
                 <th data-field="pubchemCid" data-visible="false">PubchemCid</th>
 
                 <th data-field="value">Peak Area</th>
-                <th data-field="chromatogramsUrl">Chromatogram</th>
+                <th data-field="chromatogramUrl">Chromatogram</th>
                 <th data-field="pertId" data-visible="false">Pert Id</th>
                 <th data-field="downloadUrl" data-visible="true">GCT file</th>
             </tr>
@@ -242,7 +242,7 @@
                                 })
                                 .y(function (d) {
                                     return y(d);
-                                })
+                                });
                         graph.append("svg:path").attr("d", line(data));
                     }
                 });

@@ -75,6 +75,10 @@ public class UtilsStatistics {
             }
         }
 
+        if (nonEmpty == 0) {
+            log.warn("All coordinates of a profile are zeros");
+        }
+
         for (int i = 0; i < profileVector.length; i++) {
             if (profileVector[i] == null) {
                 profileVector[i] = sum / nonEmpty;

@@ -10,7 +10,10 @@ import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by chojnasm on 7/14/15.
@@ -18,9 +21,8 @@ import java.util.*;
 
 @Service
 public class ParseGCT {
-    Logger logger = LoggerFactory.getLogger("edu.uc.eh.utils.ParseGCT");
-
     private final PeptideAnnotationRepository peptideAnnotationRepository;
+    Logger logger = LoggerFactory.getLogger("edu.uc.eh.utils.ParseGCT");
 
     @Autowired
     public ParseGCT(PeptideAnnotationRepository peptideAnnotationRepository) {
@@ -114,11 +116,11 @@ public class ParseGCT {
 
     public void parseToRepository(String url,
                                   List peakValues,
-                                  HashMap<String, List<AnnotationValue>> metaProbes,
+                                  HashMap<String, List<AnnotationValue>> metaPeptides,
                                   HashMap<String, List<AnnotationValue>> metaReplicates) throws IOException {
         logger.info("Processing: {}", url);
 
-        List<String> labelsOfProbes = new ArrayList<>();
+        List<String> labelsOfPeptides = new ArrayList<>();
         List<String> labelsOfReplicates = new ArrayList<>();
 
         BufferedReader reader = UtilsNetwork.downloadFile(url);
@@ -144,11 +146,11 @@ public class ParseGCT {
 //                    9 = number of probe/peptide annotations / meta-data (in columns)
 //                    15 = number of replicate annotations / meta-data (in rows)
                 } else {
-                    int numberOfProbes = Integer.valueOf(tokens[0]).intValue(); // probes are also identified by peptides
+                    int numberOfPeptides = Integer.valueOf(tokens[0]).intValue(); // probes are also identified by peptides
                     int numberOfReplicates = Integer.valueOf(tokens[1]).intValue();
-                    int annotationsOfProbes = Integer.valueOf(tokens[2]).intValue() + 1; //also count "Id"
+                    int annotationsOfPeptides = Integer.valueOf(tokens[2]).intValue() + 1; //also count "Id"
                     int annotationsOfReplicates = Integer.valueOf(tokens[3]).intValue() + 1; // also count "Id"
-                    if (numberOfProbes > 0 && numberOfReplicates > 0 && annotationsOfProbes > 0 && annotationsOfReplicates > 0) {
+                    if (numberOfPeptides > 0 && numberOfReplicates > 0 && annotationsOfPeptides > 0 && annotationsOfReplicates > 0) {
 
                         ArrayList<String> idsOfReplicas = new ArrayList<String>();
 
@@ -157,26 +159,26 @@ public class ParseGCT {
                             throw new IOException("Line 3 of GCT should contain some data.");
                         } else {
                             tokens = line.split("\t", -1);
-                            if (tokens.length != annotationsOfProbes + numberOfReplicates) {
+                            if (tokens.length != annotationsOfPeptides + numberOfReplicates) {
                                 throw new IOException("We expect number of columns to be = number of replicas + number of probe annotations");
                             } else {
 
                                 // first token is Id
-                                if(labelsOfProbes.size()==0&&labelsOfReplicates.size()==0) {
-                                    labelsOfProbes.add(tokens[0]);
+                                if (labelsOfPeptides.size() == 0 && labelsOfReplicates.size() == 0) {
+                                    labelsOfPeptides.add(tokens[0]);
                                     labelsOfReplicates.add(tokens[0]);
                                 }
 
                                 // Labels of annotations of probes/peptides
-                                for (int i = 1; i < annotationsOfProbes; i++) {
-                                    if(!labelsOfProbes.contains(tokens[i])) {
-                                        labelsOfProbes.add(tokens[i]);
+                                for (int i = 1; i < annotationsOfPeptides; i++) {
+                                    if (!labelsOfPeptides.contains(tokens[i])) {
+                                        labelsOfPeptides.add(tokens[i]);
                                     }
                                 }
 
                                 // Ids of replicates
-                                for (int i = annotationsOfProbes; i < annotationsOfProbes + numberOfReplicates; i++) {
-                                    metaReplicates.put(tokens[i], new ArrayList<AnnotationValue>());
+                                for (int i = annotationsOfPeptides; i < annotationsOfPeptides + numberOfReplicates; i++) {
+                                    metaReplicates.put(tokens[i], new ArrayList<>());
                                     idsOfReplicas.add(tokens[i]);
                                 }
 
@@ -188,7 +190,7 @@ public class ParseGCT {
                                     }
 
                                     tokens = line.split("\t", -1);
-                                    if (tokens.length != annotationsOfProbes + numberOfReplicates) {
+                                    if (tokens.length != annotationsOfPeptides + numberOfReplicates) {
                                         throw new IOException("We expect number of columns to be = number of replicas + number of probe annotations");
                                     }
 
@@ -197,40 +199,40 @@ public class ParseGCT {
                                         labelsOfReplicates.add(tokens[0]);
                                     }
 
-                                    for (int colId = annotationsOfProbes; colId < annotationsOfProbes + numberOfReplicates; colId++) {
-                                        updateMetaReplicas(url, tokens[0], colId - annotationsOfProbes, tokens[colId], metaReplicates);
+                                    for (int colId = annotationsOfPeptides; colId < annotationsOfPeptides + numberOfReplicates; colId++) {
+                                        updateMetaReplicates(url, tokens[0], colId - annotationsOfPeptides, tokens[colId], metaReplicates);
                                     }
                                 }
 
                                 // lines with meta probes and values
-                                for (int rowId = 0; rowId < numberOfProbes; rowId++) {
+                                for (int rowId = 0; rowId < numberOfPeptides; rowId++) {
                                     line = reader.readLine();
                                     if (line == null) {
                                         throw new IOException("Line " + rowId + " in meta probes + values should not be empty");
                                     }
 
                                     tokens = line.split("\t", -1);
-                                    if (tokens.length != annotationsOfProbes + numberOfReplicates) {
+                                    if (tokens.length != annotationsOfPeptides + numberOfReplicates) {
                                         throw new IOException("We expect number of columns to be = number of replicas + number of probe annotations");
                                     }
 
                                     // fill meta probes
-                                    metaProbes.put(tokens[0], updateMetaProbes(url,
-                                            labelsOfProbes,
-                                            Arrays.copyOfRange(tokens, 1, annotationsOfProbes)));
+                                    metaPeptides.put(tokens[0], updateMetaPeptides(url,
+                                            labelsOfPeptides,
+                                            Arrays.copyOfRange(tokens, 1, annotationsOfPeptides)));
 
-                                    for (int colId = annotationsOfProbes; colId < numberOfReplicates + annotationsOfProbes; colId++) {
+                                    for (int colId = annotationsOfPeptides; colId < numberOfReplicates + annotationsOfPeptides; colId++) {
 
                                         if (tokens[colId].equals("NA")) {
-                                            peakValues.add(new ProbeReplicatePeak(
+                                            peakValues.add(new PeptideReplicatePeak(
                                                     tokens[0], // probe id
-                                                    idsOfReplicas.get(colId - annotationsOfProbes), // replica id
+                                                    idsOfReplicas.get(colId - annotationsOfPeptides), // replica id
                                                     null)); // measurement
                                             // continue;
                                         }else {
-                                            peakValues.add(new ProbeReplicatePeak(
+                                            peakValues.add(new PeptideReplicatePeak(
                                                     tokens[0], // probe id
-                                                    idsOfReplicas.get(colId - annotationsOfProbes), // replica id
+                                                    idsOfReplicas.get(colId - annotationsOfPeptides), // replica id
                                                     Double.valueOf(tokens[colId]))); // measurement
                                         }
                                     }
@@ -249,7 +251,7 @@ public class ParseGCT {
 
     }
 
-    private List<AnnotationValue> updateMetaProbes(String fileName, List<String> localLabelsOfProbes, String[] values) {
+    private List<AnnotationValue> updateMetaPeptides(String fileName, List<String> localLabelsOfProbes, String[] values) {
         List<AnnotationValue> output = new ArrayList<AnnotationValue>();
         int counter = -1;
 
@@ -264,8 +266,8 @@ public class ParseGCT {
         return output;
     }
 
-    private void updateMetaReplicas(String fileName, String annotationName, int colId,
-                                    String token, HashMap<String, List<AnnotationValue>> metaReplicas) {
+    private void updateMetaReplicates(String fileName, String annotationName, int colId,
+                                      String token, HashMap<String, List<AnnotationValue>> metaReplicas) {
 
         int counter = 0;
         for (String currentKey : metaReplicas.keySet()) {
@@ -336,23 +338,23 @@ public class ParseGCT {
 
     }
 
-    public class ProbeReplicatePeak {
-        private String probeId;
+    public class PeptideReplicatePeak {
+        private String peptideId;
         private String replicateId;
         private Double peakArea;
 
-        public ProbeReplicatePeak(String probeId, String replicateId, Double peakArea) {
-            this.probeId = probeId;
+        public PeptideReplicatePeak(String peptideId, String replicateId, Double peakArea) {
+            this.peptideId = peptideId;
             this.replicateId = replicateId;
             this.peakArea = peakArea;
         }
 
-        public String getProbeId() {
-            return probeId;
+        public String getPeptideId() {
+            return peptideId;
         }
 
-        public void setProbeId(String probeId) {
-            this.probeId = probeId;
+        public void setPeptideId(String peptideId) {
+            this.peptideId = peptideId;
         }
 
         public String getReplicateId() {

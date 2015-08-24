@@ -12,10 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by chojnasm on 8/11/15.
@@ -24,13 +21,12 @@ import java.util.Set;
 @Service
 public class RepositoryService {
 
+    private static final Logger log = LoggerFactory.getLogger(RepositoryService.class);
     private final GctFileRepository gctFileRepository;
     private final PeakAreaRepository peakAreaRepository;
     private final PeptideAnnotationRepository peptideAnnotationRepository;
     private final ReplicateAnnotationRepository replicateAnnotationRepository;
     private final ProfileRepository profileRepository;
-
-    private static final Logger log = LoggerFactory.getLogger(RepositoryService.class);
 
     @Autowired
     public RepositoryService(GctFileRepository gctFileRepository,
@@ -71,6 +67,7 @@ public class RepositoryService {
         for (PeptideAnnotation peptideAnnotation : peptideAnnotationRepository.findByAssayType(assayType)) {
             output.add(peptideAnnotation.getPeptideId());
         }
+        Collections.sort(output);
         return output;
     }
 }

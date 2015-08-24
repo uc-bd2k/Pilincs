@@ -24,4 +24,7 @@ public interface ProfileRepository extends JpaRepository<Profile,Long> {
 
     List<Profile> findByAssayType(AssayType assayType);
 
+    List<Profile> findByReplicateAnnotationCellIdIn(List<String> cells);
+
+    List<Profile> findByReplicateAnnotationPertinameIn(List<String> perturbations);
 }

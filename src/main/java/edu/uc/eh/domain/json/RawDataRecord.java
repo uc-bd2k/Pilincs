@@ -45,7 +45,7 @@ public class RawDataRecord {
     private String pubchemCid;
 
     public RawDataRecord(PeakArea peakArea) {
-        this.chromatogramsUrl = "<a href=\"" + peakArea.getChromatogramsUrl() + "\" target=\"_blank\" \"><img src=\"https://panoramaweb.org/labkey/TargetedMS/images/TransitionGroupLib.gif\"></a>";
+        this.chromatogramsUrl = "<a href=\"" + peakArea.getChromatogramUrl() + "\" target=\"_blank\" \"><img src=\"https://panoramaweb.org/labkey/TargetedMS/images/TransitionGroupLib.gif\"></a>";
         this.value=peakArea.getValue();
         this.downloadUrl= "<a href=\"" + peakArea.getGctFile().getDownloadUrl() + "\" target=\"_blank\"\">gct</a>";
         this.assayType=peakArea.getGctFile().getAssayType();

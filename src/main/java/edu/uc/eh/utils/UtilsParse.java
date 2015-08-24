@@ -1,8 +1,11 @@
 package edu.uc.eh.utils;
 
-import com.google.gson.*;
-import edu.uc.eh.datatypes.AnnotationNameValue;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import edu.uc.eh.datatypes.AssayType;
+import edu.uc.eh.datatypes.IdNameValue;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -153,6 +156,7 @@ public class UtilsParse {
         return lastTagAnnotation;
     }
 
+
     public static List<String> getPeptideIdNamesFromJSON(String jsonUrl) throws Exception {
         String jsonAsString = UtilsNetwork.readUrl(jsonUrl);
         List<String> output = new ArrayList<>();
@@ -170,6 +174,24 @@ public class UtilsParse {
             }
         }
         Collections.sort(output);
+        return output;
+    }
+
+    public static List<IdNameValue> getAnnotationsFromJSON(String jsonAsString, String type) throws Exception {
+
+        List<IdNameValue> output = new ArrayList<>();
+
+        JsonElement rootElement = new JsonParser().parse(jsonAsString);
+        JsonObject jsonObject = rootElement.getAsJsonObject();
+        JsonArray jsonArray = jsonObject.getAsJsonArray("rows");
+
+        for (int i = 0; i < jsonArray.size(); i++) {
+            JsonObject jobject = jsonArray.get(i).getAsJsonObject();
+            String id = jobject.get(type).toString().replaceAll("\"", "");
+            String name = jobject.get("Name").toString().replaceAll("\"", "");
+            String value = jobject.get("Value").toString().replaceAll("\"", "");
+            output.add(new IdNameValue(id, name, value));
+        }
         return output;
     }
 }
