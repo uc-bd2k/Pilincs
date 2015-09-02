@@ -92,7 +92,7 @@ public class DatabaseLoader {
     }
 
     private void cleanUp() {
-//        TODO: free memory
+//        TODO:
     }
 
     private void loadPeptideAnnotations() throws Exception {

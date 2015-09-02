@@ -105,12 +105,13 @@ public class UtilsTransform {
      * @param profiles
      * @param databaseLoader
      * @param peptideAnnotationRepository
+     * @param ifTransponse
      * @return
      */
     public static String profilesToGct(AssayType assayType,
                                        List<Profile> profiles,
                                        DatabaseLoader databaseLoader,
-                                       PeptideAnnotationRepository peptideAnnotationRepository) {
+                                       PeptideAnnotationRepository peptideAnnotationRepository, boolean ifTransponse) {
 
 
         List<String> peptideIds = databaseLoader.getReferenceProfile(assayType);
@@ -128,8 +129,8 @@ public class UtilsTransform {
 
         int numReplicates = profiles.size();
         int numPeptides = peptideIds.size();
-        int numReplicateAnnotations = replicateLabels.size() + 1;
-        int numPeptideAnnotations = peptideLabels.size() + 1;
+        int numReplicateAnnotations = replicateLabels.size();
+        int numPeptideAnnotations = peptideLabels.size();
 
         // Counts
         stringBuilder.append(numReplicates).append("\t");
@@ -205,6 +206,64 @@ public class UtilsTransform {
             }
         }
 
-        return stringBuilder.toString();
+        if (ifTransponse) {
+            return transponseGct(stringBuilder.toString());
+        } else {
+            return stringBuilder.toString();
+        }
+
+    }
+
+    private static String transponseGct(String gct) {
+
+        String[][] matrix = null; //rows by columns
+        int[] dims = new int[4];
+
+        String[] rows = gct.split("\n");
+
+        for (int rowId = 0; rowId < rows.length; rowId++) {
+
+            if (rowId == 0) {
+                continue;
+
+            } else if (rowId == 1) {
+
+                String[] dimensionsString = rows[rowId].split("\t");
+                dims[0] = Integer.valueOf(dimensionsString[0]);
+                dims[1] = Integer.valueOf(dimensionsString[1]);
+                dims[2] = Integer.valueOf(dimensionsString[2]);
+                dims[3] = Integer.valueOf(dimensionsString[3]);
+
+                matrix = new String[dims[0] + dims[3] + 1][dims[1] + dims[2] + 1];
+                continue;
+            }
+
+            String[] cols = rows[rowId].split("\t");
+
+            for (int colId = 0; colId < cols.length; colId++) {
+                matrix[rowId - 2][colId] = cols[colId];
+            }
+        }
+
+        StringBuilder sb = new StringBuilder("#1.3\n");
+
+        sb.append(dims[1]).append("\t");
+        sb.append(dims[0]).append("\t");
+        sb.append(dims[3]).append("\t");
+        sb.append(dims[2]).append("\n");
+
+        for (int i = 0; i < dims[1] + dims[2] + 1; i++) {
+            for (int j = 0; j < dims[0] + dims[3] + 1; j++) {
+                sb.append(matrix[j][i]);
+
+                if (j == dims[0] + dims[3]) {
+                    sb.append("\n");
+                } else {
+                    sb.append("\t");
+                }
+            }
+        }
+
+        return sb.toString();
     }
 }

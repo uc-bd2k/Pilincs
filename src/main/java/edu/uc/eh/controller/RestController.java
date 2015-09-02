@@ -412,6 +412,7 @@ public class RestController {
             output.add(profile);
         }
 
-        return UtilsTransform.profilesToGct(assayType, output, databaseLoader, peptideAnnotationRepository);
+        boolean ifTransponse = true;
+        return UtilsTransform.profilesToGct(assayType, output, databaseLoader, peptideAnnotationRepository, ifTransponse);
     }
 }
