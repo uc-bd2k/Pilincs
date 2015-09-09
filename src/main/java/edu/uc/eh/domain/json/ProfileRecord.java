@@ -1,13 +1,12 @@
 package edu.uc.eh.domain.json;
 
-import edu.uc.eh.datatypes.StringDouble;
 import edu.uc.eh.domain.Profile;
-import edu.uc.eh.datatypes.Tuples;
 
 /**
  * Created by chojnasm on 8/3/15.
  */
 public class ProfileRecord {
+    private int background; // 0 - none, 1 - p100, gcp
     private String assayType;
     private int runId;
     private String replicateId;
@@ -21,7 +20,8 @@ public class ProfileRecord {
     private String positivePeptides;
 
 
-    public ProfileRecord(Profile profile) {
+    public ProfileRecord(Profile profile, int backGroundColor) {
+        this.background = backGroundColor;
         this.assayType = profile.getAssayType().toString();
         this.runId = profile.getRunId();
         this.replicateId = profile.getReplicateAnnotation().getReplicateId();
@@ -46,7 +46,9 @@ public class ProfileRecord {
         return positiveCorrelation;
     }
 
-
+    public void setPositiveCorrelation(String positiveCorrelation) {
+        this.positiveCorrelation = positiveCorrelation;
+    }
 
     public String getAssayType() {
         return assayType;
@@ -100,17 +102,16 @@ public class ProfileRecord {
         return correlatedVector;
     }
 
-    public void setPositiveCorrelation(String positiveCorrelation) {
-        this.positiveCorrelation = positiveCorrelation;
-    }
-
-
     public String getPositivePeptides() {
         return positivePeptides;
     }
 
     public void setPositivePeptides(String positivePeptides) {
         this.positivePeptides = positivePeptides;
+    }
+
+    public int getBackground() {
+        return background;
     }
 
 

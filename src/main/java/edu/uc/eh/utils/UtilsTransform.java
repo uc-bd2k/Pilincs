@@ -1,11 +1,13 @@
 package edu.uc.eh.utils;
 
 import edu.uc.eh.datatypes.AssayType;
+import edu.uc.eh.datatypes.Int4Tuple;
 import edu.uc.eh.datatypes.PeptideOrder;
 import edu.uc.eh.datatypes.StringDouble;
 import edu.uc.eh.domain.PeptideAnnotation;
 import edu.uc.eh.domain.Profile;
 import edu.uc.eh.domain.ReplicateAnnotation;
+import edu.uc.eh.domain.json.ExploreResponse;
 import edu.uc.eh.domain.json.HeatMapResponse;
 import edu.uc.eh.domain.json.MatrixRow;
 import edu.uc.eh.domain.repository.PeptideAnnotationRepository;
@@ -265,5 +267,47 @@ public class UtilsTransform {
         }
 
         return sb.toString();
+    }
+
+    public static ExploreResponse profilesToExplore(List<Profile> profiles) {
+
+        List<String> cellNames = new ArrayList<>();
+        List<String> pertNames = new ArrayList<>();
+        List<String> doseNames = new ArrayList<>();
+        List<String> timeNames = new ArrayList<>();
+        List<Int4Tuple> rows = new ArrayList<>();
+
+
+        for (Profile profile : profiles) {
+
+            String cellName = profile.getReplicateAnnotation().getCellId();
+            String pertName = profile.getReplicateAnnotation().getPertiname();
+            String doseName = profile.getReplicateAnnotation().getPertDose();
+            String timeName = profile.getReplicateAnnotation().getPertTime();
+
+            if (!cellNames.contains(cellName)) {
+                cellNames.add(cellName);
+            }
+
+            if (!pertNames.contains(pertName)) {
+                pertNames.add(pertName);
+            }
+
+            if (!doseNames.contains(doseName)) {
+                doseNames.add(doseName);
+            }
+
+            if (!timeNames.contains(timeName)) {
+                timeNames.add(timeName);
+            }
+
+            int cellNameId = cellNames.indexOf(cellName);
+            int pertNameId = pertNames.indexOf(pertName);
+            int doseNameId = doseNames.indexOf(doseName);
+            int timeNameId = timeNames.indexOf(timeName);
+
+            rows.add(new Int4Tuple(cellNameId, pertNameId, doseNameId, timeNameId));
+        }
+        return new ExploreResponse(cellNames, pertNames, doseNames, timeNames, rows);
     }
 }

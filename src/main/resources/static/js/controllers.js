@@ -75,7 +75,7 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
             $('#tableRelations').hide();
             $('#tableExplore').show();
             $('#tableAPI').hide();
-            test();
+            $scope.loadExploreTab();
 
         } else if (wk == $scope.workspaces[4]) {
             $('#tablePeaks').parent().parent().parent().hide();
@@ -83,14 +83,16 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
             $('#tableRelations').hide();
             $('#tableExplore').hide();
             $('#tableAPI').show();
-            test();
+            //test();
         }
     };
 
     $scope.refreshTables = function(){
         $('#tablePeaks').bootstrapTable('refresh');
         $('#tableProfiles').bootstrapTable('refresh');
+        //$('#tableProfiles').bootstrapTable('mergeCells', {index: 3, field: 'cellId', colspan: 1, rowspan: 3});
         $scope.loadHeatMap();
+        $scope.loadExploreTab();
     };
 
     $timeout(callAtTimeout, 0);
@@ -287,6 +289,7 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
         toolbarAlign: 'right',
         //showColumns: true,
         detailView: true,
+
         detailFormatter: function (index, row) {
             return "<div class=\"row\">" +
                 "<div class=\"col-md-3\"><b style=\"color: #23527c;\">Selected profile</b> <br/>" +
@@ -410,13 +413,22 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
         //},
         columns: [
             {
-                field: 'assayType',
-                title: 'Assay'
+                field: 'background',
+                title: 'Background',
+                visible: false
             },
             {
-                field: 'runId',
-                title: 'RunId',
-                visible: false
+                field: 'assayType',
+                title: 'Assay',
+                cellStyle: function (value, row, index) {
+
+                    if (row.background == '1') {
+                        return {classes: ['info']}
+                    } else {
+                        return {classes: 'success'}
+                    }
+
+                }
             },
             {
                 field: 'replicateId',
@@ -451,14 +463,32 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
                 visible: false
             },
             {
-                field: 'sth',
-                title: 'Panorama',
-                visible: false
+                field: 'runId',
+                title: 'RunId',
+                visible: true,
+                cellStyle: function (value, row, index) {
+
+                    if (row.background == '1') {
+                        return {classes: ['info']}
+                    } else {
+                        return {classes: 'success'}
+                    }
+
+                }
+            },
+            {
+                field: 'concate',
+                title: 'Concatenate',
+                visible: true,
+                checkbox: true,
+
             }],
         responseHandler: function (res) {
             return res;
         }
     });
+
+    //$('#tableProfiles').bootstrapTable('mergeCells', {index: 3, field: 'cellId', colspan: 1, rowspan: 3});
 
     //$('#tableProfiles').parent().parent().parent().hide();
     $scope.changeCurrentWorkspace($scope.workspaces[1]);
@@ -466,6 +496,8 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
     // --------------
     //UI configuration
 
+
+    // HeatMap tab
     $scope.loadHeatMap = function() {
 
         var queryContent = [];
@@ -606,6 +638,141 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
 
         });
         //$scope.heatmapMessage ='';
+    };
+
+
+    // Explore tab
+    $scope.loadExploreTab = function () {
+
+        var queryContent = [];
+        queryContent.push({"p100": true});
+        queryContent.push({"gcp": false});
+        queryContent = queryContent.concat($scope.tags);
+
+        $('#exploreMessage').show();
+
+        // Left Legend
+
+        // Grouping Labels
+
+        // Dots
+
+        // Grouping dropdown
+
+        // Coloring dropdown
+
+        // Filter
+
+        // Query server for profiles
+
+        var res = $http.post('/pilincs/api-explore', JSON.stringify(queryContent));
+        res.success(function (data, status, headers, config) {
+
+            console.log(data);
+
+            var cellNames = data.cellNames,
+                pertNames = data.pertNames,
+                doseNames = data.doseNames,
+                timeNames = data.timeNames,
+                rows = data.rows;
+
+            console.log("Cell names: " + cellNames);
+            console.log("Pert names: " + pertNames);
+            console.log("Dose names: " + doseNames);
+            console.log("Time names: " + timeNames);
+            console.log("Rows: " + rows.length);
+
+            var width = 800,
+                height = 500;
+
+            var fill = d3.scale.category20();
+
+            console.log("Fill: " + fill);
+
+            var spaceX = width / 6;
+            var d = 6;
+            var nodes = [],
+                foci = [{x: spaceX - d, y: 50}, {x: 2 * spaceX - d, y: 50}, {x: 3 * spaceX - d, y: 50}, {
+                    x: 4 * spaceX - d,
+                    y: 50
+                }, {x: 5 * spaceX - d, y: 50},
+                    {x: spaceX + d, y: 50}, {x: 2 * spaceX + d, y: 50}, {x: 3 * spaceX + d, y: 50}, {
+                        x: 4 * spaceX + d,
+                        y: 50
+                    }, {x: 5 * spaceX + d, y: 50}];
+
+            var svg = d3.select("#explorer")
+                .attr("width", width)
+                .attr("height", height);
+
+            var force = d3.layout.force()
+                .nodes(nodes)
+                .links([])
+                .size([width, height])
+                .friction(0.8)
+                .linkDistance(0)
+                .linkStrength(2)
+                .charge(-3)
+                .gravity(0.01)
+                .theta(0.8)
+                .alpha(0.1)
+                .on("tick", tick);
+
+            var node = svg.selectAll("circle");
+
+            function tick(e) {
+                var k = .15 * e.alpha;
+
+                // Push nodes toward their designated focus.
+                nodes.forEach(function (o, i) {
+                    o.y += (foci[o.id].y - o.y) * k;
+                    o.x += (foci[o.id].x - o.x) * k;
+                });
+
+                node
+                    .attr("cx", function (d) {
+                        return d.x;
+                    })
+                    .attr("cy", function (d) {
+                        return d.y;
+                    });
+            }
+
+            for (var i = 0; i < 500; i++) {
+
+                nodes.push({id: ~~(Math.random() * foci.length)});
+
+                force.start();
+
+                node = node.data(nodes);
+
+                node.enter().append("circle")
+                    .attr("class", "node")
+                    .attr("cx", function (d) {
+                        return foci[d.id].x;
+                    })
+                    .attr("cy", function (d) {
+                        return foci[d.id].y;
+                    })
+                    .attr("r", 3)
+                    .style("fill", function (d) {
+
+                        if (Math.random() > -1) {
+                            return fill(d.id);
+                        } else {
+                            return fill(2 * d.id);
+                        }
+                    })
+                    .style("stroke", function (d) {
+                        return d3.rgb(fill(d.id)).darker(1);
+                    });
+                //.call(force.drag);
+            }
+
+            $('#exploreMessage').hide();
+
+        });
+
     };
 
 }]);

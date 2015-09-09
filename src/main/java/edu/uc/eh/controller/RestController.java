@@ -172,13 +172,21 @@ public class RestController {
         List<String> cellTags = tagsParsed.get("CellId").size() > 0 ? tagsParsed.get("CellId") : allTagsForcell;
         List<String> genesymbolTags = tagsParsed.get("PrGeneSymbol").size() > 0 ? tagsParsed.get("PrGeneSymbol") : allTagsForgenesymbol;
 
-        result = profileRepository.findByAssayTypeInAndReplicateAnnotationCellIdInAndReplicateAnnotationPertinameIn(
+        result = profileRepository.findByAssayTypeInAndReplicateAnnotationCellIdInAndReplicateAnnotationPertinameInOrderByConcatDesc(
                 assayTypes, cellTags, pertinameTags, pageRequest);
 
         count = result.getTotalElements();
 
+        String previousConcat = "";
+        boolean background = true;
         for(Profile profile : result){
-            output.add(new ProfileRecord(profile));
+
+
+            if (!profile.getConcat().equals(previousConcat)) {
+                background = !background;
+            }
+            output.add(new ProfileRecord(profile, background ? 1 : 0));
+            previousConcat = profile.getConcat();
         }
 
         return new ProfileResponse(count,output);
@@ -190,12 +198,9 @@ public class RestController {
     HeatMapResponse profilesAsHeatMap(
             @RequestBody String tags) throws ParseException {
 
-        List<ProfileRecord> output = new ArrayList<>();
-
         HashMap<String,List<String>> tagsParsed = UtilsParse.parseTags(tags);
 
         List<Profile> result;
-        Long count;
 
         List<String> allTagsForPertiname = new ArrayList<>();
         List<String> allTagsForcell = new ArrayList<>();
@@ -224,13 +229,56 @@ public class RestController {
 
         List<String> pertinameTags = tagsParsed.get("Pertiname").size() > 0 ? tagsParsed.get("Pertiname") : allTagsForPertiname;
         List<String> cellTags = tagsParsed.get("CellId").size() > 0 ? tagsParsed.get("CellId") : allTagsForcell;
-        List<String> genesymbolTags = tagsParsed.get("PrGeneSymbol").size() > 0 ? tagsParsed.get("PrGeneSymbol") : allTagsForgenesymbol;
+//        List<String> genesymbolTags = tagsParsed.get("PrGeneSymbol").size() > 0 ? tagsParsed.get("PrGeneSymbol") : allTagsForgenesymbol;
 
         result = profileRepository.findByAssayTypeInAndReplicateAnnotationCellIdInAndReplicateAnnotationPertinameIn(
                 assayTypes, cellTags, pertinameTags);
 
 
         return UtilsTransform.profilesToHeatMap(result,databaseLoader.getReferenceProfile(assayTypes.get(0)));
+    }
+
+    @RequestMapping(value = "/api-explore", method = RequestMethod.POST)
+    public
+    @ResponseBody
+    ExploreResponse profilesForExplore(
+            @RequestBody String tags) throws ParseException {
+
+        HashMap<String, List<String>> tagsParsed = UtilsParse.parseTags(tags);
+
+        List<Profile> result;
+
+        List<String> allTagsForPertiname = new ArrayList<>();
+        List<String> allTagsForcell = new ArrayList<>();
+
+        for (TagFormat tagFormat : getTagsForAutocompletion()) {
+            String annotation = tagFormat.getAnnotation();
+            switch (annotation) {
+                case "Pertiname":
+                    allTagsForPertiname.add(tagFormat.getName());
+                    break;
+                case "CellId":
+                    allTagsForcell.add(tagFormat.getName());
+                    break;
+                case "PrGeneSymbol":
+                    break;
+            }
+        }
+
+        List<String> assayTypesString = tagsParsed.get("AssayTypes");
+        List<AssayType> assayTypes = new ArrayList<>();
+
+        // Only first Assay Type !!!!
+        assayTypes.add(AssayType.valueOf(assayTypesString.get(0)));
+
+        List<String> pertinameTags = tagsParsed.get("Pertiname").size() > 0 ? tagsParsed.get("Pertiname") : allTagsForPertiname;
+        List<String> cellTags = tagsParsed.get("CellId").size() > 0 ? tagsParsed.get("CellId") : allTagsForcell;
+
+        result = profileRepository.findByAssayTypeInAndReplicateAnnotationCellIdInAndReplicateAnnotationPertinameIn(
+                assayTypes, cellTags, pertinameTags);
+
+
+        return UtilsTransform.profilesToExplore(result);
     }
 
     @RequestMapping(value = "/api-tags",method = RequestMethod.GET)

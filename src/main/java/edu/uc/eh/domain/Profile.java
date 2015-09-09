@@ -43,6 +43,8 @@ public class Profile implements Serializable {
     private ListWrapper colors;
     private Integer clusteringOrder;
 
+    private String concat;
+
     public Profile(ReplicateAnnotation replicateAnnotation, GctFile gctFile,
                    double[] vector,
                    boolean[] imputes,
@@ -71,6 +73,7 @@ public class Profile implements Serializable {
         }
         this.clusteringOrder = clusteringOrder;
 
+        this.concat = replicateAnnotation.getCellId() + replicateAnnotation.getPertiname() + assayType + getRunId();
     }
 
     public Profile() {
@@ -161,4 +164,7 @@ public class Profile implements Serializable {
         this.clusteringOrder = clusteringOrder;
     }
 
+    public String getConcat() {
+        return concat;
+    }
 }

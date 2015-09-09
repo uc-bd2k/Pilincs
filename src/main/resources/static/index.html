@@ -165,17 +165,14 @@
             <div id="ilincs">
                 <div class="form-inline" role="form">
                     <button id="ok" type="submit" class="btn btn-default disabled">Analyze in iLINCS</button>
+                    <button id="merge" type="submit" class="btn btn-default disabled">Merge profiles</button>
                 </div>
             </div>
         </table>
 
     <!-- HeatMap -->
         <div id="tableRelations">
-            <!--<label style="font-weight: normal; font-size: smaller;"><input type="radio"> Natural order</label>-->
-            <!--<label style="font-weight: normal; font-size: smaller; padding-left: 3em;"><input type="radio" > Cluster membership</label>-->
-
             <div id="heatMap" style="padding-top:10px;">
-                <!--<p id="heatMapMessage" style="text-align: center;">...</p>-->
                 <div class="col-lg-offset-5">
                     <button id="heatMapMessage" style="align: center; display: none;" class="btn btn-default"><span
                             class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...
@@ -196,9 +193,9 @@
                                 <button class="btn btn-default disabled">Analyze in iLINCS</button>
                             </label>
                         </div>
-                        <!--form-group-->
                     </fieldset>
                 </form>
+                x
                 <svg width="1170" height="5000" style="padding-left:35px;">
                     <g id="colorScale" style="padding-botton:20px;"></g>
                 <g id="rowLabels"></g>
@@ -208,49 +205,65 @@
             </div>
         </div>
 
-    <!-- HeatMap -->
+    <!-- Explore -->
     <div id="tableExplore">
-        <p>Coming soon ...</p>
+        <!--<p>Coming soon ...</p>-->
 
-        <!--<div class="col-sm-1 well">-->
-        <!--<p>Legend</p>-->
-        <!--</div>-->
-        <!--<div class="col-sm-9">-->
-        <!--<p>Foci</p>-->
-        <!--<svg id="explorer"></svg>-->
-        <!--</div>-->
-        <!--<div class="col-sm-2 well">-->
+        <div id="explore">
+            <div class="col-lg-offset-5">
+                <button id="exploreMessage" style="align: center; display: none;" class="btn btn-default"><span
+                        class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...
+                </button>
+            </div>
 
-        <!--<div>-->
-        <!--Group by:-->
-        <!--<ul>-->
-        <!--<li><a href="#">Cell Id</a></li>-->
-        <!--</ul>-->
-        <!--</div>-->
-        <!--<br/>-->
-        <!--<div class="dropdown">-->
-        <!--<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">-->
-        <!--Color by-->
-        <!--<span class="caret"></span></button>-->
-        <!--<ul>-->
-        <!--<li><a href="#">Cell Id</a></li>-->
-        <!--<li><a href="#">Perturbation</a></li>-->
-        <!--<li><a href="#">Dose</a></li>-->
-        <!--<li><a href="#">Time</a></li>-->
-        <!--<li><a href="#">Gene Name</a></li>-->
-        <!--</ul>-->
-        <!--</div>-->
-        <!--<br/>-->
+            <div class="col-sm-1 well">
+                <p>Legend</p>
+                <table>
+                    <tbody id="legend">
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-sm-9">
+                <svg id="explorer"></svg>
+            </div>
+            <div class="col-sm-2 well">
 
-        <!--<p>Filter</p>-->
-        <!--<div class="checkbox">-->
-        <!--<label>-->
+                <div>
+                    Group by:
+                    <ul>
+                        <li><a href="#">Cell Id</a></li>
+                    </ul>
+                </div>
+                <br/>
 
-        <!--<input type="checkbox"> Cell 1 <br/>-->
-        <!--<input type="checkbox"> Cell 2 <br/>-->
-        <!--</label>-->
-        <!--</div>-->
-        <!--</div>-->
+                <div class="dropdown">
+                    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        Color by
+                        <span class="caret"></span></button>
+                    <ul>
+                        <li><a href="#">Cell Id</a></li>
+                        <li><a href="#">Perturbation</a></li>
+                        <li><a href="#">Dose</a></li>
+                        <li><a href="#">Time</a></li>
+                        <li><a href="#">Gene Name</a></li>
+                    </ul>
+                </div>
+                <br/>
+
+                <p>Filter</p>
+
+                <div class="checkbox">
+                    <label>
+
+                        <input type="checkbox"> Cell 1 <br/>
+                        <input type="checkbox"> Cell 2 <br/>
+                    </label>
+                </div>
+            </div>
+
+            <hr/>
+        </div>
     </div>
 
     <!-- API -->
@@ -311,6 +324,7 @@
             <br/><br/>
 
             <h3>Examples</h3>
+            <hr/>
         <pre style="">
             <p>1. List of cells in GCP assay: <br/><a href="api-cells/GCP" target="_blank">eh3.uc.edu/pilincs/<b>api-cells/GCP</b></a>
             </p>
@@ -324,11 +338,11 @@
                         href="api-gct/P100;cells=PC3;perturbations=DMSO,methylstat"
                         target="_blank">eh3.uc.edu/pilincs/<b>api-gct/P100;cells=PC3;perturbations=DMSO,methylstat</b></a>
             </p>
-                <img width="90%" src="img/prm.png">
+                <img width="70%" src="img/prm.png">
             <p style="padding-top: 60px;">4. GCT file with all profiles from GCP assay.<br/><a href="api-gct/GCP"
                                                                                                target="_blank">eh3.uc.edu/pilincs/<b>api-gct/GCP</b></a>
             </p>
-                <img width="90%" src="img/gcp.png">
+                <img width="60%" src="img/gcp.png">
             <p style="padding-top: 60px;">5. List all GCT files in Panorama (slow): <br/><a href="api-panorama"
                                                                                             target="_blank">eh3.uc.edu/pilincs/<b>api-panorama</b></a>
             </p>
@@ -339,6 +353,7 @@
             <br/><br/>
 
             <h3>Comments</h3>
+            <hr/>
 
             <div class="bs-callout bs-callout-primary">
                 <p>In examples 3 and 4 output was imported into Excel.</p>

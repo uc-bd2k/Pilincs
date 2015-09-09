@@ -16,7 +16,7 @@ public interface ProfileRepository extends JpaRepository<Profile,Long> {
     Page<Profile> findByReplicateAnnotationCellIdInAndReplicateAnnotationPertinameIn(
             List<String> cells, List<String> pertiname, Pageable pageable);
 
-    Page<Profile> findByAssayTypeInAndReplicateAnnotationCellIdInAndReplicateAnnotationPertinameIn(
+    Page<Profile> findByAssayTypeInAndReplicateAnnotationCellIdInAndReplicateAnnotationPertinameInOrderByConcatDesc(
             List<AssayType> assays, List<String> cells, List<String> pertiname, Pageable pageable);
 
     List<Profile> findByAssayTypeInAndReplicateAnnotationCellIdInAndReplicateAnnotationPertinameIn(
