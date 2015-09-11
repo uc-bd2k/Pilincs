@@ -1,7 +1,7 @@
 package edu.uc.eh.utils;
 
 import edu.uc.eh.datatypes.AssayType;
-import edu.uc.eh.datatypes.Int4Tuple;
+import edu.uc.eh.datatypes.Int5Tuple;
 import edu.uc.eh.datatypes.PeptideOrder;
 import edu.uc.eh.datatypes.StringDouble;
 import edu.uc.eh.domain.PeptideAnnotation;
@@ -271,19 +271,25 @@ public class UtilsTransform {
 
     public static ExploreResponse profilesToExplore(List<Profile> profiles) {
 
+        List<String> assayNames = new ArrayList<>();
         List<String> cellNames = new ArrayList<>();
         List<String> pertNames = new ArrayList<>();
         List<String> doseNames = new ArrayList<>();
         List<String> timeNames = new ArrayList<>();
-        List<Int4Tuple> rows = new ArrayList<>();
+        List<Int5Tuple> rows = new ArrayList<>();
 
 
         for (Profile profile : profiles) {
 
+            String assayName = profile.getAssayType().toString();
             String cellName = profile.getReplicateAnnotation().getCellId();
             String pertName = profile.getReplicateAnnotation().getPertiname();
             String doseName = profile.getReplicateAnnotation().getPertDose();
             String timeName = profile.getReplicateAnnotation().getPertTime();
+
+            if (!assayNames.contains(assayName)) {
+                assayNames.add(assayName);
+            }
 
             if (!cellNames.contains(cellName)) {
                 cellNames.add(cellName);
@@ -301,13 +307,14 @@ public class UtilsTransform {
                 timeNames.add(timeName);
             }
 
+            int assayNameId = assayNames.indexOf(assayName);
             int cellNameId = cellNames.indexOf(cellName);
             int pertNameId = pertNames.indexOf(pertName);
             int doseNameId = doseNames.indexOf(doseName);
             int timeNameId = timeNames.indexOf(timeName);
 
-            rows.add(new Int4Tuple(cellNameId, pertNameId, doseNameId, timeNameId));
+            rows.add(new Int5Tuple(assayNameId, cellNameId, pertNameId, doseNameId, timeNameId));
         }
-        return new ExploreResponse(cellNames, pertNames, doseNames, timeNames, rows);
+        return new ExploreResponse(assayNames, cellNames, pertNames, doseNames, timeNames, rows);
     }
 }

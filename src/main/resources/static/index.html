@@ -91,39 +91,17 @@
                 <div class="btn-group col-sm-2" style="top: 5px;">
                     <input type="submit" ng-click="searchClicked()" value="Search assays"
                            class="btn btn-primary"/>
-                    <!--<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"-->
-                    <!--aria-expanded="false">-->
-                    <!--<span class="caret"></span>-->
-                    <!--</button>-->
-                    <!--<ul class="dropdown-menu" role="menu">-->
-                    <!--<li><a href="#" target="_blank">Advanced search</a></li>-->
-                    <!--</ul>-->
                 </div>
             </form>
         </div>
 
-        <!-- Recommendations -->
-        <!--<div id="assayButtons" class="btn-group col-sm-3" role="group" style="top: 4px;">-->
-        <!--<button type="button" ng-click="toggle('p100')" class="btn btn-default col-xs-4"-->
-        <!--ng-class="getToggleClass(p100)" style=" margin-bottom: 2px; margin-top:2px;">P100-->
-        <!--</button>-->
-        <!--<button type="button" ng-click="toggle('gcp')" class="btn btn-default col-xs-4"-->
-        <!--ng-class="getToggleClass(gcp)" style="margin-bottom: 2px; margin-top:2px; ">GCP-->
-        <!--</button>-->
-        <!--<button type="button" ng-click="toggle('other')" class="btn btn-default disabled col-xs-4"-->
-        <!--ng-class="getToggleClass(other)" style="margin-bottom: 2px; margin-top:2px; ">Other-->
-        <!--</button>-->
-        <!--</div>-->
-        <div id="assayButtons" class="btn-group col-sm-3" style="padding-left:0px; " role="group">
+        <div id="assayButtons" class="btn-group col-sm-3" style="padding-left:0px;padding-bottom: 30px; " role="group">
             <button type="button" ng-click="toggle('p100')" class="btn btn-default btn-xs col-xs-4"
                     ng-class="getToggleClass(p100)" style="margin-bottom: 3px; margin-top:3px;">P100
             </button>
             <button type="button" ng-click="toggle('gcp')" class="btn btn-default btn-xs col-xs-4"
                     ng-class="getToggleClass(gcp)" style="margin-bottom: 3px; margin-top:3px;">GCP
             </button>
-            <!--<button type="button" ng-click="toggle('other')" class="btn btn-default btn-xs  disabled col-xs-4"-->
-            <!--ng-class="getToggleClass(other)" style="margin-bottom: 3px; margin-top:3px;">Other-->
-            <!--</button>-->
         </div>
 
         <div class="row col-sm-offset-1" style="padding-left: 10px;">
@@ -165,7 +143,7 @@
             <div id="ilincs">
                 <div class="form-inline" role="form">
                     <button id="ok" type="submit" class="btn btn-default disabled">Analyze in iLINCS</button>
-                    <button id="merge" type="submit" class="btn btn-default disabled">Merge profiles</button>
+                    <!--<button id="merge" type="submit" class="btn btn-default disabled">Merge profiles</button>-->
                 </div>
             </div>
         </table>
@@ -207,7 +185,6 @@
 
     <!-- Explore -->
     <div id="tableExplore">
-        <!--<p>Coming soon ...</p>-->
 
         <div id="explore">
             <div class="col-lg-offset-5">
@@ -216,50 +193,259 @@
                 </button>
             </div>
 
-            <div class="col-sm-1 well">
-                <p>Legend</p>
-                <table>
-                    <tbody id="legend">
-                    </tbody>
-                </table>
-            </div>
-            <div class="col-sm-9">
-                <svg id="explorer"></svg>
+            <div class="col-sm-10">
+                <svg id="explorer">
+                    <g id="background"></g>
+                    <g id="rowLabels"></g>
+                    <g id="colLabels"></g>
+                    <g id="dots"></g>
+                    <g id="legendRect"></g>
+                    <g id="legendLabel"></g>
+                </svg>
             </div>
             <div class="col-sm-2 well">
 
                 <div>
-                    Group by:
-                    <ul>
-                        <li><a href="#">Cell Id</a></li>
-                    </ul>
+                    <div><b>Group by</b></div>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+                            Cell Id
+                        </label>
+                    </div>
                 </div>
                 <br/>
 
-                <div class="dropdown">
-                    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                        Color by
-                        <span class="caret"></span></button>
-                    <ul>
-                        <li><a href="#">Cell Id</a></li>
-                        <li><a href="#">Perturbation</a></li>
-                        <li><a href="#">Dose</a></li>
-                        <li><a href="#">Time</a></li>
-                        <li><a href="#">Gene Name</a></li>
-                    </ul>
-                </div>
-                <br/>
-
-                <p>Filter</p>
-
-                <div class="checkbox">
+                <div><b>Color by</b></div>
+                <div class="radio">
                     <label>
-
-                        <input type="checkbox"> Cell 1 <br/>
-                        <input type="checkbox"> Cell 2 <br/>
+                        <input type="radio" name="optionsRadios2" id="optionsRadios2" value="option2" disabled>
+                        Cell Id
+                    </label>
+                    <label>
+                        <input type="radio" name="optionsRadios2" id="optionsRadios3" value="option2" disabled>
+                        Perturbation
+                    </label>
+                    <label>
+                        <input type="radio" name="optionsRadios2" id="optionsRadios4" value="option2" checked>
+                        Dose
+                    </label><br/>
+                    <label>
+                        <input type="radio" name="optionsRadios2" id="optionsRadios5" value="option2" disabled>
+                        Time
                     </label>
                 </div>
+                <br/>
+
+                <div><b>Filter by</b><br/></div>
+                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true"
+                     style="margin-top:5px;">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" role="tab" id="headingOne" style="padding: 5px;">
+                            <div style="font-size:14px;" class="panel-title">
+                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion"
+                                   href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                    Cell Id
+                                </a>
+                            </div>
+                        </div>
+                        <div id="collapseOne" class="panel-collapse collapse" role="tabpanel"
+                             aria-labelledby="headingOne">
+                            <div class="panel-body">
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox2"
+                                               value="option2" checked>
+                                        MCF7
+                                    </label><br/>
+                                    <label>
+                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox3"
+                                               value="option2" checked>
+                                        NPC
+                                    </label><br/>
+                                    <label>
+                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox4"
+                                               value="option2" checked>
+                                        A375
+                                    </label><br/>
+                                    <label>
+                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox5"
+                                               value="option2" checked>
+                                        PC3
+                                    </label><br/>
+                                    <label>
+                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox6"
+                                               value="option2" checked>
+                                        A549
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading" role="tab" id="headingTwo" style="padding: 5px;">
+                            <div style="font-size:14px;" class="panel-title">
+                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion"
+                                   href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    Perturbation
+                                </a>
+                            </div>
+                        </div>
+                        <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel"
+                             aria-labelledby="headingTwo">
+                            <div class="panel-body">
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox12"
+                                               value="option2" checked>
+                                        1271738-62-5
+                                    </label><br/>
+                                    <label>
+                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox13"
+                                               value="option2" checked>
+                                        BIX-01294
+                                    </label><br/>
+                                    <label>
+                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox14"
+                                               value="option2" checked>
+                                        BIX-01338
+                                    </label><br/>
+                                    <label>
+                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox15"
+                                               value="option2" checked>
+                                        CI-994
+                                    </label><br/>
+                                    <label>
+                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox16"
+                                               value="option2" checked>
+                                        CPI-169
+                                    </label><br/>
+                                    <label>
+                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox17"
+                                               value="option2" checked>
+                                        DMSO
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading" role="tab" id="headingThree" style="padding: 5px;">
+                            <div style="font-size:14px;" class="panel-title">
+                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion"
+                                   href="#collapseThree" aria-expanded="false" aria-controls="collapseTwo">
+                                    Dose
+                                </a>
+                            </div>
+                        </div>
+                        <div id="collapseThree" class="panel-collapse collapse" role="tabpanel"
+                             aria-labelledby="headingThree">
+                            <div class="panel-body">
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox112"
+                                               value="option2" checked>
+                                        0
+                                    </label><br/>
+                                    <label>
+                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox113"
+                                               value="option2" checked>
+                                        0.05
+                                    </label><br/>
+                                    <label>
+                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox114"
+                                               value="option2" checked>
+                                        0.1
+                                    </label><br/>
+                                    <label>
+                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox115"
+                                               value="option2" checked>
+                                        0.5
+                                    </label><br/>
+                                    <label>
+                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox116"
+                                               value="option2" checked>
+                                        1
+                                    </label><br/>
+                                    <label>
+                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox117"
+                                               value="option2" checked>
+                                        1.5
+                                    </label><br/>
+                                    <label>
+                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox118"
+                                               value="option2" checked>
+                                        2
+                                    </label><br/>
+                                    <label>
+                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox119"
+                                               value="option2" checked>
+                                        3
+                                    </label><br/>
+                                    <label>
+                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox120"
+                                               value="option2" checked>
+                                        3.5
+                                    </label><br/>
+                                    <label>
+                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox121"
+                                               value="option2" checked>
+                                        5
+                                    </label><br/>
+                                    <label>
+                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox122"
+                                               value="option2" checked>
+                                        6
+                                    </label><br/>
+                                    <label>
+                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox123"
+                                               value="option2" checked>
+                                        10
+                                    </label><br/>
+                                    <label>
+                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox124"
+                                               value="option2" checked>
+                                        12
+                                    </label><br/>
+                                    <label>
+                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox125"
+                                               value="option2" checked>
+                                        25
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading" role="tab" id="headingFour" style="padding: 5px;">
+                            <div style="font-size:14px;" class="panel-title">
+                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion"
+                                   href="#collapseFour" aria-expanded="false" aria-controls="collapseTwo">
+                                    Time
+                                </a>
+                            </div>
+                        </div>
+                        <div id="collapseFour" class="panel-collapse collapse" role="tabpanel"
+                             aria-labelledby="headingFour">
+                            <div class="panel-body">
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox212"
+                                               value="option2" checked>
+                                        3
+                                    </label>
+                                    <label>
+                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox213"
+                                               value="option2" checked>
+                                        24
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <br/>
             </div>
 
             <hr/>

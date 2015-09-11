@@ -3,17 +3,27 @@ package edu.uc.eh.datatypes;
 /**
  * Created by chojnasm on 9/3/15.
  */
-public class Int4Tuple {
+public class Int5Tuple {
+    private int int0;
     private int int1;
     private int int2;
     private int int3;
     private int int4;
 
-    public Int4Tuple(int int1, int int2, int int3, int int4) {
+    public Int5Tuple(int int0, int int1, int int2, int int3, int int4) {
+        this.int0 = int0;
         this.int1 = int1;
         this.int2 = int2;
         this.int3 = int3;
         this.int4 = int4;
+    }
+
+    public int getInt0() {
+        return int0;
+    }
+
+    public void setInt0(int int0) {
+        this.int0 = int0;
     }
 
     public int getInt1() {

@@ -268,8 +268,10 @@ public class RestController {
         List<String> assayTypesString = tagsParsed.get("AssayTypes");
         List<AssayType> assayTypes = new ArrayList<>();
 
-        // Only first Assay Type !!!!
-        assayTypes.add(AssayType.valueOf(assayTypesString.get(0)));
+        for (String string : assayTypesString) {
+            assayTypes.add(AssayType.valueOf(string));
+        }
+
 
         List<String> pertinameTags = tagsParsed.get("Pertiname").size() > 0 ? tagsParsed.get("Pertiname") : allTagsForPertiname;
         List<String> cellTags = tagsParsed.get("CellId").size() > 0 ? tagsParsed.get("CellId") : allTagsForcell;
