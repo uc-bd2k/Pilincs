@@ -33,10 +33,12 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
     $scope.workspaces = [];
     $scope.workspaces.push({name: 'Raw Data', alias: 'tablePeaks', active: true});
     $scope.workspaces.push({name: 'Profiles', alias: 'tableProfiles', active: true});
+    $scope.workspaces.push({name: 'Merge', alias: 'tableMerge', active: true});
+    $scope.workspaces.push({name: 'Explore', alias: 'tableAPI', active: true});
     $scope.workspaces.push({name: 'HeatMap', alias: 'tableRelations', active: true});
     //$scope.workspaces.push({ name: 'Charts', alias: 'tableRelations',active:true });
-    $scope.workspaces.push({name: 'Explore', alias: 'tableAPI', active: true});
-    $scope.workspaces.push({ name: 'Show API', alias: 'tableAPI',active:true });
+
+    $scope.workspaces.push({name: 'API', alias: 'tableAPI', active: true});
 
     $scope.currentWorkspace = $scope.workspaces[1];
     $scope.previousWorkspace = $scope.workspaces[1];
@@ -50,6 +52,7 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
         if(wk == $scope.workspaces[0]){
             $('#tablePeaks').parent().parent().parent().show();
             $('#tableProfiles').parent().parent().parent().hide();
+            $('#tableMerge').parent().parent().parent().hide();
             $('#tableRelations').hide();
             $('#tableExplore').hide();
             $('#tableAPI').hide();
@@ -57,6 +60,7 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
         }else if(wk == $scope.workspaces[1]){
             $('#tablePeaks').parent().parent().parent().hide();
             $('#tableProfiles').parent().parent().parent().show();
+            $('#tableMerge').parent().parent().parent().hide();
             $('#tableRelations').hide();
             $('#tableExplore').hide();
             $('#tableAPI').hide();
@@ -64,26 +68,40 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
         }else if(wk == $scope.workspaces[2]){
             $('#tablePeaks').parent().parent().parent().hide();
             $('#tableProfiles').parent().parent().parent().hide();
-            $('#tableRelations').show();
+            $('#tableMerge').parent().parent().parent().show();
+            $('#tableRelations').hide();
             $('#tableExplore').hide();
             $('#tableAPI').hide();
-            $('#heatMapRadios').show();
-            $scope.loadHeatMap();
+
 
         }else if(wk == $scope.workspaces[3]){
             $('#tablePeaks').parent().parent().parent().hide();
             $('#tableProfiles').parent().parent().parent().hide();
+            $('#tableMerge').parent().parent().parent().hide();
             $('#tableRelations').hide();
             $('#tableExplore').show();
             $('#tableAPI').hide();
+            $('#heatMapRadios').show();
             if (!$scope.exporeLoaded) {
                 $scope.loadExploreTab();
                 $scope.exporeLoaded = true;
             }
 
+
         } else if (wk == $scope.workspaces[4]) {
             $('#tablePeaks').parent().parent().parent().hide();
             $('#tableProfiles').parent().parent().parent().hide();
+            $('#tableMerge').parent().parent().parent().hide();
+            $('#tableRelations').show();
+            $('#tableExplore').hide();
+            $('#tableAPI').hide();
+            $scope.loadHeatMap();
+
+            //test();
+        } else if (wk == $scope.workspaces[5]) {
+            $('#tablePeaks').parent().parent().parent().hide();
+            $('#tableProfiles').parent().parent().parent().hide();
+            $('#tableMerge').parent().parent().parent().hide();
             $('#tableRelations').hide();
             $('#tableExplore').hide();
             $('#tableAPI').show();
@@ -95,6 +113,7 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
         $('#tablePeaks').bootstrapTable('refresh');
         $('#tableProfiles').bootstrapTable('refresh');
         //$('#tableProfiles').bootstrapTable('mergeCells', {index: 3, field: 'cellId', colspan: 1, rowspan: 3});
+        $('#tableMerge').bootstrapTable('refresh');
         $scope.loadHeatMap();
         $scope.loadExploreTab();
     };
@@ -140,7 +159,7 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
         return $http.get('/pilincs/api-tags', {cache: false}).then(function (response) {
             var annotations = response.data;
             return annotations.filter(function(annotation) {
-                if ($scope.currentWorkspace == $scope.workspaces[1]) {
+                if ($scope.currentWorkspace != $scope.workspaces[0]) {
                     return annotation.name.toLowerCase().indexOf($query.toLowerCase()) != -1
                         && annotation.flag != 'Peptide';
                 } else {
@@ -483,9 +502,165 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
 
                 }
             }
-
         ],
         responseHandler: function (res) {
+            return res;
+        }
+    });
+
+    $('#tableMerge').bootstrapTable({
+        url: '/pilincs/api-merged-profiles-paged/',
+        queryParams: 'postQueryParams',
+        pagination: 'true',
+        sidePagination: 'server',
+        onLoadSuccess: function () {
+            d3.selectAll(".mergedchart").each(function (d) {
+
+                    var parsed = JSON.parse(d3.select(this).attr("vector"));
+                    var series = parsed.series;
+                    var height = 30;
+                    var seriesLength = series.length;
+                    var labels = [];
+                    var min = Number.POSITIVE_INFINITY;
+                    var max = Number.NEGATIVE_INFINITY;
+
+                    var firstP100 = false;
+                    var firstGCP = false;
+
+                    var p100Series = [];
+                    var gcpSeries = [];
+
+
+                    for (var n = 0; n < seriesLength; n++) {
+
+                        var localSeries = series[n];
+                        var dose = localSeries.dose;
+                        var time = localSeries.time;
+                        var assay = localSeries.assay;
+                        var runid = localSeries.runId;
+                        var replicates = localSeries.replicates;
+                        labels[n] = assay + "  d=" + dose + ", t=" + time + ", (" + runid + ", " + replicates + ")";
+
+                        var useAssay = false;
+                        if (assay == "P100" && firstP100 == false) {
+                            useAssay = true;
+                            p100Series = localSeries.data;
+                            firstP100 = true;
+                        }
+
+                        if (assay == "GCP" && firstGCP == false) {
+                            useAssay = true;
+                            gcpSeries = localSeries.data;
+                            firstGCP = true;
+                        }
+
+                        if (useAssay == true) {
+
+                            for (var j = 0; j < localSeries.data.length; j++) {
+                                var tmpMin = localSeries.data[j].min;
+                                var tmpMax = localSeries.data[j].max;
+                                if (tmpMin < min) min = tmpMin;
+                                if (tmpMax > max) max = tmpMax;
+                            }
+                        }
+                    }
+
+                    var range = max - min;
+                    //console.log(min+" "+max);
+
+                    // Legend
+                    var legend = d3.select(this).selectAll('text').data(labels);
+                    legend
+                        .enter().append('text')
+                        .attr('x', 800)
+                        .attr('y', 6)
+                        .attr("text-anchor", "start")
+                        .attr('transform', function (d, i) {
+                            return "translate(0," + i * 12 + ")";
+                        })
+                        .text(function (d) {
+                            return d;
+                        })
+                        .style('font-size', '8px');
+
+                    legend.exit().remove();
+
+                    // Dots
+
+                    var scaling = height / range;
+                    max = max * scaling;
+
+                    //console.log(p100Series);
+
+                    p100Series = p100Series.map(function (x) {
+                        return {"assay": "P100", "value": x.avg * scaling};
+                    });
+
+                    gcpSeries = gcpSeries.map(function (x) {
+                        return {"assay": "GCP", "value": x.avg * scaling};
+                    });
+
+                    var mergedSeries = p100Series.concat(gcpSeries);
+
+                    //console.log(mergedSeries);
+
+                    var chart = d3.select(this).selectAll('rect').data(mergedSeries);
+                    chart
+                        .enter().append("rect")
+                        .attr("fill", function (d) {
+                            if (d.assay == "P100") {
+                                return '#7B4EA4';
+                            } else {
+                                return '#8c564b';
+                            }
+                        })
+                        .attr("x", function (d, i) {
+                            if (d.assay == "GCP" && firstP100 == false) {
+                                return 480 + i * 5;
+                            } else {
+                                return i * 5;
+                            }
+                        })
+                        .attr("width", 4)
+                        .attr("y", function (d) {
+                            if (d.value <= 0) {
+                                return max;
+                            } else {
+                                return max - d.value;
+                            }
+                        })
+                        .attr("height", function (d) {
+                            if (d.value < 0) {
+                                return -d.value;
+                            } else {
+                                return d.value;
+                            }
+                        });
+
+                    chart.exit().remove();
+
+                }
+            )
+        },
+        columns: [
+            {
+                field: 'nTuple',
+                title: 'Cell - perturbation',
+                visible: true
+            },
+            {
+                field: 'chart',
+                title: 'Merged Profiles'
+            }
+        ],
+        responseHandler: function (res) {
+
+            for (var i = 0; i < res.rows.length; i++) {
+                res.rows[i].chart = "<svg height=\"30px\" width=\"900px\" class=\"mergedchart\" vector=" + res.rows[i].vector + "></div>";
+                delete res.rows[i].vector;
+            }
+
+
             return res;
         }
     });
@@ -755,13 +930,12 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
                 .attr('height', height - 2 * y0)
                 .style("fill", d3.rgb(229, 231, 233));
 
-            var legendData = [{color: fill[0], label: '0.0 - 0.1'}, {
-                color: fill[1],
-                label: '0.5 - 1.5'
-            }, {color: fill[2], label: '2.0 - 3.5'}, {color: fill[3], label: '5.0 - 10'}, {
-                color: fill[4],
-                label: '12  - 25'
-            }];
+            var legendData = [
+                {color: fill[0], label: '0.0 - 0.1'},
+                {color: fill[1], label: '0.5 - 1.5'},
+                {color: fill[2], label: '2.0 - 3.5'},
+                {color: fill[3], label: '5.0 - 10'},
+                {color: fill[4], label: '12  - 25'}];
 
             // swatches
             legendRect = legendRect.selectAll('rect').data(legendData);
@@ -848,7 +1022,6 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
 
                 var fociLocal = foci[assayIndex][cellIndex];
 
-                var fillColor;
 
                 var subGroupId;
                 var disturb = {};
@@ -886,7 +1059,8 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
                         break;
                 }
 
-                fillColor = fill[subGroupId];
+                var fillColor = fill[subGroupId];
+                //fillColor = '#FFFFFF';
 
                 sorted.push({foci: fociLocal, color: fillColor, group: subGroupId});
 
@@ -927,28 +1101,9 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
                     });
                 node.exit().remove();
             }
-
-            //node
-            //    .transition()
-            //    .ease('cubic-in-out')
-            //    .duration(2000)
-            //    .tween('dataTween', function(d){
-            //        //console.log("Dx "+d.foci.x+" "+ d.foci.y+ " "+ d.x+ " "+ d.y + " "+ d.disturb.dx+ " "+ d.disturb.dy+ " "+ d.px + " "+ d.py);
-            //        var ix = d3.interpolate(0, d.foci.x);
-            //        var iy = d3.interpolate(0, d.foci.y);
-            //        return function(t){
-            //            d.x = d.px = ix(t)
-            //            d.y = d.py = iy(t)
-            //        }
-            //    });
-            //force.start();
-
             $('#exploreMessage').hide();
-
         });
-
     };
-
 }]);
 
 

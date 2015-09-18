@@ -122,7 +122,7 @@
         <table class="table table-bordered table-striped" style="padding-top: 30px;">
             <tbody>
             <tr>
-                <td align="center" width="20%" ng-repeat="wk in workspaces" ng-class="{thisTab: currentWorkspace==wk}"
+                <td align="center" width="17%" ng-repeat="wk in workspaces" ng-class="{thisTab: currentWorkspace==wk}"
 
                     ng-click="changeCurrentWorkspace(wk)">
                     <h4 ng-class="{disabled: wk.active}"><a href="#" class="ng-cloak">{{wk.name}}</a></h4>
@@ -148,6 +148,10 @@
             </div>
         </table>
 
+    <!-- Merge profiles -->
+    <table class="table" id="tableMerge">
+
+    </table>
     <!-- HeatMap -->
         <div id="tableRelations">
             <div id="heatMap" style="padding-top:10px;">
@@ -551,7 +555,8 @@
                     </li>
                     <li style="margin-top:10px;">Removing following replicate annotations: <i>canonical_smiles,
                         cell_reprogrammed, det_normalization_group_vector, det_filename,
-                        pert_batch_internal_compound_enumerator, pert_batch_internal_replicate, provenance_code</i></li>
+                        pert_batch_internal_compound_enumerator, pert_batch_internal_replicate, provenance_code,
+                        pert_desc</i></li>
                     <li style="margin-top:10px;">Removing following peptide annotations: <i>EntrezGeneId, GeneName,
                         P100_BasePeptide, P100_Cluster, P100_GeneClusterCode, P100_ModifiedPeptideCode,
                         P100_OriginalGeneSiteCode, pr_P100_original_gene_site_code, P100_OriginalProbeID, PhosphoSite,

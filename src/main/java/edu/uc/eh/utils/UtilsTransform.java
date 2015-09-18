@@ -1,12 +1,7 @@
 package edu.uc.eh.utils;
 
-import edu.uc.eh.datatypes.AssayType;
-import edu.uc.eh.datatypes.Int5Tuple;
-import edu.uc.eh.datatypes.PeptideOrder;
-import edu.uc.eh.datatypes.StringDouble;
-import edu.uc.eh.domain.PeptideAnnotation;
-import edu.uc.eh.domain.Profile;
-import edu.uc.eh.domain.ReplicateAnnotation;
+import edu.uc.eh.datatypes.*;
+import edu.uc.eh.domain.*;
 import edu.uc.eh.domain.json.ExploreResponse;
 import edu.uc.eh.domain.json.HeatMapResponse;
 import edu.uc.eh.domain.json.MatrixRow;
@@ -316,5 +311,82 @@ public class UtilsTransform {
             rows.add(new Int5Tuple(assayNameId, cellNameId, pertNameId, doseNameId, timeNameId));
         }
         return new ExploreResponse(assayNames, cellNames, pertNames, doseNames, timeNames, rows);
+    }
+
+    public static MergedProfile mergeProfiles(List<Profile> bunchOfProfiles, int p100Length, int gcpLength) {
+
+        List<ChartSeries> chartSeries = new ArrayList<>();
+        String nTuple = null;
+        HashMap<String, List<Profile>> seriesMap = new HashMap<>();
+        ReplicateAnnotation replicateAnnotation = null;
+        GctFile gctFile = null;
+
+        for (Profile profile : bunchOfProfiles) {
+            if (nTuple == null || replicateAnnotation == null || gctFile == null) {
+                nTuple = profile.getReplicateAnnotation().getCellId() + " - "
+                        + profile.getReplicateAnnotation().getPertiname();
+                replicateAnnotation = profile.getReplicateAnnotation();
+                gctFile = profile.getGctFile();
+            }
+
+            String seriesKey = profile.getAssayType().toString()
+                    + profile.getRunId()
+                    + profile.getReplicateAnnotation().getPertDose()
+                    + profile.getReplicateAnnotation().getPertTime();
+
+            if (!seriesMap.containsKey(seriesKey)) {
+                seriesMap.put(seriesKey, new ArrayList<>());
+            }
+
+            List<Profile> updatedSeries = seriesMap.get(seriesKey);
+            updatedSeries.add(profile);
+            seriesMap.put(seriesKey, updatedSeries);
+        }
+
+        for (String seriesKey : seriesMap.keySet()) {
+            List<Profile> profiles = seriesMap.get(seriesKey);
+
+            Profile firstProfile = profiles.get(0);
+            AssayType assayType = firstProfile.getAssayType();
+            String dose = firstProfile.getReplicateAnnotation().getPertDose();
+            String time = firstProfile.getReplicateAnnotation().getPertTime();
+            int technicalReplicates = 0;
+            int runId = firstProfile.getRunId();
+
+            int profileLength = assayType == AssayType.P100 ? p100Length : gcpLength;
+
+            double[] minValues = new double[profileLength];
+            double[] maxValues = new double[profileLength];
+            double[] sumValues = new double[profileLength];
+
+            for (int i = 0; i < profileLength; i++) {
+                minValues[i] = Double.MAX_VALUE;
+                maxValues[i] = Double.MIN_VALUE;
+                sumValues[i] = 0;
+            }
+
+            for (Profile profile : profiles) {
+                technicalReplicates++;
+
+                double[] vector = profile.getVector();
+
+                for (int j = 0; j < vector.length; j++) {
+                    minValues[j] = minValues[j] < vector[j] ? minValues[j] : vector[j];
+                    maxValues[j] = maxValues[j] > vector[j] ? maxValues[j] : vector[j];
+                    sumValues[j] += vector[j];
+                }
+            }
+
+            for (int k = 0; k < profileLength; k++) {
+                sumValues[k] /= technicalReplicates;
+            }
+
+            ChartSeries chartSeriesLocal = new ChartSeries(
+                    assayType, runId, minValues, maxValues, sumValues, dose, time, technicalReplicates);
+
+            chartSeries.add(chartSeriesLocal);
+        }
+
+        return new MergedProfile(nTuple, chartSeries, replicateAnnotation, gctFile);
     }
 }

@@ -41,6 +41,7 @@ public class DatabaseLoader {
     private final PeptideAnnotationRepository peptideAnnotationRepository;
     private final ReplicateAnnotationRepository replicateAnnotationRepository;
     private final ProfileRepository profileRepository;
+    private final MergedProfileRepository mergedProfileRepository;
     private final RepositoryService repositoryService;
     private final PeptideService peptideService;
     private final ReplicateService replicateService;
@@ -57,6 +58,7 @@ public class DatabaseLoader {
                           PeptideAnnotationRepository peptideAnnotationRepository,
                           ReplicateAnnotationRepository replicateAnnotationRepository,
                           ProfileRepository profileRepository,
+                          MergedProfileRepository mergedProfileRepository,
                           RepositoryService repositoryService,
                           PeptideService peptideService,
                           ReplicateService replicateService
@@ -68,6 +70,7 @@ public class DatabaseLoader {
         this.peptideAnnotationRepository = peptideAnnotationRepository;
         this.replicateAnnotationRepository = replicateAnnotationRepository;
         this.profileRepository = profileRepository;
+        this.mergedProfileRepository = mergedProfileRepository;
         this.repositoryService = repositoryService;
         this.peptideService = peptideService;
         this.replicateService = replicateService;
@@ -86,10 +89,12 @@ public class DatabaseLoader {
         loadRawData();
         buildProfiles();
         computeCorrelations();
+        mergeProfiles(referenceP100Profile.size(), referenceGCPProfile.size());
 //        runHierarchicalClustering();
 
         cleanUp();
     }
+
 
     private void cleanUp() {
 //        TODO:
@@ -239,6 +244,42 @@ public class DatabaseLoader {
 
     }
 
+    private void mergeProfiles(int p100Length, int gcpLength) {
+
+        log.info("Merging profiles");
+
+        ArrayList<AssayType> dummyAssay = new ArrayList<>();
+        dummyAssay.add(AssayType.GCP);
+        dummyAssay.add(AssayType.P100);
+
+        List<Profile> profiles = profileRepository.findByAssayTypeInOrderByConcatDesc(dummyAssay);
+
+        String prevConcat = null;
+        String curConcat;
+        List<Profile> bunchOfProfiles = null;
+
+        for (Profile profile : profiles) {
+            curConcat = profile.getReplicateAnnotation().getCellId()
+                    + profile.getReplicateAnnotation().getPertiname();
+            if (prevConcat == null) {
+                prevConcat = curConcat;
+                bunchOfProfiles = new ArrayList<>();
+            }
+
+            if (!curConcat.equals(prevConcat)) {
+                prevConcat = curConcat;
+
+                MergedProfile mergedProfile = UtilsTransform.mergeProfiles(bunchOfProfiles, p100Length, gcpLength);
+                mergedProfileRepository.save(mergedProfile);
+
+                bunchOfProfiles = new ArrayList<>();
+
+            } else {
+                bunchOfProfiles.add(profile);
+            }
+        }
+
+    }
 
     private void computeCorrelations() {
         log.info("Filling repository with most correlated profiles");

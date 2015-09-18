@@ -26,6 +26,10 @@ public class Profile implements Serializable {
     @ManyToOne
     private GctFile gctFile;
 
+
+    @ManyToOne
+    private MergedProfile mergedProfile;
+
     private AssayType assayType;
 
     @Lob
@@ -166,5 +170,9 @@ public class Profile implements Serializable {
 
     public String getConcat() {
         return concat;
+    }
+
+    public GctFile getGctFile() {
+        return gctFile;
     }
 }

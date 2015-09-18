@@ -139,6 +139,7 @@ public class ReplicateService {
             case "pert_batch_internal_compound_enumerator":
             case "pert_batch_internal_replicate":
             case "provenance_code":
+            case "pert_desc":
                 // Skip these annotations
                 break;
             default:
