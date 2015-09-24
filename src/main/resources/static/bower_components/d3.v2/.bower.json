@@ -1,0 +1,12 @@
+{
+  "name": "d3.v2",
+  "_cacheHeaders": {
+    "Last-Modified": "Sat, 14 Jun 2014 04:28:46 GMT",
+    "Content-Length": "68",
+    "Content-Type": "application/javascript; charset=utf-8"
+  },
+  "main": "index.js",
+  "_source": "http://mbostock.github.com/d3/d3.v2.js",
+  "_target": "*",
+  "_originalSource": "http://mbostock.github.com/d3/d3.v2.js"
+}
