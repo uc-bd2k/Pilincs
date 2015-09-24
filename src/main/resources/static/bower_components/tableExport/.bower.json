@@ -1,0 +1,12 @@
+{
+  "name": "tableExport",
+  "_cacheHeaders": {
+    "ETag": "\"bddf203a2fcf012dbaefd6b695afa96d6feb881e\"",
+    "Content-Type": "application/javascript;charset=utf-8"
+  },
+  "_release": "e-tag:bddf203a2",
+  "main": "index.js",
+  "_source": "http://rawgit.com/hhurz/tableExport.jquery.plugin/master/tableExport.js",
+  "_target": "*",
+  "_originalSource": "http://rawgit.com/hhurz/tableExport.jquery.plugin/master/tableExport.js"
+}
