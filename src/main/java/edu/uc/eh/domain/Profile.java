@@ -1,7 +1,7 @@
 package edu.uc.eh.domain;
 
 import edu.uc.eh.datatypes.AssayType;
-import edu.uc.eh.datatypes.ListAndJsonWrapper;
+import edu.uc.eh.datatypes.ListAndJsonWrapper2;
 import edu.uc.eh.datatypes.ListWrapper;
 import org.apache.commons.math3.stat.StatUtils;
 
@@ -33,10 +33,10 @@ public class Profile implements Serializable {
     private AssayType assayType;
 
     @Lob
-    private ListAndJsonWrapper vector;
+    private ListAndJsonWrapper2 vector;
 
     @Lob
-    private ListAndJsonWrapper correlatedVector;
+    private ListAndJsonWrapper2 correlatedVector;
 
     private String positiveCorrelation;
 
@@ -57,7 +57,7 @@ public class Profile implements Serializable {
 
         this.replicateAnnotation = replicateAnnotation;
         this.gctFile = gctFile;
-        this.vector = new ListAndJsonWrapper(vector, imputes, referenceProfile);
+        this.vector = new ListAndJsonWrapper2(vector, imputes, referenceProfile);
         this.assayType = gctFile.getAssayType();
 
         this.colors = new ListWrapper(new int[vector.length]);
@@ -103,11 +103,11 @@ public class Profile implements Serializable {
         this.positiveCorrelation = positiveCorrelation;
     }
 
-    public ListAndJsonWrapper getCorrelatedVector() {
+    public ListAndJsonWrapper2 getCorrelatedVector() {
         return correlatedVector;
     }
 
-    public void setCorrelatedVector(ListAndJsonWrapper correlatedVector) {
+    public void setCorrelatedVector(ListAndJsonWrapper2 correlatedVector) {
         this.correlatedVector = correlatedVector;
     }
 
@@ -131,7 +131,7 @@ public class Profile implements Serializable {
         return vector.getDoubles();
     }
 
-    public ListAndJsonWrapper getListWrapper() {
+    public ListAndJsonWrapper2 getListWrapper() {
         return vector;
     }
 
