@@ -163,8 +163,35 @@ public class RestController {
         List<String> assayTypesString = tagsParsed.get("AssayTypes");
         List<AssayType> assayTypes = new ArrayList<>();
 
-        for(String string : assayTypesString){
-            assayTypes.add(AssayType.valueOf(string));
+//      A dirty way to deal with gene search
+        boolean containsP100Gene = false;
+        boolean containsGCPGene = false;
+
+        boolean selectedP100AndGcp = false;
+
+        for (String geneName : tagsParsed.get("PrGeneSymbol")) {
+            if (geneName.toUpperCase().equals("H3F3A") || geneName.toUpperCase().equals("HIST1H3A")) {
+                containsGCPGene = true;
+            } else {
+                containsP100Gene = true;
+            }
+        }
+
+
+        if (assayTypesString.contains("P100") && assayTypesString.contains("GCP")) {
+            selectedP100AndGcp = true;
+        }
+
+        if (selectedP100AndGcp && ((containsGCPGene || containsP100Gene) == true) && ((containsGCPGene && containsP100Gene) == false)) {
+            if (containsGCPGene) {
+                assayTypes.add(AssayType.GCP);
+            } else {
+                assayTypes.add(AssayType.P100);
+            }
+        } else {
+            for (String string : assayTypesString) {
+                assayTypes.add(AssayType.valueOf(string));
+            }
         }
 
         List<String> pertinameTags = tagsParsed.get("Pertiname").size() > 0 ? tagsParsed.get("Pertiname") : allTagsForPertiname;

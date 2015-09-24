@@ -159,11 +159,30 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
         return $http.get('/pilincs/api-tags', {cache: false}).then(function (response) {
             var annotations = response.data;
             return annotations.filter(function(annotation) {
-                if ($scope.currentWorkspace != $scope.workspaces[0]) {
+                if ($scope.currentWorkspace == $scope.workspaces[2]) {
                     return annotation.name.toLowerCase().indexOf($query.toLowerCase()) != -1
                         && annotation.flag != 'Peptide';
                 } else {
-                    return annotation.name.toLowerCase().indexOf($query.toLowerCase()) != -1;
+                    if ($scope.gcp == true && $scope.p100 == false) {
+                        if (annotation.flag == 'Peptide') {
+                            return annotation.name.toLowerCase().indexOf($query.toLowerCase()) != -1
+                                && (annotation.name.toUpperCase() == 'H3F3A' || annotation.name.toUpperCase() == 'HIST1H3A');
+
+                        } else {
+                            return annotation.name.toLowerCase().indexOf($query.toLowerCase()) != -1;
+                        }
+                    } else if ($scope.gcp == false && $scope.p100 == true) {
+                        if (annotation.flag == 'Peptide') {
+                            return annotation.name.toLowerCase().indexOf($query.toLowerCase()) != -1
+                                && annotation.name.toUpperCase() != 'H3F3A' && annotation.name.toUpperCase() != 'HIST1H3A';
+
+                        } else {
+                            return annotation.name.toLowerCase().indexOf($query.toLowerCase()) != -1;
+                        }
+
+                    } else {
+                        return annotation.name.toLowerCase().indexOf($query.toLowerCase()) != -1;
+                    }
                 }
             });
         });
@@ -174,9 +193,13 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
     $scope.getRecommendation = function() {
 
         if($scope.currentWorkspace == $scope.workspaces[1]){
-            if($scope.tags[$scope.tags.length - 1].annotation=='PrGeneSymbol'){
-                $scope.recommendText = 'Ups! GeneSymbol can\'t be used to filter profiles. ';
-                $scope.recommended = [{'name':"PC3",'flag':'Cell','annotation':'CellId'}];
+            if ($scope.tags.length > 1 && $scope.tags[$scope.tags.length - 1].annotation == 'PrGeneSymbol') {
+                //$scope.recommendText = 'Cell lines: ';
+                $scope.recommended = [{'name': "PC3", 'flag': 'Cell', 'annotation': 'CellId'},
+                    {'name': "NPC", 'flag': 'Cell', 'annotation': 'CellId'},
+                    {'name': "MCF7", 'flag': 'Cell', 'annotation': 'CellId'},
+                    {'name': "A549", 'flag': 'Cell', 'annotation': 'CellId'},
+                    {'name': "A375", 'flag': 'Cell', 'annotation': 'CellId'}];
                 return;
             }else{
                 $scope.recommendText = 'You may like: ';
@@ -511,6 +534,9 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
     $('#tableMerge').bootstrapTable({
         url: '/pilincs/api-merged-profiles-paged/',
         queryParams: 'postQueryParams',
+        toolbar: '#mergedbutton',
+        //showExport: true,
+        toolbarAlign: 'right',
         pagination: 'true',
         sidePagination: 'server',
         onLoadSuccess: function () {
@@ -609,9 +635,9 @@ appControllers.controller('MainCtrl', ['$scope', '$http', '$timeout',function($s
                         .enter().append("rect")
                         .attr("fill", function (d) {
                             if (d.assay == "P100") {
-                                return '#7B4EA4';
+                                return 'steelblue';
                             } else {
-                                return '#8c564b';
+                                return 'brown';
                             }
                         })
                         .attr("x", function (d, i) {

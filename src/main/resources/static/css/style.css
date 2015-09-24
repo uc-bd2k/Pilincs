@@ -1,3 +1,8 @@
+/* Don't underline a in button*/
+button > a:hover {
+    text-decoration: none;
+}
+
 /* Sticky footer */
 /* Sticky footer styles
 -------------------------------------------------- */

@@ -142,7 +142,9 @@
         <table class="table" id="tableProfiles">
             <div id="ilincs">
                 <div class="form-inline" role="form">
-                    <button id="ok" type="submit" class="btn btn-default disabled">Analyze in iLINCS</button>
+                    <a class="btn btn-default" style="color:#337ab7;"
+                       href="http://eh3.uc.edu/GenomicsPortals/DatasetLandingPage.do?data_set=LDS-1234" target="_blank">Analyze
+                        in iLINCS</a>
                     <!--<button id="merge" type="submit" class="btn btn-default disabled">Merge profiles</button>-->
                 </div>
             </div>
@@ -150,10 +152,18 @@
 
     <!-- Merge profiles -->
     <table class="table" id="tableMerge">
-
+        <div id="mergedbutton">
+            <div class="form-inline" role="form">
+                <a class="btn btn-default" style="color:#337ab7;"
+                   href="http://www.eh3.uc.edu/pilincs/api-merged-profiles-paged/?order=asc&limit=10&offset=0&tags=%5B%7B%22p100%22%3Atrue%7D%2C%7B%22gcp%22%3Atrue%7D%5D"
+                   target="_blank">Export as JSON</a>
+                <!--<button id="merge" type="submit" class="btn btn-default disabled">Merge profiles</button>-->
+            </div>
+        </div>
     </table>
     <!-- HeatMap -->
         <div id="tableRelations">
+            Mock-up of a HeatMap. Fully functional heat map is coming soon...
             <div id="heatMap" style="padding-top:10px;">
                 <div class="col-lg-offset-5">
                     <button id="heatMapMessage" style="align: center; display: none;" class="btn btn-default"><span
@@ -161,23 +171,22 @@
                     </button>
                 </div>
 
-                <form id="heatMapRadios" class="form-inline col-lg-offset-7" style="display: none;">
-                    <fieldset>
-                        <div class="form-group">
-                            <label class="radio-inline">
-                                <input id="inlineradio1" name="inlineradio" value="0" type="radio" checked="checked">
-                                Natural order </label>
-                            <label class="radio-inline">
-                                <input id="inlineradio2" name="inlineradio" value="1" type="radio">
-                                Cluster profiles </label>
+                <!--<form id="heatMapRadios" class="form-inline col-lg-offset-7" style="display: none;">-->
+                <!--<fieldset>-->
+                <!--<div class="form-group">-->
+                <!--<label class="radio-inline">-->
+                <!--<input id="inlineradio1" name="inlineradio" value="0" type="radio" checked="checked">-->
+                <!--Natural order </label>-->
+                <!--<label class="radio-inline">-->
+                <!--<input id="inlineradio2" name="inlineradio" value="1" type="radio">-->
+                <!--Cluster profiles </label>-->
 
-                            <label style="padding-left:50px;"> <!--50 vs 280 if without radio -->
-                                <button class="btn btn-default disabled">Analyze in iLINCS</button>
-                            </label>
-                        </div>
-                    </fieldset>
-                </form>
-                x
+                <!--<label style="padding-left:50px;"> &lt;!&ndash;50 vs 280 if without radio &ndash;&gt;-->
+                <!--<button class="btn btn-default disabled">Analyze in iLINCS</button>-->
+                <!--</label>-->
+                <!--</div>-->
+                <!--</fieldset>-->
+                <!--</form>-->
                 <svg width="1170" height="5000" style="padding-left:35px;">
                     <g id="colorScale" style="padding-botton:20px;"></g>
                 <g id="rowLabels"></g>
@@ -190,6 +199,7 @@
     <!-- Explore -->
     <div id="tableExplore">
 
+        Mock-up of a multi-foci view with profiles as dots.
         <div id="explore">
             <div class="col-lg-offset-5">
                 <button id="exploreMessage" style="align: center; display: none;" class="btn btn-default"><span
