@@ -3,6 +3,7 @@ package edu.uc.eh.domain.repository;
 import edu.uc.eh.datatypes.AssayType;
 import edu.uc.eh.domain.PeptideAnnotation;
 import org.springframework.data.jpa.repository.JpaRepository;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -15,6 +16,8 @@ public interface PeptideAnnotationRepository extends JpaRepository<PeptideAnnota
     PeptideAnnotation findFirstByPeptideId(String peptide);
 
     List<PeptideAnnotation> findByAssayType(AssayType assayType);
+
+    List<PeptideAnnotation> findByAssayTypeOrderByPeptideIdAsc(AssayType assayType);
 
 
 }

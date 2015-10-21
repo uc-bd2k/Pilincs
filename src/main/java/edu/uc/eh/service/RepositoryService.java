@@ -64,10 +64,21 @@ public class RepositoryService {
         log.info("Get reference ProfileVector for assay type: {}", assayType);
 
         List<String> output = new ArrayList<>();
-        for (PeptideAnnotation peptideAnnotation : peptideAnnotationRepository.findByAssayType(assayType)) {
+        for (PeptideAnnotation peptideAnnotation : peptideAnnotationRepository.findByAssayTypeOrderByPeptideIdAsc(assayType)) {
             output.add(peptideAnnotation.getPeptideId());
         }
         Collections.sort(output);
+        return output;
+    }
+
+    public List<String> getReferenceGeneNames(AssayType assayType) {
+        log.info("Get reference GeneNames for assay type: {}", assayType);
+
+        List<String> output = new ArrayList<>();
+        for (PeptideAnnotation peptideAnnotation : peptideAnnotationRepository.findByAssayTypeOrderByPeptideIdAsc(assayType)) {
+            output.add(peptideAnnotation.getPrGeneSymbol());
+        }
+//        Collections.sort(output);
         return output;
     }
 }

@@ -1,3 +1,44 @@
+/* Tags input */
+
+tags-input .host {
+    position: relative;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    height: 100%
+}
+
+/* Hide ng-cloak etc. in Angular */
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak],
+.ng-cloak, .x-ng-cloak {
+    display: none !important;
+}
+
+/* UI Grid */
+
+/*.ui-grid-viewport, .ui-grid-canvas{*/
+/*height: auto !important;*/
+/*}*/
+
+.rawGrid {
+    width: 1138px;
+    height: 550px;
+    text-align: right;
+}
+
+.profilesGrid {
+    width: 1138px;
+    height: 500px;
+    text-align: right;
+}
+
+.grid-align {
+    text-align: center;
+}
+
+.grid-align-left {
+    text-align: left;
+}
+
 /* Don't underline a in button*/
 button > a:hover {
     text-decoration: none;
@@ -203,11 +244,11 @@ body {
 
 /* Heatmap navigation */
 
-
 /* Bar chart*/
 .bar:hover {
-    fill: brown;
+    fill: orange;
 }
+
 #tooltip {
     background-color: #fff;
     border: 1px solid #ccc;
@@ -216,11 +257,22 @@ body {
 }
 
 /* Expanded view */
-span.tab-space {padding-left:3em;}
+span.tab-space {
+    padding-left: 3em;
+}
 
 /* P100 GCP Toggle*/
-.toggle {font-weight: bold;padding-left:25px;padding-right:25px;}
-.untoggle {font-weight: normal;padding-left:25px;padding-right:25px;}
+.toggle {
+    font-weight: bold;
+    padding-left: 25px;
+    padding-right: 25px;
+}
+
+.untoggle {
+    font-weight: normal;
+    padding-left: 25px;
+    padding-right: 25px;
+}
 
 /* Autocomplete view */
 
@@ -267,24 +319,23 @@ span.tab-space {padding-left:3em;}
     /*font-size: 10px;*/
 }
 
-
 /* Tags input */
 
 .bootstrap {
-    padding-left:0px;
+    padding-left: 0px;
 }
 
 .bootstrap .tags {
     background-color: #fff;
     border: 1px solid #ccc;
     border-radius: 4px;
-    box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
     transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
 }
 
 .bootstrap .tags.focused {
     border-color: #66afe9;
-    box-shadow: inset 0 1px 1px rgba(0,0,0,0.075), 0 0 8px rgba(102,175,233,0.6);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
 }
 
 .bootstrap .tags .tag-item {

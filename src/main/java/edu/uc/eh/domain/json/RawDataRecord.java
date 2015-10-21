@@ -43,14 +43,15 @@ public class RawDataRecord {
     private String pertType;
     private String pertVehicle;
     private String pubchemCid;
+    private String lsmId;
 
     public RawDataRecord(PeakArea peakArea) {
-        this.chromatogramsUrl = "<a href=\"" + peakArea.getChromatogramUrl() + "\" target=\"_blank\" \"><img src=\"https://panoramaweb.org/labkey/TargetedMS/images/TransitionGroupLib.gif\"></a>";
+        this.chromatogramsUrl = peakArea.getChromatogramUrl();
         this.value=peakArea.getValue();
-        this.downloadUrl= "<a href=\"" + peakArea.getGctFile().getDownloadUrl() + "\" target=\"_blank\"\">gct</a>";
+        this.downloadUrl = peakArea.getGctFile().getDownloadUrl();
         this.assayType=peakArea.getGctFile().getAssayType();
         this.runId=peakArea.getGctFile().getRunId();
-        this.runIdUrl= "<a href=\"" +peakArea.getGctFile().getRunIdUrl() + "\" target=\"_blank\" \"> RunId: "+this.runId+"</a>";
+        this.runIdUrl = getRunIdUrl();
         this.processingDate=peakArea.getGctFile().getProcessingDate();
         this.peptideId=peakArea.getPeptideAnnotation().getPeptideId();
         this.prGeneId=peakArea.getPeptideAnnotation().getPrGeneId();
@@ -71,6 +72,7 @@ public class RawDataRecord {
         this.pertType=peakArea.getReplicateAnnotation().getPertType();
         this.pertVehicle=peakArea.getReplicateAnnotation().getPertVehicle();
         this.pubchemCid=peakArea.getReplicateAnnotation().getPubchemCid();
+        this.lsmId = peakArea.getReplicateAnnotation().getLsmId();
     }
 
     public String getChromatogramsUrl() {
@@ -279,5 +281,13 @@ public class RawDataRecord {
 
     public void setPubchemCid(String pubchemCid) {
         this.pubchemCid = pubchemCid;
+    }
+
+    public String getLsmId() {
+        return lsmId;
+    }
+
+    public void setLsmId(String lsmId) {
+        this.lsmId = lsmId;
     }
 }

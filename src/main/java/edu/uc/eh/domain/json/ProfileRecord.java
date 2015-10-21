@@ -19,6 +19,7 @@ public class ProfileRecord {
     private String positiveCorrelation;
     private String positivePeptides;
 
+
     public ProfileRecord(Profile profile, int backGroundColor) {
         this.background = backGroundColor;
         this.assayType = profile.getAssayType().toString();
@@ -28,8 +29,8 @@ public class ProfileRecord {
         this.pertIname = profile.getReplicateAnnotation().getPertiname();
         this.pertTime = profile.getReplicateAnnotation().getPertTime();
         this.pertDose = profile.getReplicateAnnotation().getPertDose();
-
-        this.vector = "<svg class=\"barchart\" vector="+ profile.getVectorJSON() +"></div>";
+        this.vector = profile.getVectorJSON();
+//        this.vector = "<svg class=\"barchart\" vector="+ profile.getVectorJSON() +"></div>";
         //this.correlatedVector = "<svg class=\"barchart\" vector="+ profile.getCorrelatedVectorJSON() +"></div>";
         this.positiveCorrelation = profile.getPositiveCorrelation();
 

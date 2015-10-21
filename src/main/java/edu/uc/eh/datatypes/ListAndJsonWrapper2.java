@@ -13,7 +13,7 @@ public class ListAndJsonWrapper2 implements Serializable {
     private final double[] list;
     private final String json;
 
-    public ListAndJsonWrapper2(double[] vector, boolean[] imputes, List<String> referenceProfile) {
+    public ListAndJsonWrapper2(double[] vector, boolean[] imputes, List<String> referenceProfile, List<String> referenceGeneNames) {
 
         this.list = vector;
 //        List<String> referenceProfile = databaseLoader.getReferenceProfile(assayType);
@@ -24,6 +24,7 @@ public class ListAndJsonWrapper2 implements Serializable {
             jo.put("name", referenceProfile.get(i));
             jo.put("value", vector[i]);
             jo.put("imputed", imputes[i]);
+            jo.put("gene", referenceGeneNames.get(i));
 
             ja.add(jo);
         }

@@ -49,6 +49,9 @@ public class DatabaseLoader {
     private List<String> referenceP100Profile;
     private List<String> referenceGCPProfile;
 
+    private List<String> referenceP100GeneNames;
+    private List<String> referenceGCPGeneNames;
+
 
     @Autowired
     public DatabaseLoader(ConnectPanorama connectPanorama,
@@ -83,6 +86,9 @@ public class DatabaseLoader {
 
         referenceP100Profile = repositoryService.getReferenceProfileVector(AssayType.P100);
         referenceGCPProfile = repositoryService.getReferenceProfileVector(AssayType.GCP);
+
+        referenceP100GeneNames = repositoryService.getReferenceGeneNames(AssayType.P100);
+        referenceGCPGeneNames = repositoryService.getReferenceGeneNames(AssayType.GCP);
 
         loadReplicateAnnotations();
 
@@ -121,7 +127,7 @@ public class DatabaseLoader {
             String jsonAsString = UtilsNetwork.readUrl(jsonUrl);
             List<IdNameValue> replicates = UtilsParse.getAnnotationsFromJSON(jsonAsString, "ReplicateId");
 
-            replicateService.parseAndSaveReplicateAnnotations(replicates, assayType);
+            replicateService.parseAndSaveReplicateAnnotations(replicates, assayType, jsonUrl);
         }
     }
 
@@ -151,7 +157,6 @@ public class DatabaseLoader {
 
             gctFileRepository.save(gctfile);
 
-
             List<String> probeNameIds = new ArrayList<>(metaPeptides.keySet());
 
             AssayType assayType = UtilsParse.parseArrayTypeFromUrl(url);
@@ -161,7 +166,6 @@ public class DatabaseLoader {
 
 
             for (ParseGCT.PeptideReplicatePeak peakFromGct : peakValues) {
-
 
                 String peptideId = peakFromGct.getPeptideId();
                 String replicateId = peakFromGct.getReplicateId();
@@ -206,6 +210,7 @@ public class DatabaseLoader {
         log.info("Filling repository with profiles");
 
         List<String> referenceProfile;
+        List<String> referenceGeneNames;
 
         Set<GctReplicate> gctReplicatePairs = repositoryService.getGctReplicatesCombinations();
 
@@ -220,6 +225,7 @@ public class DatabaseLoader {
             AssayType assayType = gctFile.getAssayType();
 
             referenceProfile = getReferenceProfile(assayType);
+            referenceGeneNames = getReferenceGeneNames(assayType);
 
             Double[] profileVector = new Double[referenceProfile.size()];
             boolean[] imputeVector = new boolean[referenceProfile.size()];
@@ -237,6 +243,7 @@ public class DatabaseLoader {
                     ArrayUtils.toPrimitive(profileVector),
                     imputeVector,
                     referenceProfile,
+                    referenceGeneNames,
                     dummyClusteringOrder--);
 
             profileRepository.save(profile);
@@ -383,8 +390,22 @@ public class DatabaseLoader {
     public List<String> getReferenceProfile(AssayType assayType) {
         if (assayType.equals(AssayType.GCP)) {
             return referenceGCPProfile;
-        } else {
+        } else if (assayType.equals(AssayType.P100)) {
             return referenceP100Profile;
+        } else {
+            log.warn("Unknown assay type in getReferenceProfile");
         }
+        return null;
+    }
+
+    public List<String> getReferenceGeneNames(AssayType assayType) {
+        if (assayType.equals(AssayType.GCP)) {
+            return referenceGCPGeneNames;
+        } else if (assayType.equals(AssayType.P100)) {
+            return referenceP100GeneNames;
+        } else {
+            log.warn("Unknown assay type in getReferenceGeneName");
+        }
+        return null;
     }
 }

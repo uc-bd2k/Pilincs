@@ -14,6 +14,15 @@ public class IdNameValue {
         this.value = value;
     }
 
+    @Override
+    public String toString() {
+        return "IdNameValue{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", value='" + value + '\'' +
+                '}';
+    }
+
     public String getId() {
         return id;
     }

@@ -53,11 +53,12 @@ public class Profile implements Serializable {
                    double[] vector,
                    boolean[] imputes,
                    List<String> referenceProfile,
+                   List<String> referenceGeneNames,
                    int clusteringOrder) {
 
         this.replicateAnnotation = replicateAnnotation;
         this.gctFile = gctFile;
-        this.vector = new ListAndJsonWrapper2(vector, imputes, referenceProfile);
+        this.vector = new ListAndJsonWrapper2(vector, imputes, referenceProfile, referenceGeneNames);
         this.assayType = gctFile.getAssayType();
 
         this.colors = new ListWrapper(new int[vector.length]);

@@ -1,620 +1,148 @@
 <!doctype html>
-
-    <meta charset="utf-8">
+<meta charset="utf-8">
 <title>piLINCS</title>
-    <head>
-        <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <!-- jQuery -->
-        <script type='text/javascript' src='bower_components/jquery/dist/jquery.min.js'></script>
+<html ng-app="pilincs">
 
-        <!-- Bootstrap -->
-        <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
-        <!--<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>-->
+<head>
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <!-- AngularJS -->
-        <script src="bower_components/angular/angular.min.js"></script>
-        <script src="bower_components/angular-route/angular-route.min.js"></script>
-        <script src="js/app.js"></script>
-        <script src="js/controllers.js"></script>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <!--<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>-->
 
-        <!-- Custom User Interaction-->
-        <script src="js/noangular.js"></script>
+    <script>document.write('<base href="' + document.location + '" />');</script>
+    <!-- Ng-tags-input-->
+    <link rel="stylesheet" href="bower_components/ng-tags-input/ng-tags-input.min.css"/>
+
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="css/style.css">
 
 
-        <script>document.write('<base href="' + document.location + '" />');</script>
-        <!-- Ng-tags-input-->
-        <link rel="stylesheet" href="bower_components/ng-tags-input/ng-tags-input.min.css"/>
-        <!--<script src="bower_components/ng-tags-input/ng-tags-input.min.js"></script>-->
-
-        <!-- Custom styles -->
-        <link rel="stylesheet" href="css/style.css">
-
-        <!-- Wenzhinxin Table -->
-        <link rel="stylesheet" href="bower_components/bootstrap-table/dist/bootstrap-table.min.css">
-
-    </head>
+    <link rel="shortcut icon"
+          href="http://www.lincs-dcic.org/images/dcic-logo/favicon.png?v=2"/>
+</head>
 <body>
 
-<div class="container" style="padding-top: 30px;">
-
-        <!-- Ribbon -->
-        <div class="ribbon">
-            <a href="https://github.com/sajmmon/Pilincs" target="_blank">View source on GitHub</a>
-        </div>
-
-    <!-- Angular starts here -->
-    <div ng-app="pilincs" ng-controller="MainCtrl">
-        <!-- Searching -->
-        <div class="row" style="padding-bottom: 25px;">
+<!--<div class="container" style="padding-top: 50px;">-->
 
 
-            <!-- Assays -->
-            <form>
+<div ng-controller="NavigationCtrl as mainCtrl">
 
-                <div class="col-sm-3">
-                    <p class="text-muted"><img src="img/dcic2.png" width="200px"></p>
-                </div>
-
-                <div class="controls  col-sm-6">
-
-                    <!-- Tags -->
-                    <tags-input ng-model="tags"
-                                display-property="name"
-                                class="bootstrap"
-                                placeholder="Add annotation"
-                                on-tag-added="tagAddedRemoved()"
-                                on-tag-removed="tagAddedRemoved()"
-                                add-from-autocomplete-only="true">
-                        <auto-complete
-                                source="loadTags($query)"
-                                min-length="0"
-                                load-on-empty="false"
-                                max-results-to-show="90"
-                                debounce-delay="100"
-                                template="autocomplete-template">
-                        </auto-complete>
-                    </tags-input>
-                </div>
-
-                <script type="text/ng-template" id="autocomplete-template">
-                    <div class="left-panel">
-                        <span ng-class="data.flag" class="label label-info">{{data.flag}}</span>
-                    </div>
-                    <div class="mid-panel">
-                        <span ng-bind-html="$highlight($getDisplayText())"></span>
-                    </div>
-                </script>
-
-                <!-- Search button -->
-                <div class="btn-group col-sm-2" style="top: 5px;">
-                    <input type="submit" ng-click="searchClicked()" value="Search assays"
-                           class="btn btn-primary"/>
-                </div>
-            </form>
-        </div>
-
-        <div id="assayButtons" class="btn-group col-sm-3" style="padding-left:0px;padding-bottom: 30px; " role="group">
-            <button type="button" ng-click="toggle('p100')" class="btn btn-default btn-xs col-xs-4"
-                    ng-class="getToggleClass(p100)" style="margin-bottom: 3px; margin-top:3px;">P100
-            </button>
-            <button type="button" ng-click="toggle('gcp')" class="btn btn-default btn-xs col-xs-4"
-                    ng-class="getToggleClass(gcp)" style="margin-bottom: 3px; margin-top:3px;">GCP
-            </button>
-        </div>
-
-        <div class="row col-sm-offset-1" style="padding-left: 10px;">
-            <div ng-show="showRecommend && recommended.length > 0" class="col-sm-offset-2"
-                 style="padding-left: 15px; padding-bottom: 30px;">
-                <span class="ng-cloak">{{recommendText}}</span>
-                <span ng-repeat="item in recommended">
-
-                        <button ng-click="recommendedClicked(item)" class="btn btn-default btn-xs ng-cloak"
-                                ng-class="item.flag+'B'" type="button" style="margin-bottom: 3px; margin-top:3px;">
-                            {{item.name}}
-                        </button>
-                </span>
-            </div>
-        </div>
-
-        <!-- Navigation-->
-        <table class="table table-bordered table-striped" style="padding-top: 30px;">
-            <tbody>
-            <tr>
-                <td align="center" width="17%" ng-repeat="wk in workspaces" ng-class="{thisTab: currentWorkspace==wk}"
-
-                    ng-click="changeCurrentWorkspace(wk)">
-                    <h4 ng-class="{disabled: wk.active}"><a href="#" class="ng-cloak">{{wk.name}}</a></h4>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-
-        <!-- Angular ends here -->
-    </div>
-    <!-- Views -->
-
-    <!-- Raw data -->
-        <table class="table" id="tablePeaks"></table>
-
-    <!-- Profiles -->
-        <table class="table" id="tableProfiles">
-            <div id="ilincs">
-                <div class="form-inline" role="form">
-                    <a class="btn btn-default" style="color:#337ab7;"
-                       href="http://eh3.uc.edu/GenomicsPortals/DatasetLandingPage.do?data_set=LDS-1234" target="_blank">Analyze
-                        in iLINCS</a>
-                    <!--<button id="merge" type="submit" class="btn btn-default disabled">Merge profiles</button>-->
-                </div>
-            </div>
-        </table>
-
-    <!-- Merge profiles -->
-    <table class="table" id="tableMerge">
-        <div id="mergedbutton">
-            <div class="form-inline" role="form">
-                <a class="btn btn-default" style="color:#337ab7;"
-                   href="http://www.eh3.uc.edu/pilincs/api-merged-profiles-paged/?order=asc&limit=10&offset=0&tags=%5B%7B%22p100%22%3Atrue%7D%2C%7B%22gcp%22%3Atrue%7D%5D"
-                   target="_blank">Export as JSON</a>
-                <!--<button id="merge" type="submit" class="btn btn-default disabled">Merge profiles</button>-->
-            </div>
-        </div>
-    </table>
-    <!-- HeatMap -->
-        <div id="tableRelations">
-            Mock-up of a HeatMap. Fully functional heat map is coming soon...
-            <div id="heatMap" style="padding-top:10px;">
-                <div class="col-lg-offset-5">
-                    <button id="heatMapMessage" style="align: center; display: none;" class="btn btn-default"><span
-                            class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...
-                    </button>
-                </div>
-
-                <!--<form id="heatMapRadios" class="form-inline col-lg-offset-7" style="display: none;">-->
-                <!--<fieldset>-->
-                <!--<div class="form-group">-->
-                <!--<label class="radio-inline">-->
-                <!--<input id="inlineradio1" name="inlineradio" value="0" type="radio" checked="checked">-->
-                <!--Natural order </label>-->
-                <!--<label class="radio-inline">-->
-                <!--<input id="inlineradio2" name="inlineradio" value="1" type="radio">-->
-                <!--Cluster profiles </label>-->
-
-                <!--<label style="padding-left:50px;"> &lt;!&ndash;50 vs 280 if without radio &ndash;&gt;-->
-                <!--<button class="btn btn-default disabled">Analyze in iLINCS</button>-->
-                <!--</label>-->
-                <!--</div>-->
-                <!--</fieldset>-->
-                <!--</form>-->
-                <svg width="1170" height="5000" style="padding-left:35px;">
-                    <g id="colorScale" style="padding-botton:20px;"></g>
-                <g id="rowLabels"></g>
-                <g id="colLabels"></g>
-                <g id="matrix"></g>
-            </svg>
-            </div>
-        </div>
-
-    <!-- Explore -->
-    <div id="tableExplore">
-
-        Mock-up of a multi-foci view with profiles as dots.
-        <div id="explore">
-            <div class="col-lg-offset-5">
-                <button id="exploreMessage" style="align: center; display: none;" class="btn btn-default"><span
-                        class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...
+    <nav class="navbar navbar-default navbar-static-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                        aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
                 </button>
+                <a class="navbar-brand" style="color:#337AB7;">piLINCS</a>
             </div>
-
-            <div class="col-sm-10">
-                <svg id="explorer">
-                    <g id="background"></g>
-                    <g id="rowLabels"></g>
-                    <g id="colLabels"></g>
-                    <g id="dots"></g>
-                    <g id="legendRect"></g>
-                    <g id="legendLabel"></g>
-                </svg>
-            </div>
-            <div class="col-sm-2 well">
-
-                <div>
-                    <div><b>Group by</b></div>
-                    <div class="radio">
-                        <label>
-                            <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
-                            Cell Id
-                        </label>
-                    </div>
-                </div>
-                <br/>
-
-                <div><b>Color by</b></div>
-                <div class="radio">
-                    <label>
-                        <input type="radio" name="optionsRadios2" id="optionsRadios2" value="option2" disabled>
-                        Cell Id
-                    </label>
-                    <label>
-                        <input type="radio" name="optionsRadios2" id="optionsRadios3" value="option2" disabled>
-                        Perturbation
-                    </label>
-                    <label>
-                        <input type="radio" name="optionsRadios2" id="optionsRadios4" value="option2" checked>
-                        Dose
-                    </label><br/>
-                    <label>
-                        <input type="radio" name="optionsRadios2" id="optionsRadios5" value="option2" disabled>
-                        Time
-                    </label>
-                </div>
-                <br/>
-
-                <div><b>Filter by</b><br/></div>
-                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true"
-                     style="margin-top:5px;">
-                    <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingOne" style="padding: 5px;">
-                            <div style="font-size:14px;" class="panel-title">
-                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion"
-                                   href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                                    Cell Id
-                                </a>
-                            </div>
-                        </div>
-                        <div id="collapseOne" class="panel-collapse collapse" role="tabpanel"
-                             aria-labelledby="headingOne">
-                            <div class="panel-body">
-                                <div class="checkbox">
-                                    <label>
-                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox2"
-                                               value="option2" checked>
-                                        MCF7
-                                    </label><br/>
-                                    <label>
-                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox3"
-                                               value="option2" checked>
-                                        NPC
-                                    </label><br/>
-                                    <label>
-                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox4"
-                                               value="option2" checked>
-                                        A375
-                                    </label><br/>
-                                    <label>
-                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox5"
-                                               value="option2" checked>
-                                        PC3
-                                    </label><br/>
-                                    <label>
-                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox6"
-                                               value="option2" checked>
-                                        A549
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingTwo" style="padding: 5px;">
-                            <div style="font-size:14px;" class="panel-title">
-                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion"
-                                   href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                    Perturbation
-                                </a>
-                            </div>
-                        </div>
-                        <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel"
-                             aria-labelledby="headingTwo">
-                            <div class="panel-body">
-                                <div class="checkbox">
-                                    <label>
-                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox12"
-                                               value="option2" checked>
-                                        1271738-62-5
-                                    </label><br/>
-                                    <label>
-                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox13"
-                                               value="option2" checked>
-                                        BIX-01294
-                                    </label><br/>
-                                    <label>
-                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox14"
-                                               value="option2" checked>
-                                        BIX-01338
-                                    </label><br/>
-                                    <label>
-                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox15"
-                                               value="option2" checked>
-                                        CI-994
-                                    </label><br/>
-                                    <label>
-                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox16"
-                                               value="option2" checked>
-                                        CPI-169
-                                    </label><br/>
-                                    <label>
-                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox17"
-                                               value="option2" checked>
-                                        DMSO
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingThree" style="padding: 5px;">
-                            <div style="font-size:14px;" class="panel-title">
-                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion"
-                                   href="#collapseThree" aria-expanded="false" aria-controls="collapseTwo">
-                                    Dose
-                                </a>
-                            </div>
-                        </div>
-                        <div id="collapseThree" class="panel-collapse collapse" role="tabpanel"
-                             aria-labelledby="headingThree">
-                            <div class="panel-body">
-                                <div class="checkbox">
-                                    <label>
-                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox112"
-                                               value="option2" checked>
-                                        0
-                                    </label><br/>
-                                    <label>
-                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox113"
-                                               value="option2" checked>
-                                        0.05
-                                    </label><br/>
-                                    <label>
-                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox114"
-                                               value="option2" checked>
-                                        0.1
-                                    </label><br/>
-                                    <label>
-                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox115"
-                                               value="option2" checked>
-                                        0.5
-                                    </label><br/>
-                                    <label>
-                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox116"
-                                               value="option2" checked>
-                                        1
-                                    </label><br/>
-                                    <label>
-                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox117"
-                                               value="option2" checked>
-                                        1.5
-                                    </label><br/>
-                                    <label>
-                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox118"
-                                               value="option2" checked>
-                                        2
-                                    </label><br/>
-                                    <label>
-                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox119"
-                                               value="option2" checked>
-                                        3
-                                    </label><br/>
-                                    <label>
-                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox120"
-                                               value="option2" checked>
-                                        3.5
-                                    </label><br/>
-                                    <label>
-                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox121"
-                                               value="option2" checked>
-                                        5
-                                    </label><br/>
-                                    <label>
-                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox122"
-                                               value="option2" checked>
-                                        6
-                                    </label><br/>
-                                    <label>
-                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox123"
-                                               value="option2" checked>
-                                        10
-                                    </label><br/>
-                                    <label>
-                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox124"
-                                               value="option2" checked>
-                                        12
-                                    </label><br/>
-                                    <label>
-                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox125"
-                                               value="option2" checked>
-                                        25
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingFour" style="padding: 5px;">
-                            <div style="font-size:14px;" class="panel-title">
-                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion"
-                                   href="#collapseFour" aria-expanded="false" aria-controls="collapseTwo">
-                                    Time
-                                </a>
-                            </div>
-                        </div>
-                        <div id="collapseFour" class="panel-collapse collapse" role="tabpanel"
-                             aria-labelledby="headingFour">
-                            <div class="panel-body">
-                                <div class="checkbox">
-                                    <label>
-                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox212"
-                                               value="option2" checked>
-                                        3
-                                    </label>
-                                    <label>
-                                        <input type="checkbox" name="optionsCheckbox2" id="optionsCheckbox213"
-                                               value="option2" checked>
-                                        24
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <br/>
-            </div>
-
-            <hr/>
-        </div>
-    </div>
-
-    <!-- API -->
-        <div id="tableAPI">
-
-        <h3>HTTP methods</h3>
-        <hr/>
-        <table data-toggle="table">
-            <thead style="background: #D9EDF7">
-            <tr>
-                <th class="col-md-1">Method</th>
-                <th class="col-md-4">URL</th>
-                <th class="col-md-2">Parameters</th>
-                <th class="col-md-5">Description</th>
-            </tr>
-            </thead>
-            <tbody>
-
-            <tr>
-                <td><code>GET</code></td>
-                <td><b>api-cells/</b>{assayName}</td>
-                <td>assayName</td>
-                <td>Lists all cells available for specified assay.</td>
-            </tr>
-
-            <tr>
-                <td><code>GET</code></td>
-                <td><b>api-perturbations/</b>{assayName}</td>
-                <td>assayName</td>
-                <td>Lists all perturbations available for specified assay.</td>
-            </tr>
-
-            <tr>
-                <td><code>GET</code></td>
-                <td><b>api-gct/</b>{assayName};cells=;perturbations=</td>
-                <td>assayName <br/>
-                    cells (optional) <br/>
-                    perturbations (optional)
-                </td>
-                <td>Builds a GCT file #1.3 for specified assay with filtering of profiles based on given cells and
-                    perturbations. Cell ids and perturbations names are optional and may be separated by comma.
-                </td>
-            </tr>
-
-            <tr>
-                <td><code>GET</code></td>
-                <td><b>api-panorama</b></td>
-                <td>-</td>
-                <td>Lists all GCT files available in <a href="http://www.panoramaweb.org">Panorama</a>.
-                    In returned json, two fields t1 and t2 stand for file name and file URL.
-                </td>
-            </tr>
-
-            </tbody>
-        </table>
-
-
-            <br/><br/>
-
-            <h3>Examples</h3>
-            <hr/>
-        <pre style="">
-            <p>1. List of cells in GCP assay: <br/><a href="api-cells/GCP" target="_blank">eh3.uc.edu/pilincs/<b>api-cells/GCP</b></a>
-            </p>
-                <!--<img width="7%" src="img/cells.png">-->
-            <p style="padding-top: 0px;">2. List of perturbations in P100 assay: <br/><a href="api-perturbations/P100"
-                                                                                          target="_blank">eh3.uc.edu/pilincs/<b>api-perturbations/P100</b></a>
-            </p>
-                <!--<img width="10%" src="img/perturbations.png">-->
-            <p style="padding-top: 0px;">3. GCT file based on P100 assay with cell PC3 and perturbation equal to DMSO or
-                methylstat. <br/><a
-                        href="api-gct/P100;cells=PC3;perturbations=DMSO,methylstat"
-                        target="_blank">eh3.uc.edu/pilincs/<b>api-gct/P100;cells=PC3;perturbations=DMSO,methylstat</b></a>
-            </p>
-                <img width="70%" src="img/prm.png">
-            <p style="padding-top: 60px;">4. GCT file with all profiles from GCP assay.<br/><a href="api-gct/GCP"
-                                                                                               target="_blank">eh3.uc.edu/pilincs/<b>api-gct/GCP</b></a>
-            </p>
-                <img width="60%" src="img/gcp.png">
-            <p style="padding-top: 60px;">5. List all GCT files in Panorama (slow): <br/><a href="api-panorama"
-                                                                                            target="_blank">eh3.uc.edu/pilincs/<b>api-panorama</b></a>
-            </p>
-                <!--<img width="80%" src="img/panorama.png">-->
-
-        </pre>
-
-            <br/><br/>
-
-            <h3>Comments</h3>
-            <hr/>
-
-            <div class="bs-callout bs-callout-primary">
-                <p>In examples 3 and 4 output was imported into Excel.</p>
-
-                <p style="margin-top:30px;">Following transformations where applied to source GCT files:</p>
-                <ul>
-                    <li style="margin-top:10px;">Impute missing values with mean value for given profile</li>
-                    <li style="margin-top:10px;">Adding suffix <i>_PRM</i> to sample ids from experiment with runId <i>2107</i>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li ng-class="{active:mainCtrl.activeSite=='raw-data'}"><a href="#/raw-data"
+                                                                               ng-click="mainCtrl.changeSite('raw-data')">Raw
+                        Data</a></li>
+                    <li ng-class="{active:mainCtrl.activeSite=='technical-profiles'}"><a href="#/technical-profiles"
+                                                                                         ng-click="mainCtrl.changeSite('technical-profiles')">Profiles</a>
                     </li>
-                    <li style="margin-top:10px;">Removing following replicate annotations: <i>canonical_smiles,
-                        cell_reprogrammed, det_normalization_group_vector, det_filename,
-                        pert_batch_internal_compound_enumerator, pert_batch_internal_replicate, provenance_code,
-                        pert_desc</i></li>
-                    <li style="margin-top:10px;">Removing following peptide annotations: <i>EntrezGeneId, GeneName,
-                        P100_BasePeptide, P100_Cluster, P100_GeneClusterCode, P100_ModifiedPeptideCode,
-                        P100_OriginalGeneSiteCode, pr_P100_original_gene_site_code, P100_OriginalProbeID, PhosphoSite,
-                        UniprotAC, pr_probe_normalization_group, pr_probe_suitability_manual</i></li>
-                    <li style="margin-top:10px;">Changing annotation names to CamelCase java naming standards</li>
-                    <li style="margin-top:10px;">Merging <i>pr_p100_base_peptide</i> and <i>pr_gcp_base_peptide
-                        annotations</i></li>
-                    <li style="margin-top:10px;">Merging <i>pr_p100_modified_peptide_code</i> and <i>pr_gcp_modified_peptide_code
-                        annotations</i></li>
-                    <li style="margin-top:10px;">Displaying following annotations only for P100 assay: <i>prCluster,
-                        prGeneClusterCode, prOriginalProbeId, prPhosphosite</i></li>
-                    <li style="margin-top:10px;">Displaying following annotations only for GCP assay: <i>prHistoneMark,
-                        prBiNumber</i></li>
-                    <li style="margin-top:10px;">Peptides with <i>pr_probe_suitability_manual</i> set to <i>FALSE</i>
-                        replaced with mean value
+                    <li ng-class="{active:mainCtrl.activeSite=='merged-profiles'}"><a href="#/merged-profiles"
+                                                                                      ng-click="mainCtrl.changeSite('merged-profiles')">nTuples</a>
                     </li>
-
+                    <li ng-class="{active:mainCtrl.activeSite=='explore'}"><a href="#/explore"
+                                                                              ng-click="mainCtrl.changeSite('explore')">Explore</a>
+                    </li>
                 </ul>
-            </div>
-        </div>
+                &nbsp;
+                <ul class="nav navbar-nav col-sm-5">
+                    <form class="navbar-form">
 
-    <!-- -->
+                        <div class="controls">
+
+                            <!-- Tags -->
+                            <tags-input ng-model="mainCtrl.tags"
+                                        display-property="name"
+                                        class="bootstrap"
+                                        placeholder="Start typing a query"
+                                        on-tag-added="mainCtrl.tagAddedRemoved()"
+                                        on-tag-removed="mainCtrl.tagAddedRemoved()"
+                                        add-from-autocomplete-only="true"
+                                    >
+                                <auto-complete
+                                        source="mainCtrl.loadTags($query)"
+                                        min-length="0"
+                                        load-on-empty="false"
+                                        max-results-to-show="90"
+                                        debounce-delay="100"
+                                        template="autocomplete-template">
+                                </auto-complete>
+                            </tags-input>
+                        </div>
+
+                        <script type="text/ng-template" id="autocomplete-template">
+                            <div class="left-panel">
+                                <span ng-class="data.flag" class="label label-info">{{data.flag}}</span>
+                            </div>
+                            <div class="mid-panel">
+                                <span ng-bind-html="$highlight($getDisplayText())"></span>
+                            </div>
+                        </script>
+                    </form>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li ng-class="{active:mainCtrl.activeSite=='about'}"><a href="#about"
+                                                                            ng-click="mainCtrl.changeSite('about')">About</a>
+                    </li>
+                    <li ng-class="{active:mainCtrl.activeSite=='api'}"><a href="#api"
+                                                                          ng-click="mainCtrl.changeSite('api')">API</a>
+                    </li>
+                    <li><a href="https://github.com/sajmmon/Pilincs" target="_blank">GitHub</a></li>
+                </ul>
+
+            </div>
+            <!--/.nav-collapse -->
+        </div>
+    </nav>
+    <div class="container">
+        <div ng-view></div>
 
     </div>
+</div>
+
 
 <footer class="footer">
+
     <div class="container">
         <p class="text-muted" style="padding-top:5px; text-align: right;">Developed within NIH funded <a
                 href="http://lincsproject.org" target="_blank">LINCS Project</a></p>
     </div>
-</footer>
 
-</body>
-<footer>
+    <!-- AngularJS -->
+    <script src="bower_components/angular/angular.min.js"></script>
+    <script src="bower_components/angular-route/angular-route.min.js"></script>
+
+    <!-- piLINCS JavaScript -->
+    <script src="js/heatmap.js"></script>
+    <script src="js/multifoci.js"></script>
+
+    <!-- piLINCS Angular -->
+    <script src="js/app.js"></script>
+    <script src="js/controllers.js"></script>
+
     <!-- Bootstrap -->
-    <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!--<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>-->
 
     <!-- Ng-tags-input-->
     <script src="bower_components/ng-tags-input/ng-tags-input.min.js"></script>
 
-    <!-- Wenzhinxin Table -->
-
-    <script src="bower_components/bootstrap-table/dist/bootstrap-table.min.js"></script>
-    <script src="bower_components/bootstrap-table/dist/extensions/export/bootstrap-table-export.min.js"></script>
-    <script src="bower_components/tableExport/index.js"></script>
-    <script src="bower_components/bootstrap-table/dist/extensions/filter-control/bootstrap-table-filter-control.min.js"></script>
-
     <!-- D3js-->
     <script src="bower_components/d3.v2/index.js"></script>
+
 </footer>
+
+</body>
 </html>

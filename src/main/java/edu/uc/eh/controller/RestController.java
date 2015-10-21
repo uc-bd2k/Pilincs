@@ -550,4 +550,19 @@ public class RestController {
         boolean ifTransponse = true;
         return UtilsTransform.profilesToGct(assayType, output, databaseLoader, peptideAnnotationRepository, ifTransponse);
     }
+
+// PLN
+
+    @RequestMapping(value = "convert/{peptide}", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    List<String> convertToPLN(@PathVariable String peptide) {
+        List<String> output = new ArrayList<>();
+
+        for (int i = 0; i < 10; i++) {
+            output.add("1: " + peptide);
+        }
+        return output;
+    }
+
 }

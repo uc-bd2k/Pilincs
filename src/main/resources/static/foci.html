@@ -8,10 +8,6 @@
             margin: 0;
         }
 
-        /* show or hide the foci for debugging */
-        .foci-1, .foci-2 {
-            display: none;
-        }
     </style>
 </head>
 <body>
@@ -30,12 +26,12 @@
                         .linkDistance(0)
                         .linkStrength(0.1)
                         .friction(0.9)
-                        .charge(function (d, i) {
+                        .charge(function (d) {
                             return d.charge
                         })
             }
             , Nodes = function (num, id, name) {
-                return d3.range(num).map(function (d) {
+                return d3.range(num).map(function () {
                     return {
                         id: id
                         , x: Math.random() * w
@@ -54,17 +50,75 @@
                 })
             }
             , fill = function (d) {
-                if (d) return 'red';
-                else return 'blue'
+                switch (d) {
+                    case 0:
+                        return 'red';
+                        break;
+                    case 1:
+                        return 'blue';
+                        break;
+                    case 2:
+                        return 'orange';
+                        break;
+                    case 3:
+                        return 'yellow';
+                        break;
+                    case 4:
+                        return 'green';
+                        break;
+                    case 5:
+                        return 'magenta';
+                        break;
+                    case 6:
+                        return 'steelblue';
+                        break;
+                    case 7:
+                        return 'black';
+                        break;
+                    case 8:
+                        return 'brown';
+                        break;
+                    default:
+                        return 'white';
+                }
             }
-            , nodes1 = Nodes(100, 0, 'node-1')
-            , nodes2 = Nodes(50, 1, 'node-2')
-            , foci1 = Foci(w / 2, h / 2, 'foci-1')
-            , foci2 = Foci(w / 2 + 200, h / 2, 'foci-2')
-            , links1 = Links(nodes1, foci1)
-            , links2 = Links(nodes2, foci2)
-            , all = nodes1.concat(nodes2).concat([foci1, foci2])
-            , force = Force(all, links1.concat(links2));
+            , affine = function (i, total) {
+                var radius = 100;
+                var angle = (i / total) * 2 * Math.PI;
+                var x = Math.cos(angle);
+                var y = Math.sin(angle);
+                return {'x': x * radius, 'y': y * radius};
+            };
+
+    var groups = 8;
+    var links = [];
+    var nodes = [];
+    var all = [];
+
+    for (var i = 0; i < groups; i++) {
+        this['nodes' + i] = Nodes(i * 3 + 10, i, 'node-' + i);
+        this['foci' + i] = Foci(w / 2 + affine(i, groups).x, h / 2 + affine(i, groups).y, 'foci-' + i);
+    }
+
+    for (var i = 0; i < groups; i++) {
+        this['links' + i] = Links(this['nodes' + i], this['foci' + i]);
+    }
+
+    for (var i = 0; i < groups; i++) {
+        links = links.concat(this['links' + i]);
+    }
+
+    for (var i = 0; i < groups; i++) {
+        all = all.concat(this['foci' + i]);
+    }
+
+    for (var i = 0; i < groups; i++) {
+        all = all.concat(this['nodes' + i]);
+    }
+
+
+    var force = Force(all, links);
+
 
     force.on('tick', function () {
         svg.selectAll('circle')
@@ -90,7 +144,7 @@
                     return d.name
                 }
             }).style({
-                fill: function (d) {
+                'fill': function (d) {
                     return fill(d.id)
                 }
                 , stroke: 'while'
@@ -100,19 +154,21 @@
     force.start();
 
     // d3.select('.foci-1').drag()
+    for (var i = 0; i < groups; i++) {
+        d3.select('.foci-' + i)
+                .transition()
+                .ease('cubic-in-out')
+                .duration(2000)
+                .tween('dataTween', function (d) {
+                    var ix = d3.interpolate(d.x, w / 2);
+                    var iy = d3.interpolate(d.y, h / 2);
+                    return function (t) {
+                        d.x = d.px = ix(t);
+                        d.y = d.py = iy(t)
+                    }
+                })
+    }
 
-    d3.select('.foci-2')
-            .transition()
-            .ease('cubic-in-out')
-            .duration(2000)
-            .tween('dataTween', function (d) {
-                var ix = d3.interpolate(d.x, w / 2);
-                var iy = d3.interpolate(d.y, h / 2);
-                return function (t) {
-                    d.x = d.px = ix(t);
-                    d.y = d.py = iy(t)
-                }
-            })
 </script>
 </body>
 </html>

@@ -1,0 +1,40 @@
+<br/>
+<div style="float:right; padding-bottom: 20px;">
+    <button class="btn btn-default">Analyze in iLINCS</button>
+    &nbsp;
+    <button class="btn btn-default">Export</button>
+</div><br/><br/><br/>
+
+
+<table class="table table-striped table-bordered">
+    <thead>
+    <tr>
+        <th>Cell - perturbation</th>
+        <th>Merged profiles</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="item in pagedItems">
+        <td>{{item.nTuple}}</td>
+        <td>
+            <profile-barchart-merged data="item.vector"></profile-barchart-merged>
+        </td>
+    </tr>
+    </tbody>
+    <tfoot>
+    </tfoot>
+</table>
+
+<div style="float:right;">
+    <ul class="pagination">
+        <li ng-class="prevPageDisabled()">
+            <a href ng-click="prevPage()">« Prev</a>
+        </li>
+        <li ng-repeat="n in range()" ng-class="{active: n == currentPage}" ng-click="setPage(n)">
+            <a href>{{n+1}}</a>
+        </li>
+        <li ng-class="nextPageDisabled()">
+            <a href ng-click="nextPage()">Next »</a>
+        </li>
+    </ul>
+</div>

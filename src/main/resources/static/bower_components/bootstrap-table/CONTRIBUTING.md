@@ -71,7 +71,7 @@ Guidelines for bug reports:
    [This jsfiddle](http://jsfiddle.net/) is a helpful tools. Consider to use these templates:
     * [Table from html](http://jsfiddle.net/wenyi/e3nk137y/11/light/)
     * [Table from data](http://jsfiddle.net/wenyi/e3nk137y/13/light/)
-    * [Table from DownloadUrl](http://jsfiddle.net/wenyi/e3nk137y/14/light/)
+    * [Table from url](http://jsfiddle.net/wenyi/e3nk137y/14/light/)
 
 
 A good bug report shouldn't leave others needing to chase you up for more
@@ -92,7 +92,7 @@ Example:
 > 2. This is the second step
 > 3. Further steps, etc.
 >
-> `<DownloadUrl>` - a link to the reduced test case
+> `<url>` - a link to the reduced test case
 >
 > Any other information you want to share that is relevant to the issue being
 > reported. This might include the lines of code that you have identified as

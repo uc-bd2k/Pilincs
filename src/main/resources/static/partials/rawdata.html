@@ -1,0 +1,59 @@
+<br/>
+<div style="float:right; padding-bottom: 20px;">
+    <button class="btn btn-default">Analyze in iLINCS</button>
+    &nbsp;
+    <button class="btn btn-default">Export</button>
+</div><br/><br/><br/>
+
+<!--<div ui-grid="gridOptions" class="rawGrid" ui-grid-resize-columns ui-grid-pagination></div>-->
+
+<table class="table table-striped table-bordered">
+    <thead>
+    <tr>
+        <th>Assay</th>
+        <th>Cell</th>
+        <th>Peptide</th>
+        <th>Replicate</th>
+        <th>Perturbation</th>
+        <th>Dose</th>
+        <th>Time</th>
+        <th>Peak</th>
+        <th>Panorama</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="item in pagedItems">
+        <td>{{item.assayType}}</td>
+        <td>{{item.cellId}}</td>
+        <td>{{item.peptideId}}</td>
+        <td>{{item.replicateId}}</td>
+        <td>{{item.pertIname}}</td>
+        <td>{{item.pertDose}}</td>
+        <td>{{item.pertTime}}</td>
+        <td>{{item.value}}</td>
+        <td>
+            <div style="text-align: center;">
+                <span class="label label-primary"><a style="color: white;" href="{{item.panorama.charts}}"
+                                                     target="_blank">view</a></span>&nbsp;
+                <span class="label label-success"><a style="color: white;" href="{{item.panorama.gct}}" target="_blank">gct</a></span>
+            </div>
+        </td>
+    </tr>
+    </tbody>
+    <tfoot>
+    </tfoot>
+</table>
+
+<div style="float:right; ">
+    <ul class="pagination">
+        <li ng-class="prevPageDisabled()">
+            <a href ng-click="prevPage()">« Prev</a>
+        </li>
+        <li ng-repeat="n in range()" ng-class="{active: n == currentPage}" ng-click="setPage(n)">
+            <a href>{{n+1}}</a>
+        </li>
+        <li ng-class="nextPageDisabled()">
+            <a href ng-click="nextPage()">Next »</a>
+        </li>
+    </ul>
+</div>

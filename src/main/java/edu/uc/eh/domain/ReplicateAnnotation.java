@@ -41,13 +41,13 @@ public class ReplicateAnnotation {
     private String pertVehicle;
     //    private String provenanceCode;
     private String pubchemCid;
+    private String lsmId;
 
     @OneToMany(mappedBy = "replicateAnnotation")
     private Set<PeakArea> peakAreas = new HashSet<>();
 
     @OneToMany(mappedBy = "replicateAnnotation")
     private Set<Profile> profiles = new HashSet<>();
-
 
     public ReplicateAnnotation() {
     }
@@ -73,6 +73,7 @@ public class ReplicateAnnotation {
         output.add("pertType");
         output.add("pertVehicle");
         output.add("pubchemCid");
+        output.add("lsmId");
 
         return output;
     }
@@ -91,12 +92,22 @@ public class ReplicateAnnotation {
                 ", detPlate='" + detPlate + '\'' +
                 ", cellId='" + cellId + '\'' +
                 ", replicateId='" + replicateId + '\'' +
+                ", lsmId='" + lsmId + '\'' +
                 ", id=" + id +
                 '}';
     }
 
     @Override
     public boolean equals(Object o) {
+        equalsWithoutLsmId(o);
+        ReplicateAnnotation that = (ReplicateAnnotation) o;
+
+        if (getLsmId() != null ? !getLsmId().equals(that.getLsmId()) : that.getLsmId() != null)
+            return false;
+        return !(getPubchemCid() != null ? !getPubchemCid().equals(that.getPubchemCid()) : that.getPubchemCid() != null);
+    }
+
+    public boolean equalsWithoutLsmId(Object o) {
         if (this == o) return true;
         if (!(o instanceof ReplicateAnnotation)) return false;
 
@@ -115,7 +126,7 @@ public class ReplicateAnnotation {
         if (getPertDoseUnit() != null ? !getPertDoseUnit().equals(that.getPertDoseUnit()) : that.getPertDoseUnit() != null)
             return false;
         if (getPertId() != null ? !getPertId().equals(that.getPertId()) : that.getPertId() != null) return false;
-        if (getPertiname() != null ? !getPertiname().equals(that.getPertiname()) : that.getPertiname() != null)
+        if (getPertiname() != null ? !getPertiname().toLowerCase().equals(that.getPertiname().toLowerCase()) : that.getPertiname() != null)
             return false;
         if (getPertTime() != null ? !getPertTime().equals(that.getPertTime()) : that.getPertTime() != null)
             return false;
@@ -126,7 +137,6 @@ public class ReplicateAnnotation {
         if (getPertVehicle() != null ? !getPertVehicle().equals(that.getPertVehicle()) : that.getPertVehicle() != null)
             return false;
         return !(getPubchemCid() != null ? !getPubchemCid().equals(that.getPubchemCid()) : that.getPubchemCid() != null);
-
     }
 
     @Override
@@ -254,6 +264,14 @@ public class ReplicateAnnotation {
         this.pertTimeUnit = pertTimeUnit;
     }
 
+    public String getLsmId() {
+        return lsmId;
+    }
+
+    public void setLsmId(String lsmId) {
+        this.lsmId = lsmId;
+    }
+
     public List<String> getAnnotationsForGct() {
         List<String> output = new ArrayList<>();
 
@@ -271,6 +289,7 @@ public class ReplicateAnnotation {
         output.add(pertType);
         output.add(pertVehicle);
         output.add(pubchemCid);
+        output.add(lsmId);
 
         return output;
     }

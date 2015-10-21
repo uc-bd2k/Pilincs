@@ -118,11 +118,12 @@ public class UtilsParse {
 
         while(iterator.hasNext()){
             JSONObject object = (JSONObject)iterator.next();
-            if(object.get("p100")!=null){
+            if (object == null) continue;
+            if (object.get("p100") != null) {
                 if(object.get("p100").toString().equals("true")) {
                     output.get("AssayTypes").add(AssayType.P100.name());
                 }
-            }else if(object.get("gcp")!=null){
+            } else if (object.get("gcp") != null) {
                 if(object.get("gcp").toString().equals("true")) {
                     output.get("AssayTypes").add(AssayType.GCP.name());
                 }

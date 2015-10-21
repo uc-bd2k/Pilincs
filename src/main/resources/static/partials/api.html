@@ -1,0 +1,119 @@
+<div class="workspaceContainer">
+    <h3 style="margin-top:40px;">HTTP methods</h3>
+    <hr/>
+    <table class="table table-bordered">
+        <thead style="background: #D9EDF7">
+        <tr>
+            <th class="col-md-1">Method</th>
+            <th class="col-md-4">URL</th>
+            <th class="col-md-2">Parameters</th>
+            <th class="col-md-5">Description</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        <tr>
+            <td><code>GET</code></td>
+            <td><b>api-cells/</b>{assayName}</td>
+            <td>assayName</td>
+            <td>Lists all cells available for specified assay.</td>
+        </tr>
+
+        <tr>
+            <td><code>GET</code></td>
+            <td><b>api-perturbations/</b>{assayName}</td>
+            <td>assayName</td>
+            <td>Lists all perturbations available for specified assay.</td>
+        </tr>
+
+        <tr>
+            <td><code>GET</code></td>
+            <td><b>api-gct/</b>{assayName};cells=;perturbations=</td>
+            <td>assayName <br/>
+                cells (optional) <br/>
+                perturbations (optional)
+            </td>
+            <td>Builds a GCT file #1.3 for specified assay with filtering of profiles based on given cells and
+                perturbations. Cell ids and perturbations names are optional and may be separated by comma.
+            </td>
+        </tr>
+
+        <tr>
+            <td><code>GET</code></td>
+            <td><b>api-panorama</b></td>
+            <td>-</td>
+            <td>Lists all GCT files available in <a href="http://www.panoramaweb.org">Panorama</a>.
+                In returned json, two fields t1 and t2 stand for file name and file URL.
+            </td>
+        </tr>
+
+        </tbody>
+    </table>
+
+
+    <br/><br/>
+
+    <h3>Examples</h3>
+    <hr/>
+        <pre style="">
+            <p>1. List of cells in GCP assay: <br/><a href="api-cells/GCP" target="_blank">eh3.uc.edu/pilincs/<b>api-cells/GCP</b></a>
+            </p>
+                <!--<img width="7%" src="img/cells.png">-->
+            <p style="padding-top: 0px;">2. List of perturbations in P100 assay: <br/><a href="api-perturbations/P100"
+                                                                                         target="_blank">eh3.uc.edu/pilincs/<b>api-perturbations/P100</b></a>
+            </p>
+                <!--<img width="10%" src="img/perturbations.png">-->
+            <p style="padding-top: 0px;">3. GCT file based on P100 assay with cell PC3 and perturbation equal to DMSO or
+                methylstat. <br/><a
+                        href="api-gct/P100;cells=PC3;perturbations=DMSO,methylstat"
+                        target="_blank">eh3.uc.edu/pilincs/<b>api-gct/P100;cells=PC3;perturbations=DMSO,methylstat</b></a>
+            </p>
+                <img width="70%" src="img/prm.png">
+            <p style="padding-top: 60px;">4. GCT file with all profiles from GCP assay.<br/><a href="api-gct/GCP"
+                                                                                               target="_blank">eh3.uc.edu/pilincs/<b>api-gct/GCP</b></a>
+            </p>
+                <img width="60%" src="img/gcp.png">
+            <p style="padding-top: 60px;">5. List all GCT files in Panorama (slow): <br/><a href="api-panorama"
+                                                                                            target="_blank">eh3.uc.edu/pilincs/<b>api-panorama</b></a>
+            </p>
+                <!--<img width="80%" src="img/panorama.png">-->
+
+        </pre>
+
+    <br/><br/>
+
+    <h3>Comments</h3>
+    <hr/>
+
+    <div class="bs-callout bs-callout-primary">
+        <p>In examples 3 and 4 output was imported into Excel.</p>
+
+        <p style="margin-top:30px;">Following transformations where applied to source GCT files:</p>
+        <ul>
+            <li style="margin-top:10px;">Impute missing values with mean value for given profile</li>
+            <li style="margin-top:10px;">Adding suffix <i>_PRM</i> to sample ids from experiment with runId <i>2107</i>
+            </li>
+            <li style="margin-top:10px;">Removing following replicate annotations: <i>canonical_smiles,
+                cell_reprogrammed, det_normalization_group_vector, det_filename,
+                pert_batch_internal_compound_enumerator, pert_batch_internal_replicate, provenance_code,
+                pert_desc</i></li>
+            <li style="margin-top:10px;">Removing following peptide annotations: <i>EntrezGeneId, GeneName,
+                P100_BasePeptide, P100_Cluster, P100_GeneClusterCode, P100_ModifiedPeptideCode,
+                P100_OriginalGeneSiteCode, pr_P100_original_gene_site_code, P100_OriginalProbeID, PhosphoSite,
+                UniprotAC, pr_probe_normalization_group, pr_probe_suitability_manual</i></li>
+            <li style="margin-top:10px;">Changing annotation names to CamelCase java naming standards</li>
+            <li style="margin-top:10px;">Merging <i>pr_p100_base_peptide</i> and <i>pr_gcp_base_peptide
+                annotations</i></li>
+            <li style="margin-top:10px;">Merging <i>pr_p100_modified_peptide_code</i> and <i>pr_gcp_modified_peptide_code
+                annotations</i></li>
+            <li style="margin-top:10px;">Displaying following annotations only for P100 assay: <i>prCluster,
+                prGeneClusterCode, prOriginalProbeId, prPhosphosite</i></li>
+            <li style="margin-top:10px;">Displaying following annotations only for GCP assay: <i>prHistoneMark,
+                prBiNumber</i></li>
+            <li style="margin-top:10px;">Peptides with <i>pr_probe_suitability_manual</i> set to <i>FALSE</i>
+                replaced with mean value
+            </li>
+
+        </ul>
+    </div>
+</div>

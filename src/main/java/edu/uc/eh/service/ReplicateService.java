@@ -27,12 +27,13 @@ public class ReplicateService {
         this.replicateAnnotationRepository = replicateAnnotationRepository;
     }
 
-    public void parseAndSaveReplicateAnnotations(List<IdNameValue> replicates, AssayType assayType) {
+    public void parseAndSaveReplicateAnnotations(List<IdNameValue> replicates, AssayType assayType, String jsonUrl) {
 
 
         ReplicateAnnotation replicateAnnotation = new ReplicateAnnotation();
         Integer previousId = null;
         Integer currentId;
+        Integer updatedLsmIds = 0;
 
         int counter = 0;
 
@@ -55,8 +56,27 @@ public class ReplicateService {
                         .findFirstByReplicateId(replicateAnnotation.getReplicateId());
 
                 if (replicateFromDb != null) {
+
                     if (!replicateFromDb.equals(replicateAnnotation)) {
-                        log.warn("Two replicates with same key: {}, {}", replicateAnnotation, replicateAnnotation);
+
+/*
+Update only if LSM ID in DB is Null but other fields are same.
+ */
+                        if (replicateFromDb.equalsWithoutLsmId(replicateAnnotation)
+                                && replicateFromDb.getLsmId() == null) {
+                            replicateAnnotationRepository.save(replicateAnnotation);
+                            updatedLsmIds++;
+//                            log.warn("Updated LsmId for replicate Id: "+ replicateAnnotation.getId()
+//                                    + "Triple from JSON: " + triple.toString()
+//                                    + "JSON url" + jsonUrl);
+                        } else {
+                            log.warn("+++ Two replicates with same key (db, new)");
+                            log.warn("Triple from JSON: " + triple.toString());
+                            log.warn("JSON url: " + jsonUrl);
+                            log.warn("{}", replicateFromDb);
+                            log.warn("{}", replicateAnnotation);
+                            log.warn("");
+                        }
                     }
                 } else {
                     if (replicateAnnotation.getReplicateId() == null) {
@@ -77,6 +97,8 @@ public class ReplicateService {
                 counter++;
             }
         }
+
+        log.info("Updated LSM IDs: " + updatedLsmIds);
 
     }
 
@@ -131,6 +153,9 @@ public class ReplicateService {
                 break;
             case "pubchem_cid":
                 replicateAnnotation.setPubchemCid(annotationValue);
+                break;
+            case "lsm_id":
+                replicateAnnotation.setLsmId(annotationValue);
                 break;
             case "canonical_smiles":
             case "cell_reprogrammed":
