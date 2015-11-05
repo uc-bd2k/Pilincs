@@ -131,7 +131,6 @@ public class DatabaseLoader {
         }
     }
 
-
     private void loadRawData() throws IOException, CommandException {
         log.info("Loading peak areas from panorama gct files");
 
@@ -144,8 +143,11 @@ public class DatabaseLoader {
             HashMap<String, List<ParseGCT.AnnotationValue>> metaReplicas = new HashMap<>();
             ArrayList<ParseGCT.PeptideReplicatePeak> peakValues = new ArrayList<>();
 
-            parser.parseToRepository(url, peakValues, metaPeptides, metaReplicas);
+            try {
+                parser.parseToRepository(url, peakValues, metaPeptides, metaReplicas);
+            }catch(Exception e){
 
+            }
 
             GctFile gctfile = new GctFile(url);
 

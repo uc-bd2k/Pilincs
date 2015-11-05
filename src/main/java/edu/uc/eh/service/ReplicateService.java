@@ -137,7 +137,8 @@ Update only if LSM ID in DB is Null but other fields are same.
                 replicateAnnotation.setPertId(annotationValue);
                 break;
             case "pert_iname":
-                replicateAnnotation.setPertiname(annotationValue);
+                String firstUpper = annotationValue.substring(0,1).toUpperCase()+annotationValue.substring(1,annotationValue.length());
+                replicateAnnotation.setPertiname(firstUpper);
                 break;
             case "pert_time":
                 replicateAnnotation.setPertTime(annotationValue);

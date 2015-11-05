@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+    <style>
+        body, html {
+            margin: 0;
+        }
+
+    </style>
+</head>
+<body>
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script>
+    var
+            w = 800
+            , h = 500
+            , svg = d3.select('body').append('svg')
+                    .attr({width: w, height: h})
+            , Force = function (nodes, links) {
+                return d3.layout.force()
+                        .nodes(nodes)
+                        .links(links)
+                        .gravity(0)
+                        .size([w, h])
+                        .linkDistance(0)
+                        .linkStrength(0.15)
+                        .friction(0.9)
+                        .charge(function (d) {
+                            return d.charge
+                        })
+            }
+            , Nodes = function (num, id, name) {
+                return d3.range(num).map(function () {
+                    return {
+                        id: id
+                        , x: Math.random() * w / 2
+                        , y: Math.random() * h / 2
+                        , charge: -3
+                        , name: name
+                    }
+                })
+            }
+            , Foci = function (x, y, name) {
+                return {x: x, y: y, charge: 0, fixed: true, name: name}
+            }
+            , Links = function (nodes, foci) {
+                return nodes.map(function (node) {
+                    return {source: node, target: foci}
+                })
+            },
+            colorScale = d3.scale.category20()
+            ,
+            fill = function (d) {
+
+                if (d >= 0 ) {
+                    return colorScale(d % 20);
+                } else {
+
+                    return 'white';
+                }
+            }
+            , moveColorGroup = function (i, total) {
+                var radius = 50;
+                var angle = (i / total) * 2 * Math.PI;
+                var x = Math.cos(angle);
+                var y = Math.sin(angle);
+                return {'x': x * radius, 'y': y * radius};
+            },
+            onTick = function () {
+                svg.selectAll('circle')
+                        .attr('cx', function (d) {
+                            return d.x
+                        })
+                        .attr('cy', function (d) {
+                            return d.y
+                        })
+            },
+            circlesToSvg = function (all) {
+                svg.selectAll('circle')
+                        .data(all)
+                        .enter().append('circle')
+                        .attr({
+                            cx: function (d) {
+                                return d.x
+                            }
+                            , cy: function (d) {
+                                return d.y
+                            }
+                            , r: 3
+                            , 'class': function (d) {
+                                return d.name
+                            }
+                        }).style({
+                            'fill': function (d) {
+                                return fill(d.id)
+                            }
+//                            , stroke: 'white'
+//                            , 'stroke-width': 1
+                        }).style("stroke", function (d) {
+                            if (fill(d.id) == 'white') {
+                                return 'white';
+                            } else {
+                                return d3.rgb(fill(d.id)).darker(1);
+                            }
+                        });
+            }
+            ,
+            interpolateToFoci = function (groups, cluster, destination) {
+                for (var i = 0; i < groups; i++) {
+                    d3.select('.foci-' + cluster + '-' + i)
+                            .transition()
+                            .ease('cubic-in-out')
+                            .duration(5000)
+                            .tween('dataTween', function (d) {
+                                var ix = d3.interpolate(d.x, destination.x);
+                                var iy = d3.interpolate(d.y, destination.y);
+                                return function (t) {
+                                    d.x = d.px = ix(t);
+                                    d.y = d.py = iy(t)
+                                }
+                            })
+                }
+            },
+            fillInData = function (groups, x, y, num) {
+
+                var links = [];
+                var nodes = [];
+                var all = [];
+
+                for (var i = 0; i < groups; i++) {
+                    this['nodes' + num + '-' + i] = Nodes(i * 3 + 10, i, 'node-' + num + '-' + i);
+                    this['foci' + num + '-' + i] = Foci(x + moveColorGroup(i, groups).x, y + moveColorGroup(i, groups).y, 'foci-' + num + '-' + i);
+                }
+
+                for (var i = 0; i < groups; i++) {
+                    this['links' + num + '-' + i] = Links(this['nodes' + num + '-' + i], this['foci' + num + '-' + i]);
+                }
+
+                for (var i = 0; i < groups; i++) {
+                    links = links.concat(this['links' + num + '-' + i]);
+                }
+
+                for (var i = 0; i < groups; i++) {
+                    all = all.concat(this['foci' + num + '-' + i]);
+                }
+
+                for (var i = 0; i < groups; i++) {
+                    all = all.concat(this['nodes' + num + '-' + i]);
+                }
+                return {links: links, all: all};
+            };
+
+    var groups = 10;
+    var cluster1 = 1;
+    var cluster2 = 2;
+    var allAll = [];
+
+    for (var i = 0; i < 6; i++) {
+        var dataset = fillInData(groups, 100 + (100 * i), (100 + i % 2 * 100), i);
+        allAll = allAll.concat(dataset.all);
+        this['all' + i] = dataset.all;
+        this['links' + i] = dataset.links;
+    }
+
+    for (var i = 0; i < 6; i++) {
+        var force = Force(this['all' + i], this['links' + i]);
+        force.on('tick', onTick);
+        force.start();
+    }
+
+    circlesToSvg(allAll);
+
+    for (var i = 0; i < 6; i++) {
+
+        var destination = {x: 100 + (100 * i), y: (100 + i % 2 * 100)};
+
+        interpolateToFoci(groups, i, destination);
+    }
+
+
+    //    var dataset1 = fillInData(groups, 100, 200, cluster1);
+    //    var force1 = Force(dataset1.all, dataset1.links);
+    //    force1.on('tick', onTick);
+    //
+    //    var dataset2 = fillInData(groups, 300, 100, cluster2);
+    //    var force2 = Force(dataset2.all, dataset2.links);
+    //    force2.on('tick', onTick);
+    //
+    //    var all = dataset1.all.concat(dataset2.all);
+    //    circlesToSvg(all);
+    //
+    //    force1.start();
+    //    force2.start();
+    //
+    //    var destination1 = {x: 100, y: 200};
+    //    var destination2 = {x: 300, y: 100};
+    //
+    //
+    //    interpolateToFoci(groups, cluster1, destination1);
+    //    interpolateToFoci(groups, cluster2, destination2);
+
+
+</script>
+</body>
+</html>

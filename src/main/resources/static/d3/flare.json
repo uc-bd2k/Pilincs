@@ -1,0 +1,7 @@
+{
+  "name": "flare",
+  "children": [
+        {"name": "Visualization", "size": 16540},
+    {"name": "Antor", "size": 800}
+      ]
+}

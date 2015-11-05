@@ -1,3 +1,9 @@
+/* Hide scrollbars */
+::-webkit-scrollbar {
+    display: none;
+}
+
+
 /* Tags input */
 
 tags-input .host {
