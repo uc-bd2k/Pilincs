@@ -100,6 +100,7 @@
 //                            , 'stroke-width': 1
                         }).style("stroke", function (d) {
                             if (fill(d.id) == 'white') {
+//                                return 'black';
                                 return 'white';
                             } else {
                                 return d3.rgb(fill(d.id)).darker(1);
@@ -112,7 +113,7 @@
                     d3.select('.foci-' + cluster + '-' + i)
                             .transition()
                             .ease('cubic-in-out')
-                            .duration(5000)
+                            .duration(10000)
                             .tween('dataTween', function (d) {
                                 var ix = d3.interpolate(d.x, destination.x);
                                 var iy = d3.interpolate(d.y, destination.y);

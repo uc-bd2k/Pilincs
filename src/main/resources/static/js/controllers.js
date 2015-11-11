@@ -428,6 +428,48 @@ appModule.controller("TableCtrl", ['$scope', 'SharedService', '$http', '$locatio
         });
     }]);
 
+appModule.controller("ExportCtrl" , ['SharedService', function(SharedService){
+    var self = this;
+
+    self.processingLevelRadio = 0;
+    self.outputFormatRadio = 0;
+
+    self.processingLevel = [
+        {id: 0, name: 'Raw Data', selected: true},
+        {id: 1, name: 'Profiles', selected: false},
+        {id: 2, name: 'Merged profiles', selected: false}
+    ];
+    self.outputFormat = [
+        {id: 0, name: 'JSON', selected: true}
+    ];
+
+    self.getURL = function(){
+
+        var url;
+
+        switch(self.processingLevelRadio){
+            case 0:
+                url = '/pilincs/api-assays-paged/?order=asc&limit=' + 1000
+                    + '&offset=0'
+                    + '&tags=' + SharedService.getTags();
+                break;
+            case 1:
+                url = '/pilincs/api-profiles-paged/?order=asc&limit=' + 1000
+                    + '&offset=0'
+                    + '&tags=' + SharedService.getTags();
+                break;
+            case 2:
+                url = '/pilincs/api-merged-profiles-paged/?order=asc&limit=' + 1000
+                    + '&offset=0'
+                    + '&tags=' + SharedService.getTags();
+                break;
+        }
+        return url;
+    }
+
+
+}])
+
 appModule.controller("ExploreCtrl", ['SharedService', '$http', function (SharedService, $http) {
 
     var self = this;

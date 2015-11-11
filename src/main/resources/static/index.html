@@ -56,43 +56,14 @@
                     <li ng-class="{active:mainCtrl.activeSite=='explore'}"><a href="#/explore"
                                                                               ng-click="mainCtrl.changeSite('explore')">Explore</a>
                     </li>
+                    <li ng-class="{active:mainCtrl.activeSite=='export'}"><a href="#/export"
+                                                                              ng-click="mainCtrl.changeSite('export')">Export</a>
+                    </li>
+                    <li ng-class="{active:mainCtrl.activeSite=='QC'}"><a href="#/qc"
+                                                                             ng-click="mainCtrl.changeSite('qc')">QC Stats</a>
+                    </li>
                 </ul>
-                &nbsp;
-                <ul class="nav navbar-nav col-sm-5">
-                    <form class="navbar-form">
 
-                        <div class="controls">
-
-                            <!-- Tags -->
-                            <tags-input ng-model="mainCtrl.tags"
-                                        display-property="name"
-                                        class="bootstrap"
-                                        placeholder="Start typing a query"
-                                        on-tag-added="mainCtrl.tagAddedRemoved()"
-                                        on-tag-removed="mainCtrl.tagAddedRemoved()"
-                                        add-from-autocomplete-only="true"
-                                    >
-                                <auto-complete
-                                        source="mainCtrl.loadTags($query)"
-                                        min-length="0"
-                                        load-on-empty="false"
-                                        max-results-to-show="90"
-                                        debounce-delay="100"
-                                        template="autocomplete-template">
-                                </auto-complete>
-                            </tags-input>
-                        </div>
-
-                        <script type="text/ng-template" id="autocomplete-template">
-                            <div class="left-panel">
-                                <span ng-class="data.flag" class="label label-info">{{data.flag}}</span>
-                            </div>
-                            <div class="mid-panel">
-                                <span ng-bind-html="$highlight($getDisplayText())"></span>
-                            </div>
-                        </script>
-                    </form>
-                </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li ng-class="{active:mainCtrl.activeSite=='about'}"><a href="#about"
                                                                             ng-click="mainCtrl.changeSite('about')">About</a>
@@ -125,16 +96,15 @@
     <script src="bower_components/angular/angular.min.js"></script>
     <script src="bower_components/angular-route/angular-route.min.js"></script>
 
-    <!-- piLINCS JavaScript -->
-    <script src="js/heatmap.js"></script>
-    <script src="js/multifoci.js"></script>
-
     <!-- piLINCS Angular -->
     <script src="js/app.js"></script>
     <script src="js/controllers.js"></script>
 
+    <!-- Bootstrap requires jQuery -->
+    <script src="bower_components/jquery-1.11.3.min/index.js"></script>
+
     <!-- Bootstrap -->
-    <!--<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>-->
+    <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 
     <!-- Ng-tags-input-->
     <script src="bower_components/ng-tags-input/ng-tags-input.min.js"></script>

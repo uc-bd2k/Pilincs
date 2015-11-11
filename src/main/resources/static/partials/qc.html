@@ -1,0 +1,37 @@
+<div class="workspaceContainer">
+    <h3 style="margin-top:40px;">Transformations</h3>
+
+    <p>Currently only notes about performed transformations are listed.<br/>
+        The goal is to present here up-to-date statistic
+        about applied data transformations.</p>
+
+    <div class="bs-callout bs-callout-primary">
+        <p style="margin-top:30px;">Following transformations where applied to source GCT files:</p>
+        <ul>
+            <li style="margin-top:10px;">Impute missing values with mean value for given profile</li>
+            <li style="margin-top:10px;">Adding suffix <i>_PRM</i> to sample ids from experiment with runId <i>2107</i>
+            </li>
+            <li style="margin-top:10px;">Removing following replicate annotations: <i>canonical_smiles,
+                cell_reprogrammed, det_normalization_group_vector, det_filename,
+                pert_batch_internal_compound_enumerator, pert_batch_internal_replicate, provenance_code,
+                pert_desc</i></li>
+            <li style="margin-top:10px;">Removing following peptide annotations: <i>EntrezGeneId, GeneName,
+                P100_BasePeptide, P100_Cluster, P100_GeneClusterCode, P100_ModifiedPeptideCode,
+                P100_OriginalGeneSiteCode, pr_P100_original_gene_site_code, P100_OriginalProbeID, PhosphoSite,
+                UniprotAC, pr_probe_normalization_group, pr_probe_suitability_manual</i></li>
+            <li style="margin-top:10px;">Changing annotation names to CamelCase java naming standards</li>
+            <li style="margin-top:10px;">Merging <i>pr_p100_base_peptide</i> and <i>pr_gcp_base_peptide
+                annotations</i></li>
+            <li style="margin-top:10px;">Merging <i>pr_p100_modified_peptide_code</i> and <i>pr_gcp_modified_peptide_code
+                annotations</i></li>
+            <li style="margin-top:10px;">Displaying following annotations only for P100 assay: <i>prCluster,
+                prGeneClusterCode, prOriginalProbeId, prPhosphosite</i></li>
+            <li style="margin-top:10px;">Displaying following annotations only for GCP assay: <i>prHistoneMark,
+                prBiNumber</i></li>
+            <li style="margin-top:10px;">Peptides with <i>pr_probe_suitability_manual</i> set to <i>FALSE</i>
+                replaced with mean value
+            </li>
+
+        </ul>
+    </div>
+</div>

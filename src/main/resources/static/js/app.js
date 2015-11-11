@@ -27,6 +27,16 @@ app.config(['$routeProvider',
                 controller: 'ExploreCtrl',
                 controllerAs: 'ctrl'
             }).
+            when('/export', {
+                templateUrl: 'partials/export.html',
+                controller: 'ExportCtrl',
+                controllerAs: 'ctrl'
+            }).
+            when('/qc', {
+                templateUrl: 'partials/qc.html',
+                controller: 'QualityCtrl',
+                controllerAs: 'ctrl'
+            }).
             when('/api', {
                 templateUrl: 'partials/api.html'
             }).

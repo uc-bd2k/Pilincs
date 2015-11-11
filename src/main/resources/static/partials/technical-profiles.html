@@ -1,8 +1,46 @@
 <br/>
+<form class="col-sm-4" style="padding-left: 0px;">
+
+    <div class="controls">
+
+        <!-- Tags -->
+        <tags-input ng-model="mainCtrl.tags"
+                    display-property="name"
+                    class="bootstrap"
+                    placeholder="Start typing a query"
+                    on-tag-added="mainCtrl.tagAddedRemoved()"
+                    on-tag-removed="mainCtrl.tagAddedRemoved()"
+                    add-from-autocomplete-only="true"
+                >
+            <auto-complete
+                    source="mainCtrl.loadTags($query)"
+                    min-length="0"
+                    load-on-empty="false"
+                    max-results-to-show="90"
+                    debounce-delay="100"
+                    template="autocomplete-template">
+            </auto-complete>
+        </tags-input>
+    </div>
+
+    <script type="text/ng-template" id="autocomplete-template">
+        <div class="left-panel">
+            <span ng-class="data.flag" class="label label-info">{{data.flag}}</span>
+        </div>
+        <div class="mid-panel">
+            <span ng-bind-html="$highlight($getDisplayText())"></span>
+        </div>
+    </script>
+</form>
+
 <div style="float:right; padding-bottom: 20px;">
-    <button class="btn btn-default">Analyze in iLINCS</button>
+    <button class="btn btn-default">
+        <a href="http://www.ilincs.org" target="_blank" style="text-decoration: none;">Analyze in iLINCS</a>
+    </button>
     &nbsp;
-    <button class="btn btn-default">Export</button>
+    <button class="btn btn-default" >
+        <a href="#export" style="text-decoration: none;">Export</a>
+    </button>
 </div><br/><br/><br/>
 
 <div ng-controller="TableCtrl as technicalCtrl">

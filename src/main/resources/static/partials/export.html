@@ -1,0 +1,46 @@
+<div class="workspaceContainer">
+    <h3 style="margin-top:40px;">Export data</h3>
+
+    This page will enable export based on five selections:<br/><br/>
+    <ul>
+        <li>
+            Filtering criteria (e.g. assay, cell, peptide) - not implemented
+        </li>
+        <li>
+            Applied normalizations (e.g. z-score,...) - not implemented
+        </li>
+        <li>
+            Augmenting selected assay with other (e.g. L1000) - not implemented
+        </li>
+        <li>
+            Level of processing: (e.g. raw data, profiles, merged profiles)
+        </li>
+        <li>
+            Output format (e.g. json, txt, gct, ...) - partially implemented
+        </li>
+    </ul>
+<hr/>
+    <div class="col-md-3">
+        <div><b>Level:</b></div>
+        <div class="radio" ng-repeat="group in ctrl.processingLevel">
+            <label>
+                <input type="radio" value="{{group.id}}" ng-model="ctrl.processingLevelRadio">
+                {{group.name}}
+            </label>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div><b>Output format:</b></div>
+        <div class="radio" ng-repeat="group in ctrl.outputFormat">
+            <label>
+                <input type="radio" value="{{group.id}}" ng-model="ctrl.outputFormatRadio">
+                {{group.name}}
+            </label>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <a href="http://localhost:8080/pilincs/api-assays-paged/?order=asc&limit=1000&offset=0&tags=[{%22p100%22:true},{%22gcp%22:true}]" target="_blank" style="color: white;" class="btn btn-primary">Export</a>
+    </div>
+    </div>
