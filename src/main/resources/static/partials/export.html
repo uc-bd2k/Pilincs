@@ -19,28 +19,85 @@
             Output format (e.g. json, txt, gct, ...) - partially implemented
         </li>
     </ul>
-<hr/>
-    <div class="col-md-3">
-        <div><b>Level:</b></div>
-        <div class="radio" ng-repeat="group in ctrl.processingLevel">
-            <label>
-                <input type="radio" value="{{group.id}}" ng-model="ctrl.processingLevelRadio">
-                {{group.name}}
-            </label>
+    <hr/>
+    <div class="well col-md-12">
+
+        <form class="col-sm-4" style="padding-left: 0px;">
+
+            <div><b>Filters:</b></div>
+
+            <div class="controls" style="padding-top: 14px;">
+
+                <!-- Tags -->
+                <tags-input ng-model="mainCtrl.tags"
+                            display-property="name"
+                            class="bootstrap"
+                            placeholder="Add cell or peptide"
+                            on-tag-added="mainCtrl.tagAddedRemoved()"
+                            on-tag-removed="mainCtrl.tagAddedRemoved()"
+                            add-from-autocomplete-only="true"
+                        >
+                    <auto-complete
+                            source="mainCtrl.loadTags($query)"
+                            min-length="0"
+                            load-on-empty="false"
+                            max-results-to-show="90"
+                            debounce-delay="100"
+                            template="autocomplete-template">
+                    </auto-complete>
+                </tags-input>
+            </div>
+
+            <script type="text/ng-template" id="autocomplete-template">
+                <div class="left-panel">
+                    <span ng-class="data.flag" class="label label-info">{{data.flag}}</span>
+                </div>
+                <div class="mid-panel">
+                    <span ng-bind-html="$highlight($getDisplayText())"></span>
+                </div>
+            </script>
+        </form>
+
+        <div class="col-md-2 col-md-offset-1">
+            <div><b>Normalization:</b></div>
+            <div class="radio" ng-repeat="group in ctrl.normalization">
+                <label>
+                    <input type="radio" value="{{group.id}}" ng-model="ctrl.normalizationRadio">
+                    {{group.name}}
+                </label>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div><b>Level:</b></div>
+            <div class="radio" ng-repeat="group in ctrl.processingLevel">
+                <label>
+                    <input type="radio" value="{{group.id}}" ng-model="ctrl.processingLevelRadio"
+                           ng-click="ctrl.updateUrl()">
+                    {{group.name}}
+                </label>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div><b>Output format:</b></div>
+            <div class="radio" ng-repeat="group in ctrl.outputFormat">
+                <label>
+                    <input type="radio" value="{{group.id}}" ng-model="ctrl.outputFormatRadio">
+                    {{group.name}}
+                </label>
+            </div>
+        </div>
+
+        <div class="col-md-1" style="padding-top: 40px;">
+            <a ng-href="{{ctrl.targetUrl}}" target="_blank" style="color: white;"
+               class="btn btn-primary">Export</a>
         </div>
     </div>
 
-    <div class="col-md-3">
-        <div><b>Output format:</b></div>
-        <div class="radio" ng-repeat="group in ctrl.outputFormat">
-            <label>
-                <input type="radio" value="{{group.id}}" ng-model="ctrl.outputFormatRadio">
-                {{group.name}}
-            </label>
-        </div>
+   <hr/>
+    <div>
+        Specified export is also available with API call:<br/>
+        <a ng-href="http://www.eh3.uc.edu{{ctrl.targetUrl}}" target="_blank">{{ctrl.targetUrl}}</a>
     </div>
-
-    <div class="col-md-3">
-        <a href="http://localhost:8080/pilincs/api-assays-paged/?order=asc&limit=1000&offset=0&tags=[{%22p100%22:true},{%22gcp%22:true}]" target="_blank" style="color: white;" class="btn btn-primary">Export</a>
-    </div>
-    </div>
+</div>

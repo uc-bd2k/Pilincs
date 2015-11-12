@@ -428,11 +428,18 @@ appModule.controller("TableCtrl", ['$scope', 'SharedService', '$http', '$locatio
         });
     }]);
 
-appModule.controller("ExportCtrl" , ['SharedService', function(SharedService){
+appModule.controller("ExportCtrl", ['SharedService', '$routeParams', '$scope', function (SharedService, $routeParams, $scope) {
+
     var self = this;
 
-    self.processingLevelRadio = 0;
+    $scope.$on('updateTags', function(){
+        self.updateUrl();
+    });
+
+    self.processingLevelRadio = $routeParams.level;
     self.outputFormatRadio = 0;
+    self.normalizationRadio = 0;
+    self.targetUrl;
 
     self.processingLevel = [
         {id: 0, name: 'Raw Data', selected: true},
@@ -440,33 +447,41 @@ appModule.controller("ExportCtrl" , ['SharedService', function(SharedService){
         {id: 2, name: 'Merged profiles', selected: false}
     ];
     self.outputFormat = [
-        {id: 0, name: 'JSON', selected: true}
+        {id: 0, name: 'JSON', selected: true, enabled: true}
     ];
 
-    self.getURL = function(){
+    self.normalization = [
+        {id: 0, name: 'None', selected: true, enabled: true}
+    ];
 
-        var url;
+    self.updateUrl = function () {
+        console.log("Update url: " + self.processingLevelRadio);
 
-        switch(self.processingLevelRadio){
+        switch (parseInt(self.processingLevelRadio)) {
             case 0:
-                url = '/pilincs/api-assays-paged/?order=asc&limit=' + 1000
+                self.targetUrl = '/pilincs/api-assays-paged/?order=asc&limit=' + 1000
                     + '&offset=0'
                     + '&tags=' + SharedService.getTags();
                 break;
             case 1:
-                url = '/pilincs/api-profiles-paged/?order=asc&limit=' + 1000
+                self.targetUrl = '/pilincs/api-profiles-paged/?order=asc&limit=' + 1000
                     + '&offset=0'
                     + '&tags=' + SharedService.getTags();
                 break;
             case 2:
-                url = '/pilincs/api-merged-profiles-paged/?order=asc&limit=' + 1000
+                self.targetUrl = '/pilincs/api-merged-profiles-paged/?order=asc&limit=' + 1000
                     + '&offset=0'
                     + '&tags=' + SharedService.getTags();
                 break;
+            default:
+                console.log("Unsupported processingLevelRadio");
+                break;
         }
-        return url;
+
+        console.log("Target URL: " + self.targetUrl);
     }
 
+    self.updateUrl();
 
 }])
 
@@ -739,10 +754,10 @@ appModule.controller("ExploreCtrl", ['SharedService', '$http', function (SharedS
                 });
 
             svg.append("text")
-                .attr("x",(100 + (i % 5) * 150))
-                .attr("y",(i < 5 ? 80 : 300))
+                .attr("x", (100 + (i % 5) * 150))
+                .attr("y", (i < 5 ? 80 : 300))
                 .style("font-size", "10px")
-                .text("Total: "+total);
+                .text("Total: " + total);
         }
     }
 }]);

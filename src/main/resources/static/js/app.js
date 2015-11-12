@@ -27,7 +27,7 @@ app.config(['$routeProvider',
                 controller: 'ExploreCtrl',
                 controllerAs: 'ctrl'
             }).
-            when('/export', {
+            when('/export/:level', {
                 templateUrl: 'partials/export.html',
                 controller: 'ExportCtrl',
                 controllerAs: 'ctrl'
