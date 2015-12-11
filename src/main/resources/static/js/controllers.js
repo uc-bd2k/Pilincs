@@ -23,6 +23,7 @@ appModule.controller('NavigationCtrl', ['$scope', '$http', 'SharedService',
 
         // Trigger when tag was added or removed
         self.tagAddedRemoved = function () {
+            console.log(self.tags);
             SharedService.updateTags(self.tags);
             $scope.$broadcast('updateTags');
         };
@@ -309,10 +310,30 @@ appModule.directive('profileBarchart', ['SharedService', function (SharedService
     }
 }]);
 
-appModule.controller("TableCtrl", ['$scope', 'SharedService', '$http', '$location',
-    function ($scope, SharedService, $http, $location) {
+appModule.controller("TableCtrl", ['$scope', 'SharedService', '$http', '$location', '$routeParams',
+    function ($scope, SharedService, $http, $location, $routeParams) {
 
         var site = $location.path();
+        // just keep begining of the path eg. /technical-profiles/DMSO becomes /technical-profiles and /raw-data stays unchanged
+        var count = (site.match(/\//g) || []).length;
+        if (count == 5) {
+            site = "/" + site.split("/")[1];
+        }
+
+        if (Object.keys($routeParams).length == 2) {
+
+            var name = $routeParams.name.replace(/['"]+/g, '');
+            var annotation = $routeParams.annotation.replace(/['"]+/g, '');
+            var tags = [];
+            var oneTag = {};
+            oneTag['name'] = name;
+            oneTag['annotation'] = annotation;
+            tags.push(oneTag);
+            //console.log(tags);
+            SharedService.updateTags(tags);
+            //console.log(SharedService.getTags());
+        }
+
 
         $scope.itemsPerPage = 10;
         $scope.currentPage = 0;
@@ -369,6 +390,7 @@ appModule.controller("TableCtrl", ['$scope', 'SharedService', '$http', '$locatio
 
         $scope.loadData = function (currPage) {
 
+            console.log(site);
             switch (site) {
 
                 case "/raw-data":
@@ -432,7 +454,7 @@ appModule.controller("ExportCtrl", ['SharedService', '$routeParams', '$scope', f
 
     var self = this;
 
-    $scope.$on('updateTags', function(){
+    $scope.$on('updateTags', function () {
         self.updateUrl();
     });
 

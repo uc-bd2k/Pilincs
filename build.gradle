@@ -48,6 +48,7 @@ exclude(module: 'commons-logging')
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
     compile group: 'com.google.code.gson', name: 'gson', version:'1.7.2'
     compile 'com.github.lbehnke:hierarchical-clustering-java:v1.1.0'
+    testCompile 'junit:junit:4.12'
 }
 
 task wrapper(type: Wrapper) {

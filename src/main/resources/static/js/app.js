@@ -18,6 +18,10 @@ app.config(['$routeProvider',
                 templateUrl: 'partials/technical-profiles.html',
                 controller: 'TableCtrl'
             }).
+            when('/technical-profiles/name/:name/annotation/:annotation', {
+                templateUrl: 'partials/technical-profiles.html',
+                controller: 'TableCtrl'
+            }).
             when('/merged-profiles', {
                 templateUrl: 'partials/merged-profiles.html',
                 controller: 'TableCtrl'

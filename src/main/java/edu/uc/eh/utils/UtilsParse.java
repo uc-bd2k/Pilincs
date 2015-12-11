@@ -129,9 +129,13 @@ public class UtilsParse {
                 }
             }else {
 
-                String tagName = object.get("name").toString().replace("[", "").replace("]", "");
-                String tagAnnotation = object.get("annotation").toString().replace("[", "").replace("]", "");
-                output.get(tagAnnotation).add(tagName);
+                try {
+                    String tagName = object.get("name").toString().replace("[", "").replace("]", "");
+                    String tagAnnotation = object.get("annotation").toString().replace("[", "").replace("]", "");
+                    output.get(tagAnnotation).add(tagName);
+                }catch(NullPointerException ex){
+                    // Do nothing - ugly fast solution
+                }
             }
         }
 
