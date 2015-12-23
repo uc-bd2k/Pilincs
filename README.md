@@ -43,7 +43,7 @@ In the background Tomcat is started as well as H2 database. Your application is 
 
 ### Modify configuration
 
-To adjust the application to your needs look in:
+ To adjust the application to your needs look in:
  ```
  /src/main/resource/application.yml
  ```
