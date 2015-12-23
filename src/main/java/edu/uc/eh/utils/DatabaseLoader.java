@@ -97,13 +97,6 @@ public class DatabaseLoader {
         computeCorrelations();
         mergeProfiles(referenceP100Profile.size(), referenceGCPProfile.size());
 //        runHierarchicalClustering();
-
-        cleanUp();
-    }
-
-
-    private void cleanUp() {
-//        TODO:
     }
 
     private void loadPeptideAnnotations() throws Exception {

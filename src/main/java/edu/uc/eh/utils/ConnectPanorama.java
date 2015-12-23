@@ -33,6 +33,9 @@ public class ConnectPanorama {
     @Value("${panorama.gctDownloadUrl}")
     private String gctDownloadUrl;
 
+    @Value("${panorama.gctDownloadUrl2}")
+    private String gctDownloadUrl2;
+
     @Value("${panorama.connectionUrl}")
     private String panoramaConnectionUrl;
 
@@ -59,7 +62,7 @@ public class ConnectPanorama {
 
                 gcpOrP100 = folderName.contains("GCP") ? "GCP" : "P100";
 
-                output.add(String.format(gctDownloadUrl, gcpOrP100, runId, gcpOrP100, ifProcessed));
+                output.add(String.format(gctDownloadUrl2, gcpOrP100, runId, gcpOrP100, runId, ifProcessed));
             }
         }
         return output;
@@ -72,13 +75,14 @@ public class ConnectPanorama {
         Connection cn = new Connection(panoramaConnectionUrl);
 
         SelectRowsCommand cmd = new SelectRowsCommand("targetedms", "runs");
-        cmd.getColumns().addAll(Arrays.asList("Id", "Description"));
+        cmd.getColumns().addAll(Arrays.asList("Id", "Description", "Status"));
 
         SelectRowsResponse response = cmd.execute(cn, folderName);
         List<Map<String, Object>> rows = response.getRows();
 
         for (Map<String, Object> row : rows) {
-            if(row.get("Description").toString().contains("QC"))continue; // skip Quality Control files
+            if(row.get("Description").toString().contains("QC")) continue; // skip Quality Control files
+            if(row.get("Status") != null && row.get("Status").toString().contains("failed")) continue; // skip failed imports
             runIds.add((Integer) row.get("Id"));
         }
         return runIds;
