@@ -43,10 +43,9 @@ In the background Tomcat is started as well as H2 database. Your application is 
 
 ### Modify configuration
 
-Modify configuration files to adjust the application to your needs:
+To adjust the application to your needs look in:
  ```
- /src/main/resource/application.properties
- /src/main/resource/application-mysql.properties
+ /src/main/resource/application.yml
  ```
  After changing properties file you need to build sources again. To run `mysql` profile type: 
  
