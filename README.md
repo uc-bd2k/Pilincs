@@ -9,7 +9,7 @@ See running piLINCS website on University of Cincinnati server:
 * Build intermediate API layer to enable direct and simple querying and access to proteomics datasets by tools developed within BD2K community
 * Facilitating data integration by creating a global view of L1000 and proteomic data through iLINCS and related portals
 
-## Getting Started
+## Getting Started for developers
 
 In order to run your own piLINCS you need to have current Java installed. Gradle and git are used to ease building sources.
 
