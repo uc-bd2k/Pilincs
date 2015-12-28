@@ -53,3 +53,6 @@ In the background Tomcat is started as well as H2 database. Your application is 
  java --spring.profiles.active=mysql -jar build/libs/*.jar
  ```
  Consider changing database engine (a template of MySQL configuration is included). You may also change deployment path (currently set to /pilincs). Or just select Panorama folders that are relevant to your research.
+ 
+ ### License
+ This software is licensed with MIT license.
