@@ -9,7 +9,10 @@ See running piLINCS website on University of Cincinnati server:
 * Build intermediate API layer to enable direct and simple querying and access to proteomics datasets by tools developed within BD2K community
 * Facilitating data integration by creating a global view of L1000 and proteomic data through iLINCS and related portals
 
-## Getting Started for developers
+## Learn more in [Wiki](https://github.com/sajmmon/Pilincs/wiki)
+
+=============
+## Run piLINCS on your server
 
 In order to run your own piLINCS you need to have current Java installed. Gradle and git are used to ease building sources.
 
@@ -54,4 +57,3 @@ In the background Tomcat is started as well as H2 database. Your application is 
  ```
  Consider changing database engine (a template of MySQL configuration is included). You may also change deployment path (currently set to /pilincs). Or just select Panorama folders that are relevant to your research.
  
- ## Learn more in [Wiki](https://github.com/sajmmon/Pilincs/wiki)
