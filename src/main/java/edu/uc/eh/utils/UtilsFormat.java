@@ -1,17 +1,13 @@
 package edu.uc.eh.utils;
 
+import edu.uc.eh.DatabaseLoader;
 import edu.uc.eh.datatypes.AssayType;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.xml.ws.ServiceMode;
-import java.text.DecimalFormat;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by chojnasm on 8/10/15.

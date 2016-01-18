@@ -7,7 +7,7 @@ import edu.uc.eh.domain.json.*;
 import edu.uc.eh.domain.repository.*;
 import edu.uc.eh.service.QueryService;
 import edu.uc.eh.utils.ConnectPanorama;
-import edu.uc.eh.utils.DatabaseLoader;
+import edu.uc.eh.DatabaseLoader;
 import edu.uc.eh.utils.UtilsParse;
 import edu.uc.eh.utils.UtilsTransform;
 import org.json.simple.parser.ParseException;
@@ -71,7 +71,7 @@ public class RestController {
 
         List<RawDataRecord> output = new ArrayList<>();
 
-        HashMap<String,List<String>> tagsParsed = UtilsParse.parseTags(tags);
+        HashMap<String, List<String>> tagsParsed = UtilsParse.parseTags(tags);
 
         PageRequest pageRequest = new PageRequest(offset / limit, limit);
         Page<PeakArea> result;
@@ -99,7 +99,7 @@ public class RestController {
         List<String> assayTypesString = tagsParsed.get("AssayTypes");
         List<AssayType> assayTypes = new ArrayList<>();
 
-        for(String string : assayTypesString){
+        for (String string : assayTypesString) {
             assayTypes.add(AssayType.valueOf(string));
         }
 
@@ -114,13 +114,13 @@ public class RestController {
                 genesymbolTags,
                 pageRequest);
 
-            count = result.getTotalElements();
+        count = result.getTotalElements();
 
-        for(PeakArea peakArea : result){
+        for (PeakArea peakArea : result) {
             output.add(new RawDataRecord(peakArea));
         }
 
-        return new RawDataResponse(count,output);
+        return new RawDataResponse(count, output);
     }
 
 
@@ -135,7 +135,7 @@ public class RestController {
 
         List<ProfileRecord> output = new ArrayList<>();
 
-        HashMap<String,List<String>> tagsParsed = UtilsParse.parseTags(tags);
+        HashMap<String, List<String>> tagsParsed = UtilsParse.parseTags(tags);
 
         PageRequest pageRequest = new PageRequest(offset / limit, limit);
         Page<Profile> result;
@@ -205,7 +205,7 @@ public class RestController {
 
         String previousConcat = "";
         boolean background = true;
-        for(Profile profile : result){
+        for (Profile profile : result) {
 
 
             if (!profile.getConcat().equals(previousConcat)) {
@@ -215,7 +215,7 @@ public class RestController {
             previousConcat = profile.getConcat();
         }
 
-        return new ProfileResponse(count,output);
+        return new ProfileResponse(count, output);
     }
 
 
@@ -283,7 +283,7 @@ public class RestController {
     HeatMapResponse profilesAsHeatMap(
             @RequestBody String tags) throws ParseException {
 
-        HashMap<String,List<String>> tagsParsed = UtilsParse.parseTags(tags);
+        HashMap<String, List<String>> tagsParsed = UtilsParse.parseTags(tags);
 
         List<Profile> result;
 
@@ -320,7 +320,7 @@ public class RestController {
                 assayTypes, cellTags, pertinameTags);
 
 
-        return UtilsTransform.profilesToHeatMap(result,databaseLoader.getReferenceProfile(assayTypes.get(0)));
+        return UtilsTransform.profilesToHeatMap(result, databaseLoader.getReferenceProfile(assayTypes.get(0)));
     }
 
     @RequestMapping(value = "/api-explore", method = RequestMethod.POST)
@@ -368,31 +368,31 @@ public class RestController {
         return UtilsTransform.profilesToExplore(result);
     }
 
-    @RequestMapping(value = "/api-tags",method = RequestMethod.GET)
+    @RequestMapping(value = "/api-tags", method = RequestMethod.GET)
     public
     @ResponseBody
-    List<TagFormat> getTagsForAutocompletion(){
+    List<TagFormat> getTagsForAutocompletion() {
 
         List<TagFormat> output = new ArrayList<>();
 
         Iterator<ReplicateAnnotation> allReplicates = replicateAnnotationRepository.findAll().iterator();
         Iterator<PeptideAnnotation> allPeptides = peptideAnnotationRepository.findAll().iterator();
 
-        while(allReplicates.hasNext()){
+        while (allReplicates.hasNext()) {
             ReplicateAnnotation replicateAnnotation = allReplicates.next();
 
-            TagFormat tagFormat = new TagFormat(replicateAnnotation.getPertiname(),"Perturbation","Pertiname");
-            if(tagFormat.getName() != null && !output.contains(tagFormat))output.add(tagFormat);
+            TagFormat tagFormat = new TagFormat(replicateAnnotation.getPertiname(), "Perturbation", "Pertiname");
+            if (tagFormat.getName() != null && !output.contains(tagFormat)) output.add(tagFormat);
 
-            tagFormat = new TagFormat(replicateAnnotation.getCellId(),"Cell","CellId");
-            if(tagFormat.getName() != null && !output.contains(tagFormat))output.add(tagFormat);
+            tagFormat = new TagFormat(replicateAnnotation.getCellId(), "Cell", "CellId");
+            if (tagFormat.getName() != null && !output.contains(tagFormat)) output.add(tagFormat);
         }
 
-        while(allPeptides.hasNext()){
+        while (allPeptides.hasNext()) {
             PeptideAnnotation peptideAnnotation = allPeptides.next();
 
-           TagFormat tagFormat = new TagFormat(peptideAnnotation.getPrGeneSymbol(),"Peptide","PrGeneSymbol");
-            if(tagFormat.getName() != null && !output.contains(tagFormat))output.add(tagFormat);
+            TagFormat tagFormat = new TagFormat(peptideAnnotation.getPrGeneSymbol(), "Peptide", "PrGeneSymbol");
+            if (tagFormat.getName() != null && !output.contains(tagFormat)) output.add(tagFormat);
         }
         return output;
     }
@@ -404,9 +404,9 @@ public class RestController {
 
         List<TagFormat> output = new ArrayList<>();
 
-        HashMap<String,List<String>> tagsParsed = UtilsParse.parseTags(tags);
+        HashMap<String, List<String>> tagsParsed = UtilsParse.parseTags(tags);
         String lastTagAnnotation = UtilsParse.lastTag(tags);
-        if(lastTagAnnotation == null)return output;
+        if (lastTagAnnotation == null) return output;
 
         List<String> allTagsForAnnotation = new ArrayList<>();
 
@@ -414,10 +414,10 @@ public class RestController {
 
             String annotation = tagFormat.getAnnotation();
 
-            if(annotation.equals(lastTagAnnotation) && !tagsParsed.get(annotation).contains(tagFormat.getName())){
+            if (annotation.equals(lastTagAnnotation) && !tagsParsed.get(annotation).contains(tagFormat.getName())) {
                 allTagsForAnnotation.add(tagFormat.getName());
                 output.add(tagFormat);
-                if(allTagsForAnnotation.size() >= 8) break;
+                if (allTagsForAnnotation.size() >= 8) break;
             }
         }
         return output;
@@ -548,7 +548,46 @@ public class RestController {
         }
 
         boolean ifTransponse = true;
-        return UtilsTransform.profilesToGct(assayType, output, databaseLoader, peptideAnnotationRepository, ifTransponse);
+        String gctOutput = UtilsTransform.profilesToGct(assayType, output, databaseLoader, peptideAnnotationRepository, ifTransponse);
+
+        return gctOutput;
+
+    }
+
+    @RequestMapping(value = "api-normalized-gct/{assay}", method = RequestMethod.GET, produces = "text/plain")
+    public
+    @ResponseBody
+    String getAsNormalizedGct(@PathVariable String assay, @MatrixVariable(pathVar = "assay") Map<String, List<String>> filterParams) {
+
+
+        AssayType assayType = AssayType.valueOf(assay);
+        List<String> cells = filterParams.get("cells");
+        List<String> perturbations = filterParams.get("perturbations");
+
+        boolean cellsEmpty = cells == null || cells.isEmpty();
+        boolean pertsEmpty = perturbations == null || perturbations.isEmpty();
+
+        List<Profile> output = new ArrayList<>();
+
+        List<Profile> profiles = profileRepository.findByAssayType(assayType);
+
+        for (Profile profile : profiles) {
+            if (!cellsEmpty) {
+                String cellId = profile.getReplicateAnnotation().getCellId();
+                if (!cells.contains(cellId)) continue;
+            }
+            if (!pertsEmpty) {
+                String pertiname = profile.getReplicateAnnotation().getPertiname();
+                if (!perturbations.contains(pertiname)) continue;
+            }
+            output.add(profile);
+        }
+
+        boolean ifTransponse = true;
+        String gctOutput = UtilsTransform.profilesToGct(assayType, output, databaseLoader, peptideAnnotationRepository, ifTransponse);
+
+        return UtilsTransform.gctNormalize(gctOutput);
+
     }
 
 // PLN

@@ -1,4 +1,4 @@
-package edu.uc.eh.utils;
+package edu.uc.eh;
 
 import com.apporiented.algorithm.clustering.AverageLinkageStrategy;
 import com.apporiented.algorithm.clustering.Cluster;
@@ -10,9 +10,11 @@ import edu.uc.eh.datatypes.IdNameValue;
 import edu.uc.eh.datatypes.StringDouble;
 import edu.uc.eh.domain.*;
 import edu.uc.eh.domain.repository.*;
+import edu.uc.eh.normalize.Normalizer;
 import edu.uc.eh.service.PeptideService;
 import edu.uc.eh.service.ReplicateService;
 import edu.uc.eh.service.RepositoryService;
+import edu.uc.eh.utils.*;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 import org.labkey.remoteapi.CommandException;
@@ -93,9 +95,12 @@ public class DatabaseLoader {
         loadReplicateAnnotations();
 
         loadRawData();
+//        normalize();
+
         buildProfiles();
         computeCorrelations();
         mergeProfiles(referenceP100Profile.size(), referenceGCPProfile.size());
+
 //        runHierarchicalClustering();
     }
 
@@ -138,7 +143,7 @@ public class DatabaseLoader {
 
             try {
                 parser.parseToRepository(url, peakValues, metaPeptides, metaReplicas);
-            }catch(Exception e){
+            } catch (Exception e) {
 
             }
 
@@ -198,6 +203,84 @@ public class DatabaseLoader {
 
             }
         }
+    }
+
+    private void normalize() {
+        List<AssayType> assayTypes = Arrays.asList(AssayType.GCP, AssayType.P100);
+
+        // do loop for each assay e.g. P100, GCP
+        for (AssayType assayType : assayTypes) {
+            log.info("Normalize matrix of peak values for assay: {}", assayType);
+
+            List<PeakArea> allPeakAreas = peakAreaRepository.findByGctFileAssayType(assayType);
+
+            // inefficient, try with database count
+            int numberOfPeptides = peptideAnnotationRepository.findByAssayType(assayType).size();
+            int numberOfReplicates = replicateAnnotationRepository.findByAssayType(assayType).size();
+
+            ArrayList<Integer> mapPeptideIdToRowId = new ArrayList<>();
+            ArrayList<Integer> mapReplicateIdToColumnId = new ArrayList<>();
+
+//          double[][] matrix = new double[replicates][peptides];
+
+            // init matrix with sizes
+            List<List<Double>> peaksAsMatrix = new ArrayList<>(numberOfReplicates);
+            for(int i = 0; i < numberOfReplicates; i++){
+                peaksAsMatrix.add(new ArrayList<>(numberOfPeptides));
+            }
+
+            for (PeakArea peakArea : allPeakAreas) {
+                int peptideId = Math.toIntExact(peakArea.getPeptideAnnotation().getId());
+                int replicateId = Math.toIntExact(peakArea.getReplicateAnnotation().getId());
+
+                Double rawValue = peakArea.getValue();
+
+                int mappedRowId;
+                int mappedColumnId;
+
+                if(!mapPeptideIdToRowId.contains(peptideId)) {
+                    mapPeptideIdToRowId.add(peptideId);
+                }
+                mappedRowId = mapPeptideIdToRowId.indexOf(peptideId);
+
+                if(!mapReplicateIdToColumnId.contains(replicateId)){
+                    mapReplicateIdToColumnId.add(replicateId);
+                }
+
+                mappedColumnId = mapReplicateIdToColumnId.indexOf(replicateId);
+
+                peaksAsMatrix.get(mappedColumnId).set(mappedRowId, rawValue);
+
+            }
+
+            List<List<Double>> outputMatrix = Normalizer.quantileAndZScoreNormalize(peaksAsMatrix);
+
+            // write normalized values back to DB
+
+            for(int i = 0; i < numberOfReplicates; i++){
+                for(int j = 0; j < numberOfPeptides; j++){
+                    Double normalizedValue = outputMatrix.get(i).get(j);
+
+                    Long databaseReplicateId = mapReplicateIdToColumnId.get(i).longValue();
+                    Long databasePeptideId = mapPeptideIdToRowId.get(j).longValue();
+
+                    List<PeakArea> peakAreas = peakAreaRepository.findByGctFileAssayTypeAndReplicateAnnotationIdAndPeptideAnnotationId(
+                            assayType, databaseReplicateId, databasePeptideId);
+
+                    assert peakAreas.size() == 1;
+
+                    PeakArea peakArea = peakAreas.get(0);
+                    peakArea.setNormalizedValue(normalizedValue);
+
+                    // Fill in normalized value field in DB
+                    peakAreaRepository.save(peakArea);
+                }
+            }
+
+            log.info("Normalized assay: {} peptides: {}, replicates: {}.", assayType, numberOfPeptides, numberOfReplicates);
+
+        }
+
     }
 
 

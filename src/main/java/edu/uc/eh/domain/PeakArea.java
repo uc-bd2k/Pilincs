@@ -31,6 +31,9 @@ public class PeakArea {
     private String chromatogramUrl;
     private Double value;
 
+    /** Quantile normalized value*/
+    private Double normalizedValue;
+
     private PeakArea() {
     }
 
@@ -82,5 +85,13 @@ public class PeakArea {
 
     public Double getValue() {
         return value;
+    }
+
+    public Double getNormalizedValue() {
+        return normalizedValue;
+    }
+
+    public void setNormalizedValue(Double normalizedValue) {
+        this.normalizedValue = normalizedValue;
     }
 }

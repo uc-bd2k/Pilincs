@@ -1,5 +1,7 @@
 package edu.uc.eh.domain;
 
+import edu.uc.eh.datatypes.AssayType;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -16,9 +18,12 @@ import java.util.Set;
 @Entity
 public class ReplicateAnnotation {
 
+
     @Id
     @GeneratedValue
     private Long id;
+
+    private  AssayType assayType;
 
     private String replicateId;
     //    private String canonicalSmiles;
@@ -52,9 +57,13 @@ public class ReplicateAnnotation {
     public ReplicateAnnotation() {
     }
 
-    public ReplicateAnnotation(String replicateId) {
-        this.replicateId = replicateId;
+    public ReplicateAnnotation(AssayType assayType) {
+        this.assayType = assayType;
     }
+
+//    public ReplicateAnnotation(String replicateId) {
+//        this.replicateId = replicateId;
+//    }
 
     public static List<String> getAnnotationLabels() {
         List<String> output = new ArrayList<>();
@@ -146,6 +155,14 @@ public class ReplicateAnnotation {
 
     public Long getId() {
         return id;
+    }
+
+    public AssayType getAssayType() {
+        return assayType;
+    }
+
+    public void setAssayType(AssayType assayType) {
+        this.assayType = assayType;
     }
 
     public String getReplicateId() {

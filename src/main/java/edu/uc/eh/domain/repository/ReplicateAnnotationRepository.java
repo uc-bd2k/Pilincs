@@ -1,5 +1,6 @@
 package edu.uc.eh.domain.repository;
 
+import edu.uc.eh.datatypes.AssayType;
 import edu.uc.eh.domain.ReplicateAnnotation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,5 +18,7 @@ public interface ReplicateAnnotationRepository extends JpaRepository<ReplicateAn
 
     List<ReplicateAnnotation> findAll();
     Page<ReplicateAnnotation> findAll(Pageable pageable);
+
+    List<ReplicateAnnotation> findByAssayType(AssayType assayType);
 //    Collection<String> findDistinctCellId();
 }

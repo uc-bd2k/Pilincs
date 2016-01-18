@@ -33,8 +33,13 @@ public interface PeakAreaRepository extends JpaRepository<PeakArea,Long> {
 
     Page<PeakArea> findByGctFileAssayTypeIn(List<AssayType> assayTypes, Pageable pageable);
 
+    List<PeakArea> findByGctFileAssayType(AssayType assayType);
+
     List<PeakArea> findByReplicateAnnotationId(Long replicateId);
 
     List<PeakArea> findByGctFileAndReplicateAnnotation(GctFile gctFile, ReplicateAnnotation replicateAnnotation);
+
+    List<PeakArea> findByGctFileAssayTypeAndReplicateAnnotationIdAndPeptideAnnotationId(
+            AssayType assayType, Long replicateId, Long peptideId);
 
 }

@@ -40,6 +40,18 @@
 
         <tr>
             <td><code>GET</code></td>
+            <td><b>api-normalized-gct/</b>{assayName};cells=;perturbations=</td>
+            <td>assayName <br/>
+                cells (optional) <br/>
+                perturbations (optional)
+            </td>
+            <td>Builds a GCT file #1.3 with <strong>quantile normalized values</strong> of specified assay with filtering of profiles based on given cells and
+                perturbations. Cell ids and perturbations names are optional and may be separated by comma. <strong>This is a beta version.</strong>
+            </td>
+        </tr>
+
+        <tr>
+            <td><code>GET</code></td>
             <td><b>api-panorama</b></td>
             <td>-</td>
             <td>Lists all GCT files available in <a href="http://www.panoramaweb.org">Panorama</a>.
@@ -73,7 +85,11 @@
                                                                                                target="_blank">eh3.uc.edu/pilincs/<b>api-gct/GCP</b></a>
             </p>
                 <img width="60%" src="img/gcp.png">
-            <p style="padding-top: 60px;">5. List all GCT files in Panorama (slow): <br/><a href="api-panorama"
+
+            <p style="padding-top: 60px;">5. Quantile normalized GCT file with all profiles from GCP assay.<br/><a href="api-normalized-gct/GCP"
+                                                                                               target="_blank">eh3.uc.edu/pilincs/<b>api-normalized-gct/GCP</b></a>
+            </p>
+            <p style="padding-top: 60px;">6. List all GCT files in Panorama (slow): <br/><a href="api-panorama"
                                                                                             target="_blank">eh3.uc.edu/pilincs/<b>api-panorama</b></a>
             </p>
                 <!--<img width="80%" src="img/panorama.png">-->

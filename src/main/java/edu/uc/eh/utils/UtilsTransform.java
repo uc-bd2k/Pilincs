@@ -1,11 +1,13 @@
 package edu.uc.eh.utils;
 
+import edu.uc.eh.DatabaseLoader;
 import edu.uc.eh.datatypes.*;
 import edu.uc.eh.domain.*;
 import edu.uc.eh.domain.json.ExploreResponse;
 import edu.uc.eh.domain.json.HeatMapResponse;
 import edu.uc.eh.domain.json.MatrixRow;
 import edu.uc.eh.domain.repository.PeptideAnnotationRepository;
+import edu.uc.eh.normalize.Normalizer;
 
 import java.text.DecimalFormat;
 import java.util.*;
@@ -390,5 +392,85 @@ public class UtilsTransform {
         return new MergedProfile(nTuple, chartSeries, replicateAnnotation, gctFile);
     }
 
+    /**
+     * Parse matrix from GCT file, feed it into Normalizer and decorate normalized matrix with GCT annotations
+     */
+    public static String gctNormalize(String gct) {
 
+        StringBuilder sb = new StringBuilder("");
+
+        List<String> peptideAnnotationsCache = new ArrayList<>();
+
+        List<List<Double>> matrixOfValues = new ArrayList<>();
+
+        int numberOfPeptides = 0;
+        int numberOfReplicates = 0;
+        int numberOfPeptideAnnotations = 0;
+        int numberOfReplicateAnnotations = 0;
+
+
+        String[] rows = gct.split("\n");
+
+        for (int rowId = 0; rowId < rows.length; rowId++) {
+
+            if (rowId == 0) {
+                sb.append(rows[rowId]).append("\n");
+
+            } else if (rowId == 1) {
+                sb.append(rows[rowId]).append("\n");
+
+                String[] dimensionsString = rows[rowId].split("\t");
+                numberOfPeptides = Integer.valueOf(dimensionsString[0]);
+                numberOfReplicates = Integer.valueOf(dimensionsString[1]);
+                numberOfPeptideAnnotations = Integer.valueOf(dimensionsString[2]);
+                numberOfReplicateAnnotations = Integer.valueOf(dimensionsString[3]);
+
+                // init matrix of values
+                for (int i = 0; i < numberOfReplicates; i++) {
+                    matrixOfValues.add(new ArrayList<>());
+                }
+
+            } else if (rowId < numberOfReplicateAnnotations + 3) {
+
+                sb.append(rows[rowId]).append("\n");
+
+            } else {
+
+                String[] cols = rows[rowId].split("\t");
+                StringBuilder replicateAnnotationsInRow = new StringBuilder();
+
+                for (int colId = 0; colId < cols.length; colId++) {
+                    // add annotations to cache
+                    if (colId < numberOfPeptideAnnotations + 1) {
+                        replicateAnnotationsInRow.append(cols[colId]).append("\t");
+                    }
+                    // add values to matrix
+                    else {
+                        matrixOfValues.get(colId - (numberOfPeptideAnnotations + 1)).add(Double.parseDouble(cols[colId]));
+                    }
+                }
+                peptideAnnotationsCache.add(replicateAnnotationsInRow.toString());
+            }
+        }
+
+        List<List<Double>> normalizedMatrix = Normalizer.quantileAndZScoreNormalize(matrixOfValues);
+
+        for (int i = 0; i < numberOfPeptides; i++) {
+            // first append annotations
+            sb.append(peptideAnnotationsCache.get(i));
+
+            // secondly append normalized values
+            for (int j = 0; j < numberOfReplicates; j++) {
+                sb.append(normalizedMatrix.get(j).get(i));
+                if (j < numberOfReplicates - 1) {
+                    sb.append("\t");
+                } else {
+                    if (i < numberOfPeptides - 1)
+                    sb.append("\n");
+                }
+            }
+        }
+
+        return sb.toString();
+    }
 }

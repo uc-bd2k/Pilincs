@@ -30,6 +30,7 @@ public class ReplicateService {
     public void parseAndSaveReplicateAnnotations(List<IdNameValue> replicates, AssayType assayType, String jsonUrl) {
 
 
+
         ReplicateAnnotation replicateAnnotation = new ReplicateAnnotation();
         Integer previousId = null;
         Integer currentId;
@@ -38,6 +39,8 @@ public class ReplicateService {
         int counter = 0;
 
         for (IdNameValue triple : replicates) {
+
+
 
             currentId = Integer.parseInt(triple.getId());
 
