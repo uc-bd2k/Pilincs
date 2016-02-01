@@ -1,9 +1,9 @@
 package edu.uc.eh;
 
-import com.apporiented.algorithm.clustering.AverageLinkageStrategy;
-import com.apporiented.algorithm.clustering.Cluster;
-import com.apporiented.algorithm.clustering.ClusteringAlgorithm;
-import com.apporiented.algorithm.clustering.DefaultClusteringAlgorithm;
+//import com.apporiented.algorithm.clustering.AverageLinkageStrategy;
+//import com.apporiented.algorithm.clustering.Cluster;
+//import com.apporiented.algorithm.clustering.ClusteringAlgorithm;
+//import com.apporiented.algorithm.clustering.DefaultClusteringAlgorithm;
 import edu.uc.eh.datatypes.AssayType;
 import edu.uc.eh.datatypes.GctReplicate;
 import edu.uc.eh.datatypes.IdNameValue;
@@ -434,35 +434,35 @@ public class DatabaseLoader {
                 i++;
             }
 
-            ArrayList<String> clustered = runHierarchicalClustering(profileNames, distanceMatrix);
-
-            for (Profile profile : profiles) {
-                profile.setClusteringOrder(clustered.indexOf(profile.getId().toString()));
-                profileRepository.save(profile);
-
-            }
+//            ArrayList<String> clustered = runHierarchicalClustering(profileNames, distanceMatrix);
+//
+//            for (Profile profile : profiles) {
+//                profile.setClusteringOrder(clustered.indexOf(profile.getId().toString()));
+//                profileRepository.save(profile);
+//
+//            }
         }
     }
 
-    private ArrayList<String> runHierarchicalClustering(String[] names, double[][] distances) {
-
-        ClusteringAlgorithm alg = new DefaultClusteringAlgorithm();
-        Cluster cluster = alg.performClustering(distances, names,
-                new AverageLinkageStrategy());
-        ArrayList<String> sorted = new ArrayList<>();
-        getLeaves(cluster, sorted);
-        return sorted;
-    }
-
-    private void getLeaves(Cluster cluster, ArrayList<String> sorted) {
-        if (cluster.isLeaf()) {
-            sorted.add(cluster.getName());
-        } else {
-            for (Cluster cluster1 : cluster.getChildren()) {
-                getLeaves(cluster1, sorted);
-            }
-        }
-    }
+//    private ArrayList<String> runHierarchicalClustering(String[] names, double[][] distances) {
+//
+//        ClusteringAlgorithm alg = new DefaultClusteringAlgorithm();
+//        Cluster cluster = alg.performClustering(distances, names,
+//                new AverageLinkageStrategy());
+//        ArrayList<String> sorted = new ArrayList<>();
+//        getLeaves(cluster, sorted);
+//        return sorted;
+//    }
+//
+//    private void getLeaves(Cluster cluster, ArrayList<String> sorted) {
+//        if (cluster.isLeaf()) {
+//            sorted.add(cluster.getName());
+//        } else {
+//            for (Cluster cluster1 : cluster.getChildren()) {
+//                getLeaves(cluster1, sorted);
+//            }
+//        }
+//    }
 
 
     public List<String> getReferenceProfile(AssayType assayType) {

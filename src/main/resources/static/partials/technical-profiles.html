@@ -34,13 +34,11 @@
 </form>
 
 <div style="float:right; padding-bottom: 20px;">
-    <button class="btn btn-default">
-        <a href="http://eh3.uc.edu/GenomicsPortals/DatasetLandingPage.do?data_set=LDS-1234" target="_blank" style="text-decoration: none;">Analyze in iLINCS</a>
-    </button>
+    <a ng-href="http://eh3.uc.edu/GenomicsPortals/DatasetLandingPage.do?data_set=LDS-1234&{{mainCtrl.tagsAsMatrixVariables}}" target="_blank" style="color: #337AB7;"
+       class="btn btn-default">Analyze in iLINCS</a>
     &nbsp;
-    <button class="btn btn-default" >
-        <a href="#export/1" style="text-decoration: none;">Export</a>
-    </button>
+    <a ng-href="#export/1" style="color: #337AB7;"
+       class="btn btn-default">Export</a>
 </div><br/><br/><br/>
 
 <div ng-controller="TableCtrl as technicalCtrl">

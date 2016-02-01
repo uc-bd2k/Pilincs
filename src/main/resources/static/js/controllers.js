@@ -5,6 +5,7 @@ appModule.controller('NavigationCtrl', ['$scope', '$http', 'SharedService',
 
         var self = this;
         self.tags = [];
+        self.tagsAsMatrixVariables;
         self.activeSite = '';
 
         self.changeSite = function (el) {
@@ -24,6 +25,8 @@ appModule.controller('NavigationCtrl', ['$scope', '$http', 'SharedService',
         // Trigger when tag was added or removed
         self.tagAddedRemoved = function () {
             console.log(self.tags);
+            self.tagsAsMatrixVariables = tagsAsMatrix(self.tags);
+            console.log(self.tagsAsMatrixVariables);
             SharedService.updateTags(self.tags);
             $scope.$broadcast('updateTags');
         };
@@ -335,6 +338,9 @@ appModule.controller("TableCtrl", ['$scope', 'SharedService', '$http', '$locatio
         }
 
 
+        // Start of code for pagination,
+        // this code is still buggy, when e.g. on page 2 and by filtering pageCount is
+        // decreased to e.g. 1
         $scope.itemsPerPage = 10;
         $scope.currentPage = 0;
 
@@ -342,13 +348,16 @@ appModule.controller("TableCtrl", ['$scope', 'SharedService', '$http', '$locatio
             var rangeSize = 5;
             var ret = [];
             var start;
+            var end;
 
             start = $scope.currentPage;
             if (start > $scope.pageCount() - rangeSize) {
-                start = $scope.pageCount() - rangeSize;
+                start = Math.max($scope.pageCount() - rangeSize, 0);
             }
 
-            for (var i = start; i < start + rangeSize; i++) {
+            end = Math.min(start + rangeSize, $scope.pageCount());
+
+            for (var i = start; i < end; i++) {
                 ret.push(i);
             }
             return ret;
@@ -383,6 +392,8 @@ appModule.controller("TableCtrl", ['$scope', 'SharedService', '$http', '$locatio
                 $scope.currentPage = n;
             }
         };
+
+        // end of code for pagination
 
         $scope.$on('updateTags', function (e) {
             $scope.loadData($scope.currentPage);
@@ -477,21 +488,21 @@ appModule.controller("ExportCtrl", ['SharedService', '$routeParams', '$scope', f
     ];
 
     self.updateUrl = function () {
-        console.log("Update url: " + self.processingLevelRadio);
+        //console.log("Update url: " + self.processingLevelRadio);
 
         switch (parseInt(self.processingLevelRadio)) {
             case 0:
-                self.targetUrl = '/pilincs/api-assays-paged/?order=asc&limit=' + 1000
+                self.targetUrl = '/pilincs/api-assays-paged/?order=asc&limit=' + 100000
                     + '&offset=0'
                     + '&tags=' + SharedService.getTags();
                 break;
             case 1:
-                self.targetUrl = '/pilincs/api-profiles-paged/?order=asc&limit=' + 1000
+                self.targetUrl = '/pilincs/api-profiles-paged/?order=asc&limit=' + 100000
                     + '&offset=0'
                     + '&tags=' + SharedService.getTags();
                 break;
             case 2:
-                self.targetUrl = '/pilincs/api-merged-profiles-paged/?order=asc&limit=' + 1000
+                self.targetUrl = '/pilincs/api-merged-profiles-paged/?order=asc&limit=' + 100000
                     + '&offset=0'
                     + '&tags=' + SharedService.getTags();
                 break;
@@ -500,7 +511,7 @@ appModule.controller("ExportCtrl", ['SharedService', '$routeParams', '$scope', f
                 break;
         }
 
-        console.log("Target URL: " + self.targetUrl);
+        //console.log("Target URL: " + self.targetUrl);
     }
 
     self.updateUrl();

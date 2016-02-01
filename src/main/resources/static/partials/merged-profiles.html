@@ -10,8 +10,7 @@
                     placeholder="Start typing a query"
                     on-tag-added="mainCtrl.tagAddedRemoved()"
                     on-tag-removed="mainCtrl.tagAddedRemoved()"
-                    add-from-autocomplete-only="true"
-                >
+                    add-from-autocomplete-only="true">
             <auto-complete
                     source="mainCtrl.loadTags($query)"
                     min-length="0"
@@ -34,13 +33,11 @@
 </form>
 
 <div style="float:right; padding-bottom: 20px;">
-    <button class="btn btn-default">
-        <a href="http://eh3.uc.edu/GenomicsPortals/DatasetLandingPage.do?data_set=LDS-1234" target="_blank" style="text-decoration: none;">Analyze in iLINCS</a>
-    </button>
+    <a ng-href="http://eh3.uc.edu/GenomicsPortals/DatasetLandingPage.do?data_set=LDS-1234&{{mainCtrl.tagsAsMatrixVariables}}" target="_blank" style="color: #337AB7;"
+       class="btn btn-default">Analyze in iLINCS</a>
     &nbsp;
-    <button class="btn btn-default" >
-        <a href="#export/2" style="text-decoration: none;">Export</a>
-    </button>
+    <a ng-href="#export/2" style="color: #337AB7;"
+       class="btn btn-default">Export</a>
 </div><br/><br/><br/>
 
 
