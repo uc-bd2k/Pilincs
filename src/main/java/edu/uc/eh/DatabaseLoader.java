@@ -1,9 +1,5 @@
 package edu.uc.eh;
 
-//import com.apporiented.algorithm.clustering.AverageLinkageStrategy;
-//import com.apporiented.algorithm.clustering.Cluster;
-//import com.apporiented.algorithm.clustering.ClusteringAlgorithm;
-//import com.apporiented.algorithm.clustering.DefaultClusteringAlgorithm;
 import edu.uc.eh.datatypes.AssayType;
 import edu.uc.eh.datatypes.GctReplicate;
 import edu.uc.eh.datatypes.IdNameValue;
