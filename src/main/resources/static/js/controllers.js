@@ -5,7 +5,7 @@ appModule.controller('NavigationCtrl', ['$scope', '$http', 'SharedService',
 
         var self = this;
         self.tags = [];
-        self.tagsAsMatrixVariables;
+        self.tagsAsMatrixVariables = "assays=P100,GCP";
         self.activeSite = '';
 
         self.changeSite = function (el) {
@@ -16,6 +16,14 @@ appModule.controller('NavigationCtrl', ['$scope', '$http', 'SharedService',
         self.loadTags = function ($query) {
             return $http.get('/pilincs/api-tags', {cache: true}).then(function (response) {
                 var annotations = response.data;
+
+                //console.log("Annotations");
+                //console.log(annotations);
+
+                annotations.push(
+                    {annotation:"Assay", flag:"Assay", name: "P100"},
+                    {annotation:"Assay", flag:"Assay", name: "GCP"});
+
                 return annotations.filter(function (annotation) {
                     return annotation.name.toLowerCase().indexOf($query.toLowerCase()) != -1;
                 });
@@ -24,9 +32,14 @@ appModule.controller('NavigationCtrl', ['$scope', '$http', 'SharedService',
 
         // Trigger when tag was added or removed
         self.tagAddedRemoved = function () {
-            console.log(self.tags);
+            //console.log("Self.tags");
+            //console.log(self.tags);
+
             self.tagsAsMatrixVariables = tagsAsMatrix(self.tags);
-            console.log(self.tagsAsMatrixVariables);
+
+            //console.log("TagsAsMatrixVariables");
+            //console.log(self.tagsAsMatrixVariables);
+
             SharedService.updateTags(self.tags);
             $scope.$broadcast('updateTags');
         };
@@ -39,12 +52,34 @@ appModule.factory('SharedService', [function () {
     return {
         getTags: function () {
             var queryContent = [];
-            queryContent.push({"p100": true});
-            queryContent.push({"gcp": true});
 
-            if (localTags != null) {
-                queryContent = queryContent.concat(localTags);
+            // Always give at least one assay
+            var isP100 = false;
+            var isGCP = false;
+
+            localTags.forEach(function(el){
+                if(el.name === "P100"){
+                    isP100 = true;
+                    queryContent.push({"p100": true});
+                } else if(el.name === "GCP"){
+                    isGCP = true;
+                    queryContent.push({"gcp": true});
+                } else {
+                    queryContent.push(el);
+                }
+            })
+
+            if(!(isP100 || isGCP)){
+                queryContent.push({"p100": true}, {"gcp": true});
             }
+            // End of assay code
+
+            //if (localTags != null) {
+            //    queryContent = queryContent.concat(localTags);
+            //}
+
+            console.log("Query content");
+            console.log(queryContent);
 
             return JSON.stringify(queryContent);
         },
@@ -401,7 +436,6 @@ appModule.controller("TableCtrl", ['$scope', 'SharedService', '$http', '$locatio
 
         $scope.loadData = function (currPage) {
 
-            console.log(site);
             switch (site) {
 
                 case "/raw-data":

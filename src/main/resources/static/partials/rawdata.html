@@ -6,12 +6,13 @@
         <!-- Tags -->
         <tags-input ng-model="mainCtrl.tags"
                     display-property="name"
-                    class="bootstrap"
                     placeholder="Start typing a query"
                     on-tag-added="mainCtrl.tagAddedRemoved()"
                     on-tag-removed="mainCtrl.tagAddedRemoved()"
                     add-from-autocomplete-only="true"
-                >
+                    class="bootstrap">
+                    <!--template="my-custom-template"-->
+
             <auto-complete
                     source="mainCtrl.loadTags($query)"
                     min-length="0"
@@ -22,6 +23,15 @@
             </auto-complete>
         </tags-input>
     </div>
+
+    <script type="text/ng-template" id="my-custom-template">
+        <div class="bootstrap">
+            <div>
+                <span>{{$getDisplayText()}}</span>
+                <a class="remove-button" ng-click="$removeTag()">&#10006;</a>
+            </div>
+        </div>
+    </script>
 
     <script type="text/ng-template" id="autocomplete-template">
         <div class="left-panel">

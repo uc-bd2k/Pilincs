@@ -13,26 +13,35 @@ function tagsAsMatrix(tagsAsJson) {
     var perturbations = [];
     var output = "";
 
+    console.log(tagsAsJson);
+
     tagsAsJson.forEach(function (el) {
 
-        if (el.annotation == "CellId") {
+        if (el.flag === "Cell") {
             cells.push(el.name);
         }
 
-        if (el.annotation == "Pertiname") {
+        if (el.flag === "Perturbation") {
             perturbations.push(el.name);
+        }
+
+        if (el.flag === "Assay") {
+            assays.push(el.name);
         }
     });
 
+    if(assays.length === 0){
+        output += "assays=P100,GCP";
+    }else {
+        output += "assays=" + assays.join(",");
+    }
+
     if(cells.length > 0){
-        output += "cells=" + cells.join(",");
+        output += ";cells=" + cells.join(",");
     }
 
     if(perturbations.length > 0){
-        if(cells.length > 0){
-            output += ";";
-        }
-        output += "perturbations=" + perturbations.join(",")
+        output += ";perturbations=" + perturbations.join(",")
     }
     return output;
 }
