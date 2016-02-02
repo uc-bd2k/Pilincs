@@ -7,8 +7,7 @@ import org.springframework.web.util.UrlPathHelper;
 
 /**
  * Created by chojnasm on 8/19/15.
- * <p>
- * This configuration enables MatrixVariable annotation
+ * This configuration enables MatrixVariable annotation in RestController
  */
 
 @Configuration
