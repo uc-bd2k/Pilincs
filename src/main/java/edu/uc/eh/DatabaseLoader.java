@@ -17,6 +17,7 @@ import org.labkey.remoteapi.CommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -50,6 +51,9 @@ public class DatabaseLoader {
     private List<String> referenceP100GeneNames;
     private List<String> referenceGCPGeneNames;
 
+    @Value("${spring.jpa.hibernate.ddl-auto}")
+    private String ifCreateDropTables;
+
 
     @Autowired
     public DatabaseLoader(ConnectPanorama connectPanorama,
@@ -80,22 +84,30 @@ public class DatabaseLoader {
     @PostConstruct
     private void initDatabase() throws Exception {
 
-        loadPeptideAnnotations();
 
+        if (ifCreateDropTables.equals("create-drop")) {
+            loadPeptideAnnotations();
+        }
         referenceP100Profile = repositoryService.getReferenceProfileVector(AssayType.P100);
         referenceGCPProfile = repositoryService.getReferenceProfileVector(AssayType.GCP);
 
         referenceP100GeneNames = repositoryService.getReferenceGeneNames(AssayType.P100);
         referenceGCPGeneNames = repositoryService.getReferenceGeneNames(AssayType.GCP);
 
-        loadReplicateAnnotations();
+        if (ifCreateDropTables.equals("create-drop")) {
+            loadPeptideAnnotations();
+            loadReplicateAnnotations();
 
-        loadRawData();
+            loadRawData();
 //        normalize();
 
-        buildProfiles();
-        computeCorrelations();
-        mergeProfiles(referenceP100Profile.size(), referenceGCPProfile.size());
+            buildProfiles();
+            computeCorrelations();
+            mergeProfiles(referenceP100Profile.size(), referenceGCPProfile.size());
+        }
+        int count = peptideAnnotationRepository.findByAssayType(AssayType.GCP).size();
+        log.warn("Database connection works, and number of peptide annotations: " + count);
+
 
 //        runHierarchicalClustering();
     }
@@ -221,7 +233,7 @@ public class DatabaseLoader {
 
             // init matrix with sizes
             List<List<Double>> peaksAsMatrix = new ArrayList<>(numberOfReplicates);
-            for(int i = 0; i < numberOfReplicates; i++){
+            for (int i = 0; i < numberOfReplicates; i++) {
                 peaksAsMatrix.add(new ArrayList<>(numberOfPeptides));
             }
 
@@ -234,12 +246,12 @@ public class DatabaseLoader {
                 int mappedRowId;
                 int mappedColumnId;
 
-                if(!mapPeptideIdToRowId.contains(peptideId)) {
+                if (!mapPeptideIdToRowId.contains(peptideId)) {
                     mapPeptideIdToRowId.add(peptideId);
                 }
                 mappedRowId = mapPeptideIdToRowId.indexOf(peptideId);
 
-                if(!mapReplicateIdToColumnId.contains(replicateId)){
+                if (!mapReplicateIdToColumnId.contains(replicateId)) {
                     mapReplicateIdToColumnId.add(replicateId);
                 }
 
@@ -253,8 +265,8 @@ public class DatabaseLoader {
 
             // write normalized values back to DB
 
-            for(int i = 0; i < numberOfReplicates; i++){
-                for(int j = 0; j < numberOfPeptides; j++){
+            for (int i = 0; i < numberOfReplicates; i++) {
+                for (int j = 0; j < numberOfPeptides; j++) {
                     Double normalizedValue = outputMatrix.get(i).get(j);
 
                     Long databaseReplicateId = mapReplicateIdToColumnId.get(i).longValue();
