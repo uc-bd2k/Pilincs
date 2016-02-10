@@ -1,5 +1,8 @@
+logging.file: pilincs-logs.txt
 spring:
-  jpa.hibernate.ddl-auto: create-drop
+# because of data safety it is recommended to overwrite this property at application startup from command line, not here
+  jpa.hibernate.ddl-auto: none
+#  jpa.hibernate.ddl-auto: create-drop
   jackson.serialization.INDENT_OUTPUT: true
 server:
   contextPath: /pilincs
@@ -30,8 +33,10 @@ spring:
   profiles: mysql
   datasource:
     url: jdbc:mysql://localhost/pilincs
+    #url: jdbc:mysql://10.165.4.32:3306/pilincs_20160205
+    #url: jdbc:mysql://10.165.104.119:3306/pilincs
     driverClassName: com.mysql.jdbc.Driver
-    username: root
+    username: pilincs
     password:
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect

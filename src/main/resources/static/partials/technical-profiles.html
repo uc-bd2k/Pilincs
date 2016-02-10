@@ -49,6 +49,8 @@
             <th>Assay</th>
             <th>Cell</th>
             <th>Perturbation</th>
+            <th>Time</th>
+            <th>Dose</th>
             <th>Profile</th>
             <th>RunId</th>
         </tr>
@@ -58,6 +60,8 @@
             <td>{{item.assayType}}</td>
             <td>{{item.cellId}}</td>
             <td>{{item.pertIname}}</td>
+            <td>{{item.pertTime}}</td>
+            <td>{{item.pertDose}}</td>
             <td>
                 <profile-barchart data="item.vector"></profile-barchart>
             </td>
