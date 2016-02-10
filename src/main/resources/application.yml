@@ -32,9 +32,9 @@ spring:
 spring:
   profiles: mysql
   datasource:
-    url: jdbc:mysql://localhost/pilincs
+    #url: jdbc:mysql://localhost/pilincs
     #url: jdbc:mysql://10.165.4.32:3306/pilincs_20160205
-    #url: jdbc:mysql://10.165.104.119:3306/pilincs
+    url: jdbc:mysql://10.165.104.119:3306/pilincs
     driverClassName: com.mysql.jdbc.Driver
     username: pilincs
     password:

@@ -37,11 +37,11 @@ function tagsAsMatrix(tagsAsJson) {
     }
 
     if(cells.length > 0){
-        output += ";cells=" + cells.join(",");
+        output += "&cells=" + cells.join(",");
     }
 
     if(perturbations.length > 0){
-        output += ";perturbations=" + perturbations.join(",")
+        output += "&perturbations=" + perturbations.join(",")
     }
     return output;
 }

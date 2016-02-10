@@ -6,10 +6,10 @@ var app = angular.module('pilincs', [
 app.config(['$routeProvider',
     function ($routeProvider) {
         $routeProvider.
-            //when('/', {
-            //    template: '',
-            //    controller: 'MainCtrl'
-            //}).
+            when('/', {
+                //template: '',
+                //controller: 'MainCtrl'
+            }).
             when('/raw-data', {
                 templateUrl: 'partials/rawdata.html',
                 controller: 'TableCtrl'
@@ -48,6 +48,7 @@ app.config(['$routeProvider',
                 templateUrl: 'partials/about.html'
             }).
             otherwise({
-                redirectTo: '/raw-data'
+                //redirectTo: '/raw-data'
+                redirectTo: '/'
             });
     }]);

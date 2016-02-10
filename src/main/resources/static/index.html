@@ -40,7 +40,9 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" style="color:#337AB7;">piLINCS</a>
+                <a ng-href="#/" style="color:#337AB7;" ng-click="mainCtrl.changeSite('')"
+                   class="navbar-brand">piLINCS</a>
+                <!--<a class="navbar-brand" style="color:#337AB7;">piLINCS</a>-->
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
@@ -51,34 +53,57 @@
                                                                                          ng-click="mainCtrl.changeSite('technical-profiles')">Profiles</a>
                     </li>
                     <li ng-class="{active:mainCtrl.activeSite=='merged-profiles'}"><a href="#/merged-profiles"
-                                                                                      ng-click="mainCtrl.changeSite('merged-profiles')">Merged profiles</a>
+                                                                                      ng-click="mainCtrl.changeSite('merged-profiles')">Merged
+                        profiles</a>
                     </li>
                     <li ng-class="{active:mainCtrl.activeSite=='explore'}"><a href="#/explore"
                                                                               ng-click="mainCtrl.changeSite('explore')">Explore</a>
                     </li>
                     <li ng-class="{active:mainCtrl.activeSite=='export'}"><a href="#/export/0"
-                                                                              ng-click="mainCtrl.changeSite('export')">Export</a>
+                                                                             ng-click="mainCtrl.changeSite('export')">Export</a>
                     </li>
                     <li ng-class="{active:mainCtrl.activeSite=='QC'}"><a href="#/qc"
-                                                                             ng-click="mainCtrl.changeSite('qc')">QC Stats</a>
+                                                                         ng-click="mainCtrl.changeSite('qc')">QC
+                        Stats</a>
                     </li>
                 </ul>
 
                 <ul class="nav navbar-nav navbar-right">
-                    <li ng-class="{active:mainCtrl.activeSite=='about'}"><a href="#about"
-                                                                            ng-click="mainCtrl.changeSite('about')">About</a>
+                    <li><a href="https://github.com/uc-bd2k/Pilincs/wiki" target="_blank">Wiki</a>
                     </li>
                     <li ng-class="{active:mainCtrl.activeSite=='api'}"><a href="#api"
                                                                           ng-click="mainCtrl.changeSite('api')">API</a>
                     </li>
-                    <li><a href="https://github.com/sajmmon/Pilincs" target="_blank">GitHub</a></li>
+                    <li><a href="https://github.com/uc-bd2k/Pilincs" target="_blank">GitHub</a></li>
                 </ul>
 
             </div>
             <!--/.nav-collapse -->
         </div>
     </nav>
+
+
     <div class="container">
+        <div ng-show="mainCtrl.activeSite==''">
+            <img width="60%" src="img/pilincs_flowchart.jpg">
+
+            <h3>Goals</h3>
+
+            <ul>
+                <li>Provide interface and seamless access to LINCS proteomics datasets (P100, GCP, etc.) available in
+                    Panorama
+                </li>
+                <li>Build intermediate API layer to enable direct and simple querying and access to proteomics datasets
+                    by tools developed within BD2K community
+                </li>
+                <li>Facilitating data integration by creating a global view of L1000 and proteomic data through iLINCS
+                    and related portals
+                </li>
+
+
+            </ul>
+        </div>
+
         <div ng-view></div>
 
     </div>
