@@ -10,6 +10,7 @@ import org.springframework.boot.context.embedded.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import javax.annotation.PostConstruct;
 
@@ -18,6 +19,7 @@ import javax.annotation.PostConstruct;
  */
 @SpringBootApplication
 @EnableSpringDataWebSupport
+@EnableScheduling
 public class Application {
 
     private static final Logger log = LoggerFactory.getLogger(Application.class);
