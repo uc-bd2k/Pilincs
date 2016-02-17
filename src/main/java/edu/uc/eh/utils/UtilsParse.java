@@ -182,6 +182,13 @@ public class UtilsParse {
         return output;
     }
 
+    /**
+     * Get all 3-tuples with PeptideId/ReplicateId, Name, Value.
+     * @param jsonAsString
+     * @param type
+     * @return
+     * @throws Exception
+     */
     public static List<IdNameValue> getAnnotationsFromJSON(String jsonAsString, String type) throws Exception {
 
         List<IdNameValue> output = new ArrayList<>();

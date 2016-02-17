@@ -33,14 +33,17 @@ import java.util.*;
 public class DatabaseLoader {
 
     private static final Logger log = LoggerFactory.getLogger(DatabaseLoader.class);
+
     private final ConnectPanorama connectPanorama;
     private final ParseGCT parser;
+
     private final GctFileRepository gctFileRepository;
     private final PeakAreaRepository peakAreaRepository;
     private final PeptideAnnotationRepository peptideAnnotationRepository;
     private final ReplicateAnnotationRepository replicateAnnotationRepository;
     private final ProfileRepository profileRepository;
     private final MergedProfileRepository mergedProfileRepository;
+
     private final RepositoryService repositoryService;
     private final PeptideService peptideService;
     private final ReplicateService replicateService;
@@ -68,14 +71,17 @@ public class DatabaseLoader {
                           PeptideService peptideService,
                           ReplicateService replicateService
     ) {
+
         this.connectPanorama = connectPanorama;
         this.parser = parser;
+
         this.gctFileRepository = gctFileRepository;
         this.peakAreaRepository = peakAreaRepository;
         this.peptideAnnotationRepository = peptideAnnotationRepository;
         this.replicateAnnotationRepository = replicateAnnotationRepository;
         this.profileRepository = profileRepository;
         this.mergedProfileRepository = mergedProfileRepository;
+
         this.repositoryService = repositoryService;
         this.peptideService = peptideService;
         this.replicateService = replicateService;
@@ -87,7 +93,9 @@ public class DatabaseLoader {
 
         if (ifCreateDropTables.equals("create-drop")) {
             loadPeptideAnnotations();
+            loadReplicateAnnotations();
         }
+
         referenceP100Profile = repositoryService.getReferenceProfileVector(AssayType.P100);
         referenceGCPProfile = repositoryService.getReferenceProfileVector(AssayType.GCP);
 
@@ -95,21 +103,16 @@ public class DatabaseLoader {
         referenceGCPGeneNames = repositoryService.getReferenceGeneNames(AssayType.GCP);
 
         if (ifCreateDropTables.equals("create-drop")) {
-            loadPeptideAnnotations();
-            loadReplicateAnnotations();
+//            loadPeptideAnnotations();
+//            loadReplicateAnnotations();
 
-            loadRawData();
+            loadDataPoints();
 //        normalize();
 
             buildProfiles();
             computeCorrelations();
             mergeProfiles(referenceP100Profile.size(), referenceGCPProfile.size());
         }
-        int count = peptideAnnotationRepository.findByAssayType(AssayType.GCP).size();
-        log.warn("Database connection works, and number of peptide annotations: " + count);
-
-
-//        runHierarchicalClustering();
     }
 
     private void loadPeptideAnnotations() throws Exception {
@@ -137,14 +140,13 @@ public class DatabaseLoader {
         }
     }
 
-    private void loadRawData() throws IOException, CommandException {
+    private void loadDataPoints() throws IOException, CommandException {
         log.info("Loading peak areas from panorama gct files");
 
         List<String> gctDownloadUrls = connectPanorama.gctDownloadUrls(true);
-        int counter = 0;
 
         for (String url : gctDownloadUrls) {
-//            if(counter++ > 0) continue;
+
             HashMap<String, List<ParseGCT.AnnotationValue>> metaPeptides = new HashMap<>();
             HashMap<String, List<ParseGCT.AnnotationValue>> metaReplicas = new HashMap<>();
             ArrayList<ParseGCT.PeptideReplicatePeak> peakValues = new ArrayList<>();
@@ -441,37 +443,8 @@ public class DatabaseLoader {
                 profileRepository.save(profileA);
                 i++;
             }
-
-//            ArrayList<String> clustered = runHierarchicalClustering(profileNames, distanceMatrix);
-//
-//            for (Profile profile : profiles) {
-//                profile.setClusteringOrder(clustered.indexOf(profile.getId().toString()));
-//                profileRepository.save(profile);
-//
-//            }
         }
     }
-
-//    private ArrayList<String> runHierarchicalClustering(String[] names, double[][] distances) {
-//
-//        ClusteringAlgorithm alg = new DefaultClusteringAlgorithm();
-//        Cluster cluster = alg.performClustering(distances, names,
-//                new AverageLinkageStrategy());
-//        ArrayList<String> sorted = new ArrayList<>();
-//        getLeaves(cluster, sorted);
-//        return sorted;
-//    }
-//
-//    private void getLeaves(Cluster cluster, ArrayList<String> sorted) {
-//        if (cluster.isLeaf()) {
-//            sorted.add(cluster.getName());
-//        } else {
-//            for (Cluster cluster1 : cluster.getChildren()) {
-//                getLeaves(cluster1, sorted);
-//            }
-//        }
-//    }
-
 
     public List<String> getReferenceProfile(AssayType assayType) {
         if (assayType.equals(AssayType.GCP)) {

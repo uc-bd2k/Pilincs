@@ -12,6 +12,7 @@ import org.springframework.web.util.UrlPathHelper;
 
 @Configuration
 public class WebMvcConfig extends WebMvcConfigurerAdapter {
+
     @Override
     public void configurePathMatch(PathMatchConfigurer configurer) {
         UrlPathHelper urlPathHelper = new UrlPathHelper();

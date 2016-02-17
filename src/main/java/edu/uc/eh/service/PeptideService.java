@@ -26,6 +26,11 @@ public class PeptideService {
         this.peptideAnnotationRepository = peptideAnnotationRepository;
     }
 
+    /**
+     * Keep in DB only unique peptideIds and inform about unexpected situtations. Also group peptide annotations by peptideId.
+     * @param peptides
+     * @param assayType
+     */
     public void parseAndSavePeptideAnnotations(List<IdNameValue> peptides, AssayType assayType) {
 
         PeptideAnnotation peptideAnnotation = new PeptideAnnotation(assayType);
@@ -55,7 +60,7 @@ public class PeptideService {
 
                 if (peptideFromDb != null) {
                     if (!peptideFromDb.equals(peptideAnnotation)) {
-                        log.warn("Two peptides with same key: {}, {}", peptideAnnotation, peptideFromDb);
+                        log.warn("Two different peptides with the same key: {}, {}", peptideAnnotation, peptideFromDb);
                     }
                 } else {
                     if (peptideAnnotation.getPeptideId() == null) {
@@ -79,6 +84,12 @@ public class PeptideService {
 
     }
 
+    /**
+     * Skip some annotations and merge some other annotations
+     * @param peptideAnnotation
+     * @param triple
+     * @param assayType
+     */
     private void addAnnotationToPeptide(PeptideAnnotation peptideAnnotation, IdNameValue triple, AssayType assayType) {
 
 

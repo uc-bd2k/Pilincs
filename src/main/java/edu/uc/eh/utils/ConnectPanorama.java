@@ -88,24 +88,6 @@ public class ConnectPanorama {
         return runIds;
     }
 
-//    public String getChromatogramUrl(PeakArea peakArea) {
-//
-//        AssayType assayType = peakArea.getGctFile().getAssayType();
-//        int runId = peakArea.getGctFile().getRunId();
-//        String escapedPeptideId = peakArea.getPeptideAnnotation().escapedPeptideId();
-//        String replicateId = peakArea.getReplicateAnnotation().getReplicateId();
-//
-//        String stepOne = String.format(intermediateLink, assayType, escapedPeptideId, runId);
-//        log.warn(stepOne);
-//
-//        Integer peptide = UtilsParse.parsePeptideNumber(stepOne);
-//
-//        if(peptide!=null){
-//            return String.format(detailedLink,assayType,peptide,replicateId);
-//        }
-//            return null;
-//    }
-
     public HashMap<String, Integer> getPeptideIdsFromJSON(List<String> peptideIds, AssayType assayType, int runId) throws IOException {
 
         HashMap<String,Integer> output;
@@ -140,23 +122,21 @@ public class ConnectPanorama {
         return String.format(chromatogramUrl, assayType, peptide, replicateId);
     }
 
-    public List<String> getPeptideReferenceIdNames(AssayType assayType) throws Exception {
 
-        String jsonUrl = String.format(peptideAnnotationsUrl, assayType);
-
-        return UtilsParse.getPeptideIdNamesFromJSON(jsonUrl);
-    }
-
-//    public void loadPeptideAnnotationsFromJson(PeptideAnnotationRepository peptideAnnotationRepository, AssayType assayType) {
-//
-//        String jsonUrl = String.format(peptideAnnotationsUrl, assayType);
-//
-//    }
-
+    /**
+     * Insert assay name into Panorama API URL template for peptide annotations.
+     * @param assayType
+     * @return
+     */
     public String getPeptideJsonUrl(AssayType assayType) {
         return String.format(peptideAnnotationsUrl, assayType);
     }
 
+    /**
+     * Insert assay name into Panorama API URL template for replicate annotations.
+     * @param assayType
+     * @return
+     */
     public String getReplicateJsonUrl(AssayType assayType) {
         return String.format(replicateAnnotationsUrl, assayType);
     }
