@@ -26,8 +26,7 @@ public class ScheduleUpdate {
 
     @Scheduled(fixedRate = 3600000)//once an hour
     public void run() {
-        long count = gctFileRepository.count();
-        log.warn("Its a dirty hack to maintain DB connectivity. " + count);
-
+        //Its a dirty hack to maintain DB connectivity.
+        gctFileRepository.count();
     }
 }

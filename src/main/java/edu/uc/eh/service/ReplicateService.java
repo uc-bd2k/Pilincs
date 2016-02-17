@@ -27,6 +27,12 @@ public class ReplicateService {
         this.replicateAnnotationRepository = replicateAnnotationRepository;
     }
 
+    /**
+     * Group replicates by replicateId and skip some annotations. Report unexpected situtations.
+     * @param replicates
+     * @param assayType
+     * @param jsonUrl
+     */
     public void parseAndSaveReplicateAnnotations(List<IdNameValue> replicates, AssayType assayType, String jsonUrl) {
 
 
@@ -79,6 +85,7 @@ Update only if LSM ID in DB is Null but other fields are same.
                             log.warn("{}", replicateFromDb);
                             log.warn("{}", replicateAnnotation);
                             log.warn("");
+
                         }
                     }
                 } else {
@@ -105,6 +112,12 @@ Update only if LSM ID in DB is Null but other fields are same.
 
     }
 
+    /**
+     * Skip some replicate annotations and map names from Panorama to our names that follow Java naming convention.
+     * @param replicateAnnotation
+     * @param triple
+     * @param assayType
+     */
     private void addAnnotationToReplicate(ReplicateAnnotation replicateAnnotation, IdNameValue triple, AssayType assayType) {
 
 
